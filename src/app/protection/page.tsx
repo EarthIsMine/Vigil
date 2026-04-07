@@ -103,27 +103,24 @@ export default function ProtectionPage() {
                 <div className="p-6 font-mono text-sm">
                   <pre className="text-vigil-muted">
                     <code>
-                      <span className="text-purple-400">import</span> <span className="text-white">{'{'} VigilShield {'}'}</span> <span className="text-purple-400">from</span> <span className="text-emerald-400">'@vigil/shield'</span>
+                      <span className="text-purple-400">import</span> <span className="text-white">{'{'} Vigil {'}'}</span> <span className="text-purple-400">from</span> <span className="text-emerald-400">'@vigil/sdk'</span>
                       {'\n\n'}
-                      <span className="text-purple-400">const</span> <span className="text-white">shield</span> <span className="text-purple-400">=</span> <span className="text-cyan-400">VigilShield</span>.<span className="text-yellow-400">configure</span>({'{'}
+                      <span className="text-purple-400">const</span> <span className="text-white">vigil</span> <span className="text-purple-400">=</span> <span className="text-cyan-400">new Vigil</span>({'{'}
+                      {'\n  '}
+                      <span className="text-white">apiKey</span>: <span className="text-emerald-400">process.env.VIGIL_API_KEY</span>,
+                      {'\n  '}
+                      <span className="text-white">cluster</span>: <span className="text-emerald-400">'mainnet-beta'</span>,
                       {'\n  '}
                       <span className="text-white">protection</span>: <span className="text-emerald-400">'maximum'</span>,
                       {'\n  '}
                       <span className="text-white">mevRebates</span>: <span className="text-orange-400">true</span>,
                       {'\n  '}
-                      <span className="text-white">networks</span>: [
-                      {'\n    '}
-                      <span className="text-emerald-400">'ethereum'</span>,
-                      {'\n    '}
-                      <span className="text-emerald-400">'arbitrum'</span>,
-                      {'\n    '}
-                      <span className="text-emerald-400">'base'</span>
-                      {'\n  '}],
-                      {'\n  '}
                       <span className="text-white">webhook</span>: <span className="text-emerald-400">'https://api.example.com/alerts'</span>
                       {'\n'}{'}'});
                       {'\n\n'}
-                      <span className="text-purple-400">export</span> <span className="text-purple-400">default</span> <span className="text-white">shield</span>;
+                      <span className="text-vigil-muted">{'// protected send — Jito bundle routing'}</span>
+                      {'\n'}
+                      <span className="text-purple-400">await</span> <span className="text-white">vigil</span>.<span className="text-yellow-400">protectedSend</span>(<span className="text-white">tx</span>);
                     </code>
                   </pre>
                 </div>
@@ -179,9 +176,9 @@ export default function ProtectionPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
               </div>
-              <h3 className="font-display text-xl font-bold text-white mb-3">Predictive Scanning</h3>
+              <h3 className="font-display text-xl font-bold text-white mb-3">Real-Time TX Analysis</h3>
               <p className="text-vigil-muted mb-6">
-                AI-powered mempool analysis detects sandwich attacks before they execute. Machine learning models trained on 10M+ attack patterns.
+                Every swap is analyzed via Helius gRPC before submission — pool state, searcher activity, and slippage exposure are scored in under 1ms.
               </p>
               <div className="pt-4 border-t border-vigil-border">
                 <div className="text-sm text-vigil-muted">Detection Rate</div>
@@ -199,9 +196,9 @@ export default function ProtectionPage() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
                 </svg>
               </div>
-              <h3 className="font-display text-xl font-bold text-white mb-3">Private Relay Routing</h3>
+              <h3 className="font-display text-xl font-bold text-white mb-3">Jito Bundle Submission</h3>
               <p className="text-vigil-muted mb-6">
-                Your transactions bypass the public mempool entirely. Direct routing to trusted block builders keeps you invisible to attackers.
+                High-risk TXs are wrapped in a Jito bundle and submitted directly to the Block Engine — invisible to searchers until the block is finalized.
               </p>
               <div className="pt-4 border-t border-vigil-border">
                 <div className="text-sm text-vigil-muted">Network Nodes</div>
@@ -241,7 +238,7 @@ export default function ProtectionPage() {
               <div>
                 <h2 className="font-display text-4xl font-bold text-white mb-4">Built For Developers</h2>
                 <p className="text-lg text-vigil-muted">
-                  Drop-in replacement for ethers.js and web3.js providers. No code changes required.
+                  Drop-in wrapper for <code className="text-vigil-green text-base">@solana/web3.js</code>. No transaction logic changes required.
                 </p>
               </div>
 
@@ -253,9 +250,9 @@ export default function ProtectionPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-display text-lg font-bold text-white mb-2">Provider Wrapper</h3>
+                    <h3 className="font-display text-lg font-bold text-white mb-2">Connection Wrapper</h3>
                     <p className="text-vigil-muted">
-                      Wrap any existing provider with Vigil protection in a single line of code. Works with MetaMask, WalletConnect, and more.
+                      Wrap any existing Solana <code className="text-vigil-green">Connection</code> with Vigil in one line. Works with Phantom, Backpack, and any wallet adapter.
                     </p>
                   </div>
                 </div>
@@ -267,9 +264,9 @@ export default function ProtectionPage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="font-display text-lg font-bold text-white mb-2">Multi-Chain Support</h3>
+                    <h3 className="font-display text-lg font-bold text-white mb-2">Jito Bundle Routing</h3>
                     <p className="text-vigil-muted">
-                      Protection across Ethereum, Arbitrum, Optimism, Base, and Polygon. Single SDK, unified protection.
+                      High-risk swaps are automatically routed through Jito Block Engine bundles, bypassing the public TX pipeline and eliminating sandwich opportunities.
                     </p>
                   </div>
                 </div>
@@ -328,7 +325,7 @@ export default function ProtectionPage() {
                   </div>
                   <div className="flex items-center gap-2 mt-2">
                     <span className="pulse-dot bg-vigil-green"></span>
-                    <span className="text-vigil-green">Shield active on Ethereum mainnet</span>
+                    <span className="text-vigil-green">Shield active on Solana mainnet-beta</span>
                   </div>
                 </div>
               </div>
@@ -374,7 +371,7 @@ export default function ProtectionPage() {
                   <svg className="w-5 h-5 text-vigil-green flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                   </svg>
-                  <span>Ethereum mainnet</span>
+                  <span>Solana mainnet-beta</span>
                 </li>
                 <li className="flex items-start gap-2 text-vigil-muted">
                   <svg className="w-5 h-5 text-vigil-green flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

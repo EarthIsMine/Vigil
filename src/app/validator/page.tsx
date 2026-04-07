@@ -13,7 +13,7 @@ export default function ValidatorPage() {
           <div className="flex items-center gap-8">
             <Link href="/dashboard" className="flex items-center gap-2">
               <div className="w-8 h-8 bg-[#3b82f6] rounded flex items-center justify-center">
-                <span className="material-icons text-white text-lg">security</span>
+                <span className="material-symbols-outlined text-white text-lg">security</span>
               </div>
               <span className="font-bold text-xl">VIGIL</span>
             </Link>
@@ -49,7 +49,7 @@ export default function ValidatorPage() {
         <div className="flex-1 p-4">
           <div className="mb-6">
             <div className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded mb-4">
-              <span className="material-icons text-[#ef4444] text-lg">warning</span>
+              <span className="material-symbols-outlined text-[#ef4444] text-lg">warning</span>
               <span className="font-medium text-sm">Stake House Capital</span>
             </div>
           </div>
@@ -105,7 +105,7 @@ export default function ValidatorPage() {
               <div className="flex items-start justify-between mb-4">
                 <div className="flex items-center gap-4">
                   <div className="w-16 h-16 bg-[#ef4444]/20 rounded-lg flex items-center justify-center">
-                    <span className="material-icons text-[#ef4444] text-3xl">gpp_bad</span>
+                    <span className="material-symbols-outlined text-[#ef4444] text-3xl">gpp_bad</span>
                   </div>
                   <div>
                     <div className="flex items-center gap-3 mb-2">
@@ -128,10 +128,10 @@ export default function ValidatorPage() {
                 </div>
                 <div className="flex items-center gap-2">
                   <button className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded transition-colors">
-                    <span className="material-icons text-sm">share</span>
+                    <span className="material-symbols-outlined text-sm">share</span>
                   </button>
                   <button className="px-4 py-2 bg-[#ef4444]/20 text-[#ef4444] hover:bg-[#ef4444]/30 rounded transition-colors">
-                    <span className="material-icons text-sm">flag</span>
+                    <span className="material-symbols-outlined text-sm">flag</span>
                   </button>
                 </div>
               </div>
@@ -303,7 +303,7 @@ export default function ValidatorPage() {
                         <span className={`inline-flex items-center gap-1 px-2 py-1 rounded text-xs font-medium ${
                           row.status === 'success' ? 'bg-[#22c55e]/20 text-[#22c55e]' : 'bg-[#ef4444]/20 text-[#ef4444]'
                         }`}>
-                          <span className="material-icons text-xs">
+                          <span className="material-symbols-outlined text-xs">
                             {row.status === 'success' ? 'check_circle' : 'cancel'}
                           </span>
                           {row.status}

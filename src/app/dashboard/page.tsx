@@ -168,11 +168,11 @@ export default function DashboardPage() {
               </h2>
               <div className="space-y-4">
                 {[
-                  { rank: 1, address: '0x7a1f...3c2d', operator: 'Lido', relay: '87%', amount: '$892K' },
-                  { rank: 2, address: '0x9b4e...5f8a', operator: 'Coinbase', relay: '82%', amount: '$743K' },
-                  { rank: 3, address: '0x3c7d...1a9b', operator: 'Kraken', relay: '79%', amount: '$621K' },
-                  { rank: 4, address: '0x5e2f...8d4c', operator: 'Binance', relay: '76%', amount: '$558K' },
-                  { rank: 5, address: '0x8a3b...6e1f', operator: 'Rocket Pool', relay: '73%', amount: '$492K' },
+                  { rank: 1, address: 'StKHse...7Qx4p', operator: 'Stake House Capital', jito: true, amount: '$892K' },
+                  { rank: 2, address: 'mariN4...vALi9', operator: 'Marinade Finance', jito: true, amount: '$743K' },
+                  { rank: 3, address: 'J1to1a...bund1', operator: 'Jito Labs', jito: true, amount: '$621K' },
+                  { rank: 4, address: 'C1oRu5...s1one', operator: 'Chorus One', jito: false, amount: '$558K' },
+                  { rank: 5, address: 'Ev3Rs7...take5', operator: 'Everstake', jito: true, amount: '$492K' },
                 ].map((validator) => (
                   <div
                     key={validator.rank}
@@ -192,8 +192,8 @@ export default function DashboardPage() {
                         <span className="text-xs text-muted">{validator.operator}</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className="font-mono text-xs text-muted">
-                          Relay: {validator.relay}
+                        <span className={`font-mono text-xs px-1.5 py-0.5 rounded ${validator.jito ? 'text-secondary bg-sec-dim' : 'text-muted bg-surface-400'}`}>
+                          {validator.jito ? 'Jito-Agave' : 'Agave'}
                         </span>
                       </div>
                     </div>
@@ -214,11 +214,11 @@ export default function DashboardPage() {
               </h2>
               <div className="space-y-4">
                 {[
-                  { pool: 'WETH/USDC', dex: 'Uniswap V3', attacks: 342, volume: '$1.2M', trend: '+15%' },
-                  { pool: 'WETH/DAI', dex: 'Uniswap V2', attacks: 289, volume: '$987K', trend: '+8%' },
-                  { pool: 'WBTC/USDT', dex: 'SushiSwap', attacks: 247, volume: '$743K', trend: '+12%' },
-                  { pool: 'stETH/ETH', dex: 'Curve', attacks: 198, volume: '$621K', trend: '+5%' },
-                  { pool: 'LINK/ETH', dex: 'Uniswap V3', attacks: 156, volume: '$492K', trend: '+18%' },
+                  { pool: 'SOL/USDC', dex: 'Orca', attacks: 342, volume: '$1.2M', trend: '+15%' },
+                  { pool: 'RAY/SOL', dex: 'Raydium', attacks: 289, volume: '$987K', trend: '+8%' },
+                  { pool: 'BONK/SOL', dex: 'Orca', attacks: 247, volume: '$743K', trend: '+12%' },
+                  { pool: 'mSOL/SOL', dex: 'Meteora', attacks: 198, volume: '$621K', trend: '+5%' },
+                  { pool: 'JitoSOL/SOL', dex: 'Orca', attacks: 156, volume: '$492K', trend: '+18%' },
                 ].map((pool) => (
                   <div
                     key={pool.pool}

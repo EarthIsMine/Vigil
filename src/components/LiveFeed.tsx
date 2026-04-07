@@ -30,23 +30,26 @@ const getAttackColor = (type: AttackType) => {
   }
 };
 
-const generateRandomAddress = () => {
-  return '0x' + Array.from({ length: 40 }, () =>
-    Math.floor(Math.random() * 16).toString(16)
+const BASE58_CHARS = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+
+const generateSolanaAddress = () => {
+  const len = 32 + Math.floor(Math.random() * 12);
+  return Array.from({ length: len }, () =>
+    BASE58_CHARS[Math.floor(Math.random() * BASE58_CHARS.length)]
   ).join('');
 };
 
 const generateRandomAttack = (): Attack => {
   const type = attackTypes[Math.floor(Math.random() * attackTypes.length)];
-  const amount = (Math.random() * 10 + 0.1).toFixed(3);
+  const amount = (Math.random() * 8 + 0.05).toFixed(3);
   const now = new Date();
 
   return {
     id: Date.now().toString() + Math.random(),
     type,
-    victim: generateRandomAddress(),
-    attacker: generateRandomAddress(),
-    amount: amount + ' ETH',
+    victim: generateSolanaAddress(),
+    attacker: generateSolanaAddress(),
+    amount: amount + ' SOL',
     time: now.toLocaleTimeString('en-US', {
       hour: '2-digit',
       minute: '2-digit',
