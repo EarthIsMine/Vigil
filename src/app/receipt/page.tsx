@@ -2,20 +2,53 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { searchReceipts } from "@/lib/services/receipt";
+import { MevType } from "@/lib/types";
+import type { ReceiptSearchResult, MevReceipt, SandwichAttackDetail } from "@/lib/types";
+
+function txTypeLabel(type: MevType): { label: string; cls: string } {
+  switch (type) {
+    case MevType.SANDWICH_SINGLE:
+    case MevType.SANDWICH_WIDE:
+    case MevType.SANDWICH_AUTH_HOP:
+      return { label: 'Sandwiched', cls: 'text-vigil-red' };
+    case MevType.BACKRUN:
+      return { label: 'Backrun',    cls: 'text-accent-yellow' };
+    case MevType.JIT_LIQUIDITY:
+      return { label: 'JIT',        cls: 'text-accent-yellow' };
+    case MevType.LIQUIDATION:
+      return { label: 'Liquidation', cls: 'text-accent-yellow' };
+    default:
+      return { label: 'Neutral',    cls: 'text-accent-green' };
+  }
+}
 
 export default function ReceiptPage() {
   const [showResults, setShowResults] = useState(false);
-  const [loading, setLoading] = useState(false);
-  const [query, setQuery] = useState('');
+  const [loading,     setLoading]     = useState(false);
+  const [query,       setQuery]       = useState('');
+  const [result,      setResult]      = useState<ReceiptSearchResult | null>(null);
 
-  const handleAnalyze = () => {
+  const handleAnalyze = async () => {
     if (!query.trim()) return;
     setLoading(true);
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      const data = await searchReceipts(query.trim());
+      setResult(data);
       setShowResults(true);
-    }, 1400);
+    } finally {
+      setLoading(false);
+    }
   };
+
+  // Pick the first sandwich receipt for the sidebar detail card
+  const featuredReceipt: MevReceipt | null =
+    result?.receipts.find((r) => r.mevAnalysis.detected) ?? result?.receipts[0] ?? null;
+
+  const featuredSandwich: SandwichAttackDetail | null =
+    featuredReceipt?.attackDetail.kind === 'sandwich'
+      ? (featuredReceipt.attackDetail as SandwichAttackDetail)
+      : null;
 
   return (
     <div className="min-h-screen bg-vigil-bg text-white">
@@ -33,30 +66,10 @@ export default function ReceiptPage() {
               </span>
             </Link>
             <div className="hidden md:flex items-center gap-1 ml-4">
-              <Link
-                href="/dashboard"
-                className="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-vigil-muted hover:text-white"
-              >
-                Dashboard
-              </Link>
-              <Link
-                href="/receipt"
-                className="nav-link px-3 py-1.5 text-sm font-medium rounded-md active text-vigil-accent"
-              >
-                MEV Receipt
-              </Link>
-              <Link
-                href="/protection"
-                className="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-vigil-muted hover:text-white"
-              >
-                Protection
-              </Link>
-              <Link
-                href="/analytics"
-                className="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-vigil-muted hover:text-white"
-              >
-                Analytics
-              </Link>
+              <Link href="/dashboard"  className="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-vigil-muted hover:text-white">Dashboard</Link>
+              <Link href="/receipt"    className="nav-link px-3 py-1.5 text-sm font-medium rounded-md active text-vigil-accent">MEV Receipt</Link>
+              <Link href="/protection" className="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-vigil-muted hover:text-white">Protection</Link>
+              <Link href="/analytics"  className="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-vigil-muted hover:text-white">Analytics</Link>
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -106,9 +119,7 @@ export default function ReceiptPage() {
               </div>
 
               <div className="space-y-3 fade-up fade-up-d2">
-                <h1 className="font-display font-bold text-5xl tracking-tight">
-                  TRACE YOUR IMPACT
-                </h1>
+                <h1 className="font-display font-bold text-5xl tracking-tight">TRACE YOUR IMPACT</h1>
                 <p className="text-lg text-vigil-muted">
                   Enter a wallet address or transaction hash to analyze MEV extraction and generate your receipt
                 </p>
@@ -157,10 +168,7 @@ export default function ReceiptPage() {
             {/* Back Button + Mini Search */}
             <div className="sticky top-14 z-30 bg-vigil-bg/80 backdrop-blur-xl border-b border-vigil-border-dark px-6 py-4">
               <div className="flex items-center gap-4 max-w-7xl mx-auto">
-                <button
-                  onClick={() => setShowResults(false)}
-                  className="p-2 hover:bg-vigil-card-dark rounded-lg transition"
-                >
+                <button onClick={() => setShowResults(false)} className="p-2 hover:bg-vigil-card-dark rounded-lg transition">
                   <span className="material-symbols-outlined text-xl text-vigil-muted">arrow_back</span>
                 </button>
                 <div className="flex-1 max-w-md">
@@ -168,7 +176,7 @@ export default function ReceiptPage() {
                     type="text"
                     value={query}
                     readOnly
-                    className="w-full px-4 py-2 bg-vigil-card-dark border border-vigil-border-dark rounded-lg text-white font-mono text-sm focus:outline-none focus:border-vigil-accent transition"
+                    className="w-full px-4 py-2 bg-vigil-card-dark border border-vigil-border-dark rounded-lg text-white font-mono text-sm focus:outline-none"
                   />
                 </div>
               </div>
@@ -179,63 +187,66 @@ export default function ReceiptPage() {
               {/* Left Column */}
               <div className="flex-1 space-y-6">
                 {/* Summary Cards */}
-                <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 fade-up">
-                  <div className="receipt-card p-4 rounded-xl border border-vigil-border-dark">
-                    <div className="text-xs text-vigil-muted mb-2">Total MEV Lost</div>
-                    <div className="font-display font-bold text-2xl text-white mb-1">0.428 SOL</div>
-                    <div className="text-xs text-vigil-muted">$58.22</div>
+                {result && (
+                  <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 fade-up">
+                    <div className="receipt-card p-4 rounded-xl border border-vigil-border-dark">
+                      <div className="text-xs text-vigil-muted mb-2">Total MEV Lost</div>
+                      <div className="font-display font-bold text-2xl text-white mb-1">
+                        {result.totalLossSol.toFixed(3)} SOL
+                      </div>
+                      <div className="text-xs text-vigil-muted">${result.totalLossUsd.toFixed(2)}</div>
+                    </div>
+                    <div className="receipt-card p-4 rounded-xl border border-vigil-border-dark">
+                      <div className="text-xs text-vigil-muted mb-2">Attack Frequency</div>
+                      <div className={`font-display font-bold text-2xl mb-1 ${
+                        result.totalAttacked > 10 ? 'text-vigil-red' :
+                        result.totalAttacked > 3  ? 'text-accent-yellow' : 'text-accent-green'
+                      }`}>
+                        {result.totalAttacked > 10 ? 'HIGH' : result.totalAttacked > 3 ? 'MED' : 'LOW'}
+                      </div>
+                      <div className="text-xs text-vigil-muted">{result.totalAttacked}/{result.totalTxScanned} txs</div>
+                    </div>
+                    <div className="receipt-card p-4 rounded-xl border border-vigil-border-dark">
+                      <div className="text-xs text-vigil-muted mb-2">Avg Loss / Attack</div>
+                      <div className="font-display font-bold text-2xl text-accent-yellow mb-1">
+                        ${result.avgLossPerTx.toFixed(2)}
+                      </div>
+                      <div className="text-xs text-vigil-muted">per transaction</div>
+                    </div>
+                    <div className="receipt-card p-4 rounded-xl border border-vigil-border-dark">
+                      <div className="text-xs text-vigil-muted mb-2">TXs Scanned</div>
+                      <div className="font-display font-bold text-2xl text-accent-green mb-1">
+                        {result.totalTxScanned}
+                      </div>
+                      <div className="text-xs text-vigil-muted">total transactions</div>
+                    </div>
                   </div>
-                  <div className="receipt-card p-4 rounded-xl border border-vigil-border-dark">
-                    <div className="text-xs text-vigil-muted mb-2">Attack Frequency</div>
-                    <div className="font-display font-bold text-2xl text-vigil-red mb-1">HIGH</div>
-                    <div className="text-xs text-vigil-muted">14/30d</div>
-                  </div>
-                  <div className="receipt-card p-4 rounded-xl border border-vigil-border-dark">
-                    <div className="text-xs text-vigil-muted mb-2">Protection Rank</div>
-                    <div className="font-display font-bold text-2xl text-accent-yellow mb-1">UNSHIELDED</div>
-                    <div className="text-xs text-vigil-muted">Vulnerable</div>
-                  </div>
-                  <div className="receipt-card p-4 rounded-xl border border-vigil-border-dark">
-                    <div className="text-xs text-vigil-muted mb-2">Last Scan</div>
-                    <div className="font-display font-bold text-2xl text-accent-green mb-1">JUST NOW</div>
-                    <div className="text-xs text-vigil-muted">Live</div>
-                  </div>
-                </div>
+                )}
 
                 {/* Transaction Table */}
                 <div className="receipt-card p-6 rounded-xl border border-vigil-border-dark fade-up fade-up-d1">
                   <h2 className="font-display font-bold text-lg mb-4">Recent Transactions</h2>
                   <div className="space-y-3">
-                    <div className="flex items-center gap-4 p-3 bg-vigil-bg/50 rounded-lg border border-vigil-border-dark">
-                      <div className="flex-1">
-                        <div className="font-mono text-sm text-white mb-1">4nR8...xK2j</div>
-                        <div className="text-xs text-vigil-muted">SOL → USDC swap</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-mono text-sm font-semibold text-vigil-red">-0.082 SOL</div>
-                        <div className="text-xs text-vigil-red">Sandwiched</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4 p-3 bg-vigil-bg/50 rounded-lg border border-vigil-border-dark">
-                      <div className="flex-1">
-                        <div className="font-mono text-sm text-white mb-1">9mWz...pL5v</div>
-                        <div className="text-xs text-vigil-muted">USDC transfer</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-mono text-sm font-semibold text-accent-green">0.000 SOL</div>
-                        <div className="text-xs text-accent-green">Neutral</div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4 p-3 bg-vigil-bg/50 rounded-lg border border-vigil-border-dark">
-                      <div className="flex-1">
-                        <div className="font-mono text-sm text-white mb-1">2bTf...hQ8n</div>
-                        <div className="text-xs text-vigil-muted">RAY → SOL swap</div>
-                      </div>
-                      <div className="text-right">
-                        <div className="font-mono text-sm font-semibold text-accent-yellow">-0.038 SOL</div>
-                        <div className="text-xs text-accent-yellow">Frontrun</div>
-                      </div>
-                    </div>
+                    {result?.receipts.map((r) => {
+                      const { label, cls } = txTypeLabel(r.mevAnalysis.type);
+                      const lossAmt = r.mevAnalysis.loss.lossAmount;
+                      return (
+                        <div key={r.receiptId} className="flex items-center gap-4 p-3 bg-vigil-bg/50 rounded-lg border border-vigil-border-dark">
+                          <div className="flex-1">
+                            <div className="font-mono text-sm text-white mb-1">{r.txSignature}</div>
+                            <div className="text-xs text-vigil-muted">
+                              {r.victim.tokenIn.symbol} → {r.victim.tokenOut.symbol} swap · {r.victim.dex}
+                            </div>
+                          </div>
+                          <div className="text-right">
+                            <div className={`font-mono text-sm font-semibold ${cls}`}>
+                              {lossAmt > 0 ? `-${lossAmt.toFixed(3)} ${r.victim.tokenOut.symbol}` : '0.000'}
+                            </div>
+                            <div className={`text-xs ${cls}`}>{label}</div>
+                          </div>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
 
@@ -243,9 +254,7 @@ export default function ReceiptPage() {
                 <div className="relative receipt-card p-8 rounded-xl border border-vigil-red/30 overflow-hidden fade-up fade-up-d2">
                   <div className="absolute inset-0 scan-line pointer-events-none"></div>
                   <div className="relative z-10 text-center space-y-4">
-                    <h3 className="font-display font-bold text-2xl text-white">
-                      STOP LEAKING VALUE
-                    </h3>
+                    <h3 className="font-display font-bold text-2xl text-white">STOP LEAKING VALUE</h3>
                     <p className="text-vigil-muted max-w-md mx-auto">
                       You're losing money to MEV attacks. Activate protection to shield your transactions.
                     </p>
@@ -267,7 +276,9 @@ export default function ReceiptPage() {
                           <span className="material-symbols-outlined text-2xl text-vigil-accent">receipt_long</span>
                           <h3 className="font-display font-bold text-lg">MEV RECEIPT</h3>
                         </div>
-                        <div className="font-mono text-xs text-vigil-muted">#VGL-2026-0406-0817</div>
+                        <div className="font-mono text-xs text-vigil-muted">
+                          #{featuredReceipt?.receiptId ?? '—'}
+                        </div>
                       </div>
                     </div>
 
@@ -275,11 +286,25 @@ export default function ReceiptPage() {
                     <div className="space-y-3 mb-6">
                       <div className="flex justify-between text-sm">
                         <span className="text-vigil-muted">Scan Time</span>
-                        <span className="text-white font-mono">2026-04-06 08:17 UTC</span>
+                        <span className="text-white font-mono">
+                          {featuredReceipt
+                            ? new Date(featuredReceipt.timestamp).toUTCString().slice(5, 22) + ' UTC'
+                            : '—'}
+                        </span>
                       </div>
                       <div className="flex justify-between text-sm">
                         <span className="text-vigil-muted">TX Hash</span>
-                        <span className="text-white font-mono">7xKp...mN4q</span>
+                        <span className="text-white font-mono">{featuredReceipt?.txSignature ?? '—'}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-vigil-muted">Validator Risk</span>
+                        <span className="font-mono capitalize" style={{
+                          color: featuredReceipt?.validator.riskLevel === 'critical' ? '#ef4444' :
+                                 featuredReceipt?.validator.riskLevel === 'high'     ? '#f97316' :
+                                 featuredReceipt?.validator.riskLevel === 'medium'   ? '#eab308' : '#22c55e'
+                        }}>
+                          {featuredReceipt?.validator.riskLevel ?? '—'}
+                        </span>
                       </div>
                     </div>
 
@@ -288,12 +313,16 @@ export default function ReceiptPage() {
                     {/* Fee Breakdown */}
                     <div className="space-y-3 mb-6">
                       <div className="flex justify-between text-sm">
-                        <span className="text-vigil-muted">Network Fee</span>
-                        <span className="text-white font-mono">0.000285 SOL</span>
+                        <span className="text-vigil-muted">Extraction Type</span>
+                        <span className={`font-semibold ${txTypeLabel(featuredReceipt?.mevAnalysis.type ?? MevType.NONE).cls}`}>
+                          {txTypeLabel(featuredReceipt?.mevAnalysis.type ?? MevType.NONE).label}
+                        </span>
                       </div>
                       <div className="flex justify-between text-sm">
-                        <span className="text-vigil-muted">Extraction Type</span>
-                        <span className="text-vigil-red font-semibold">Sandwich Attack</span>
+                        <span className="text-vigil-muted">Confidence</span>
+                        <span className="text-white font-mono capitalize">
+                          {featuredReceipt?.mevAnalysis.loss.confidence ?? '—'}
+                        </span>
                       </div>
                     </div>
 
@@ -301,22 +330,26 @@ export default function ReceiptPage() {
 
                     {/* Profit Distribution */}
                     <div className="space-y-4 mb-6">
-                      <div className="text-sm font-semibold text-white mb-3">Profit Distribution</div>
+                      <div className="text-sm font-semibold text-white mb-3">Extraction Detail</div>
                       <div className="space-y-3">
                         <div className="flex justify-between text-sm">
                           <span className="text-vigil-muted">Attacker Profit</span>
-                          <span className="text-vigil-red font-mono font-semibold">0.082 SOL</span>
+                          <span className="text-vigil-red font-mono font-semibold">
+                            {featuredSandwich
+                              ? `${featuredSandwich.attackerProfit.toFixed(3)} SOL`
+                              : featuredReceipt?.attackDetail.kind === 'other'
+                                ? `${featuredReceipt.attackDetail.attackerProfit.toFixed(3)} SOL`
+                                : '—'}
+                          </span>
                         </div>
                         <div className="flex justify-between text-sm">
-                          <span className="text-vigil-muted">Validator Tip</span>
-                          <span className="text-accent-yellow font-mono font-semibold">0.038 SOL</span>
+                          <span className="text-vigil-muted">Your Loss</span>
+                          <span className="text-vigil-red font-mono font-semibold">
+                            {featuredReceipt
+                              ? `${featuredReceipt.mevAnalysis.loss.lossAmount.toFixed(3)} ${featuredReceipt.victim.tokenOut.symbol}`
+                              : '—'}
+                          </span>
                         </div>
-                      </div>
-
-                      {/* Bar Chart */}
-                      <div className="flex h-2 rounded-full overflow-hidden">
-                        <div className="bg-vigil-red" style={{ width: "68%" }}></div>
-                        <div className="bg-accent-yellow" style={{ width: "32%" }}></div>
                       </div>
                     </div>
 
@@ -324,14 +357,18 @@ export default function ReceiptPage() {
 
                     {/* Total */}
                     <div className="flex justify-between items-center mb-6">
-                      <span className="font-display font-bold text-white">Total Extraction</span>
+                      <span className="font-display font-bold text-white">Total Loss</span>
                       <div className="text-right">
-                        <div className="font-display font-bold text-xl text-white">0.120 SOL</div>
-                        <div className="text-xs text-vigil-muted">$16.32</div>
+                        <div className="font-display font-bold text-xl text-white">
+                          {result ? `${result.totalLossSol.toFixed(3)} SOL` : '—'}
+                        </div>
+                        <div className="text-xs text-vigil-muted">
+                          {result ? `$${result.totalLossUsd.toFixed(2)}` : ''}
+                        </div>
                       </div>
                     </div>
 
-                    {/* QR Code */}
+                    {/* QR Placeholder */}
                     <div className="qr-placeholder w-32 h-32 mx-auto rounded-lg mb-6"></div>
 
                     {/* Share Button */}

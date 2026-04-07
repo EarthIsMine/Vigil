@@ -1,8 +1,38 @@
 import Nav from '@/components/Nav';
 import MevChart from '@/components/MevChart';
 import LiveFeed from '@/components/LiveFeed';
+import {
+  getDashboardStats,
+  getValidatorLeaderboard,
+  getPoolLeaderboard,
+} from '@/lib/services/dashboard';
 
-export default function DashboardPage() {
+function fmtUsd(n: number): string {
+  if (n >= 1_000_000) return `$${(n / 1_000_000).toFixed(2)}M`;
+  if (n >= 1_000) return `$${(n / 1_000).toFixed(0)}K`;
+  return `$${n.toFixed(2)}`;
+}
+
+function fmtChange(pct: number | null): { label: string; cls: string } {
+  if (pct === null) return { label: 'N/A', cls: 'text-muted' };
+  const sign = pct >= 0 ? '+' : '';
+  return {
+    label: `${sign}${pct.toFixed(1)}%`,
+    cls: pct >= 0 ? 'text-secondary' : 'text-error',
+  };
+}
+
+export default async function DashboardPage() {
+  const [stats, validators, pools] = await Promise.all([
+    getDashboardStats(),
+    getValidatorLeaderboard(),
+    getPoolLeaderboard(),
+  ]);
+
+  const extracted = fmtChange(stats.totalMevExtracted24h.changePercent);
+  const attacks   = fmtChange(stats.totalAttacks24h.changePercent);
+  const avgLoss   = fmtChange(stats.averageLossPerTx.changePercent);
+
   return (
     <div className="min-h-screen bg-surface">
       <Nav />
@@ -10,80 +40,39 @@ export default function DashboardPage() {
       {/* Sidebar */}
       <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-56 bg-surface-100 border-r border-outline hidden lg:block overflow-y-auto">
         <div className="p-4 space-y-6">
-          {/* Navigation Links */}
           <nav className="space-y-1">
-            <a
-              href="#"
-              className="block px-3 py-2 rounded-lg text-sm font-medium text-primary bg-primary-dim hover:bg-surface-300 transition-colors"
-            >
+            <a href="#" className="block px-3 py-2 rounded-lg text-sm font-medium text-primary bg-primary-dim hover:bg-surface-300 transition-colors">
               Live Feed
             </a>
-            <a
-              href="#"
-              className="block px-3 py-2 rounded-lg text-sm font-medium text-on-surf hover:bg-surface-300 transition-colors"
-            >
+            <a href="#" className="block px-3 py-2 rounded-lg text-sm font-medium text-on-surf hover:bg-surface-300 transition-colors">
               Top Extractors
             </a>
-            <a
-              href="#"
-              className="block px-3 py-2 rounded-lg text-sm font-medium text-on-surf hover:bg-surface-300 transition-colors"
-            >
+            <a href="#" className="block px-3 py-2 rounded-lg text-sm font-medium text-on-surf hover:bg-surface-300 transition-colors">
               Searchers
             </a>
-            <a
-              href="#"
-              className="block px-3 py-2 rounded-lg text-sm font-medium text-on-surf hover:bg-surface-300 transition-colors"
-            >
+            <a href="#" className="block px-3 py-2 rounded-lg text-sm font-medium text-on-surf hover:bg-surface-300 transition-colors">
               Network Health
             </a>
           </nav>
 
-          {/* Filters Section */}
           <div>
-            <h3 className="px-3 mb-2 text-xs font-semibold text-muted uppercase tracking-wider">
-              Filters
-            </h3>
+            <h3 className="px-3 mb-2 text-xs font-semibold text-muted uppercase tracking-wider">Filters</h3>
             <div className="space-y-2">
+              {['Sandwich', 'Frontrun', 'Backrun'].map((f) => (
+                <label key={f} className="flex items-center px-3 py-1.5 cursor-pointer hover:bg-surface-300 rounded-lg transition-colors">
+                  <input type="checkbox" defaultChecked className="mr-2 w-4 h-4 accent-primary" />
+                  <span className="text-sm text-on-surf">{f}</span>
+                </label>
+              ))}
               <label className="flex items-center px-3 py-1.5 cursor-pointer hover:bg-surface-300 rounded-lg transition-colors">
-                <input
-                  type="checkbox"
-                  defaultChecked
-                  className="mr-2 w-4 h-4 accent-primary"
-                />
-                <span className="text-sm text-on-surf">Sandwich</span>
-              </label>
-              <label className="flex items-center px-3 py-1.5 cursor-pointer hover:bg-surface-300 rounded-lg transition-colors">
-                <input
-                  type="checkbox"
-                  defaultChecked
-                  className="mr-2 w-4 h-4 accent-primary"
-                />
-                <span className="text-sm text-on-surf">Frontrun</span>
-              </label>
-              <label className="flex items-center px-3 py-1.5 cursor-pointer hover:bg-surface-300 rounded-lg transition-colors">
-                <input
-                  type="checkbox"
-                  defaultChecked
-                  className="mr-2 w-4 h-4 accent-primary"
-                />
-                <span className="text-sm text-on-surf">Backrun</span>
-              </label>
-              <label className="flex items-center px-3 py-1.5 cursor-pointer hover:bg-surface-300 rounded-lg transition-colors">
-                <input
-                  type="checkbox"
-                  className="mr-2 w-4 h-4 accent-primary"
-                />
+                <input type="checkbox" className="mr-2 w-4 h-4 accent-primary" />
                 <span className="text-sm text-on-surf">Liquidation</span>
               </label>
             </div>
           </div>
 
-          {/* Settings at bottom */}
           <div className="pt-4 border-t border-outline">
-            <a
-              href="#"
-              className="block px-3 py-2 rounded-lg text-sm font-medium text-on-surf hover:bg-surface-300 transition-colors"
-            >
+            <a href="#" className="block px-3 py-2 rounded-lg text-sm font-medium text-on-surf hover:bg-surface-300 transition-colors">
               Settings
             </a>
             <div className="px-3 mt-4">
@@ -100,12 +89,8 @@ export default function DashboardPage() {
           <div className="mb-8">
             <div className="flex items-center justify-between">
               <div>
-                <h1 className="font-display text-3xl font-bold text-on-surf mb-2">
-                  Dashboard
-                </h1>
-                <p className="text-muted">
-                  Real-time MEV monitoring and analytics
-                </p>
+                <h1 className="font-display text-3xl font-bold text-on-surf mb-2">Dashboard</h1>
+                <p className="text-muted">Real-time MEV monitoring and analytics</p>
               </div>
               <select className="bg-surface-200 border border-outline rounded-lg px-4 py-2 text-on-surf text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary">
                 <option>Last 24 hours</option>
@@ -121,41 +106,47 @@ export default function DashboardPage() {
             <div className="bg-surface-100 border border-outline rounded-lg p-6">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-sm font-medium text-muted">MEV Extracted</h3>
-                <span className="text-xs font-mono text-secondary">+12.4%</span>
+                <span className={`text-xs font-mono ${extracted.cls}`}>{extracted.label}</span>
               </div>
-              <p className="font-display text-3xl font-bold text-on-surf">$4.82M</p>
+              <p className="font-display text-3xl font-bold text-on-surf">
+                {fmtUsd(stats.totalMevExtracted24h.usd)}
+              </p>
             </div>
 
             <div className="bg-surface-100 border border-outline rounded-lg p-6">
               <div className="flex items-start justify-between mb-4">
-                <h3 className="text-sm font-medium text-muted">Sandwich Attacks</h3>
-                <span className="text-xs font-mono text-secondary">+8.1%</span>
+                <h3 className="text-sm font-medium text-muted">Total Attacks</h3>
+                <span className={`text-xs font-mono ${attacks.cls}`}>{attacks.label}</span>
               </div>
-              <p className="font-display text-3xl font-bold text-on-surf">1,247</p>
+              <p className="font-display text-3xl font-bold text-on-surf">
+                {stats.totalAttacks24h.count.toLocaleString()}
+              </p>
             </div>
 
             <div className="bg-surface-100 border border-outline rounded-lg p-6">
               <div className="flex items-start justify-between mb-4">
-                <h3 className="text-sm font-medium text-muted">TXs Protected</h3>
-                <span className="text-xs font-mono text-secondary">+23.7%</span>
+                <h3 className="text-sm font-medium text-muted">Active Attackers</h3>
+                <span className="text-xs font-mono text-muted">{stats.activeAttackers24h.topAttacker}</span>
               </div>
-              <p className="font-display text-3xl font-bold text-on-surf">38,492</p>
+              <p className="font-display text-3xl font-bold text-on-surf">
+                {stats.activeAttackers24h.count}
+              </p>
             </div>
 
             <div className="bg-surface-100 border border-outline rounded-lg p-6">
               <div className="flex items-start justify-between mb-4">
                 <h3 className="text-sm font-medium text-muted">Avg Victim Loss</h3>
-                <span className="text-xs font-mono text-error">-5.3%</span>
+                <span className={`text-xs font-mono ${avgLoss.cls}`}>{avgLoss.label}</span>
               </div>
-              <p className="font-display text-3xl font-bold text-on-surf">$347.21</p>
+              <p className="font-display text-3xl font-bold text-on-surf">
+                ${stats.averageLossPerTx.usd.toFixed(2)}
+              </p>
             </div>
           </div>
 
           {/* MEV Chart */}
           <div className="bg-surface-100 border border-outline rounded-lg p-6 mb-8">
-            <h2 className="font-display text-xl font-bold text-on-surf mb-6">
-              MEV Extraction Over Time
-            </h2>
+            <h2 className="font-display text-xl font-bold text-on-surf mb-6">MEV Extraction Over Time</h2>
             <MevChart />
           </div>
 
@@ -163,44 +154,35 @@ export default function DashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
             {/* Risky Validators Leaderboard */}
             <div className="bg-surface-100 border border-outline rounded-lg p-6">
-              <h2 className="font-display text-xl font-bold text-on-surf mb-6">
-                Risky Validators Leaderboard
-              </h2>
+              <h2 className="font-display text-xl font-bold text-on-surf mb-6">Risky Validators Leaderboard</h2>
               <div className="space-y-4">
-                {[
-                  { rank: 1, address: 'StKHse...7Qx4p', operator: 'Stake House Capital', jito: true, amount: '$892K' },
-                  { rank: 2, address: 'mariN4...vALi9', operator: 'Marinade Finance', jito: true, amount: '$743K' },
-                  { rank: 3, address: 'J1to1a...bund1', operator: 'Jito Labs', jito: true, amount: '$621K' },
-                  { rank: 4, address: 'C1oRu5...s1one', operator: 'Chorus One', jito: false, amount: '$558K' },
-                  { rank: 5, address: 'Ev3Rs7...take5', operator: 'Everstake', jito: true, amount: '$492K' },
-                ].map((validator) => (
-                  <div
-                    key={validator.rank}
-                    className="flex items-center gap-4 p-4 bg-surface-200 border border-outline rounded-lg hover:bg-surface-300 transition-colors"
-                  >
+                {validators.map((v) => (
+                  <div key={v.rank} className="flex items-center gap-4 p-4 bg-surface-200 border border-outline rounded-lg hover:bg-surface-300 transition-colors">
                     <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-primary-dim rounded-full">
-                      <span className="font-mono text-sm font-bold text-primary">
-                        {validator.rank}
-                      </span>
+                      <span className="font-mono text-sm font-bold text-primary">{v.rank}</span>
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <code className="font-mono text-sm text-on-surf">
-                          {validator.address}
-                        </code>
+                        <code className="font-mono text-sm text-on-surf">{v.identity}</code>
                         <span className="text-xs text-muted">•</span>
-                        <span className="text-xs text-muted">{validator.operator}</span>
+                        <span className="text-xs text-muted">{v.name}</span>
                       </div>
                       <div className="flex items-center gap-3">
-                        <span className={`font-mono text-xs px-1.5 py-0.5 rounded ${validator.jito ? 'text-secondary bg-sec-dim' : 'text-muted bg-surface-400'}`}>
-                          {validator.jito ? 'Jito-Agave' : 'Agave'}
+                        <span className="font-mono text-xs px-1.5 py-0.5 rounded text-secondary bg-sec-dim">
+                          {v.client}
+                        </span>
+                        <span className={`font-mono text-xs px-1.5 py-0.5 rounded ${
+                          v.riskLevel === 'critical' ? 'text-error bg-error/10' :
+                          v.riskLevel === 'high' ? 'text-error/70 bg-error/10' :
+                          'text-muted bg-surface-400'
+                        }`}>
+                          {v.riskLevel.toUpperCase()}
                         </span>
                       </div>
                     </div>
                     <div className="flex-shrink-0 text-right">
-                      <p className="font-mono font-semibold text-error">
-                        {validator.amount}
-                      </p>
+                      <p className="font-mono font-semibold text-error">{v.extractedUsd}</p>
+                      <p className="font-mono text-xs text-muted">Risk: {v.riskScore}</p>
                     </div>
                   </div>
                 ))}
@@ -209,44 +191,25 @@ export default function DashboardPage() {
 
             {/* Most Targeted Pools */}
             <div className="bg-surface-100 border border-outline rounded-lg p-6">
-              <h2 className="font-display text-xl font-bold text-on-surf mb-6">
-                Most Targeted Pools
-              </h2>
+              <h2 className="font-display text-xl font-bold text-on-surf mb-6">Most Targeted Pools</h2>
               <div className="space-y-4">
-                {[
-                  { pool: 'SOL/USDC', dex: 'Orca', attacks: 342, volume: '$1.2M', trend: '+15%' },
-                  { pool: 'RAY/SOL', dex: 'Raydium', attacks: 289, volume: '$987K', trend: '+8%' },
-                  { pool: 'BONK/SOL', dex: 'Orca', attacks: 247, volume: '$743K', trend: '+12%' },
-                  { pool: 'mSOL/SOL', dex: 'Meteora', attacks: 198, volume: '$621K', trend: '+5%' },
-                  { pool: 'JitoSOL/SOL', dex: 'Orca', attacks: 156, volume: '$492K', trend: '+18%' },
-                ].map((pool) => (
-                  <div
-                    key={pool.pool}
-                    className="p-4 bg-surface-200 border border-outline rounded-lg hover:bg-surface-300 transition-colors"
-                  >
+                {pools.map((p) => (
+                  <div key={p.pool} className="p-4 bg-surface-200 border border-outline rounded-lg hover:bg-surface-300 transition-colors">
                     <div className="flex items-center justify-between mb-2">
                       <div>
-                        <h3 className="font-mono font-semibold text-on-surf">
-                          {pool.pool}
-                        </h3>
-                        <p className="text-xs text-muted">{pool.dex}</p>
+                        <h3 className="font-mono font-semibold text-on-surf">{p.pool}</h3>
+                        <p className="text-xs text-muted">{p.dex}</p>
                       </div>
-                      <span className="text-xs font-mono text-secondary">
-                        {pool.trend}
-                      </span>
+                      <span className="text-xs font-mono text-secondary">{p.trend}</span>
                     </div>
                     <div className="flex items-center gap-6 mt-3">
                       <div>
                         <p className="text-xs text-muted mb-1">Attacks</p>
-                        <p className="font-mono text-sm font-semibold text-error">
-                          {pool.attacks}
-                        </p>
+                        <p className="font-mono text-sm font-semibold text-error">{p.attacks}</p>
                       </div>
                       <div>
                         <p className="text-xs text-muted mb-1">Volume Lost</p>
-                        <p className="font-mono text-sm font-semibold text-on-surf">
-                          {pool.volume}
-                        </p>
+                        <p className="font-mono text-sm font-semibold text-on-surf">{p.volumeLost}</p>
                       </div>
                     </div>
                   </div>
@@ -258,9 +221,7 @@ export default function DashboardPage() {
           {/* Recent Attacks Live Feed */}
           <div className="bg-surface-100 border border-outline rounded-lg p-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="font-display text-xl font-bold text-on-surf">
-                Recent Attacks Live Feed
-              </h2>
+              <h2 className="font-display text-xl font-bold text-on-surf">Recent Attacks Live Feed</h2>
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 bg-secondary rounded-full animate-pulse"></div>
                 <span className="text-xs font-mono text-muted">Live</span>
