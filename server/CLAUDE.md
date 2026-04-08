@@ -76,6 +76,8 @@ Helius WS 구독 (슬롯)
 ```
 
 ## REST API 엔드포인트
+> Global prefix: `app.setGlobalPrefix('api/v1')` — 아래 경로는 prefix 이후 상대 경로.
+
 | Method | Path | 설명 |
 |--------|------|------|
 | GET | `/dashboard/stats` | 대시보드 요약 통계 |
