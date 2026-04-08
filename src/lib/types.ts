@@ -359,22 +359,11 @@ export interface PoolLeaderboardEntry {
   trend: string;
 }
 
-export interface ValidatorDetail {
-  identity: string;
-  voteAccount: string;
-  name: string;
+export interface ValidatorDetail extends ValidatorRiskScore {
   client: string;
   stake: string;
   commission: number;
   activeSinceEpoch: number;
-  riskScore: number;
-  riskLevel: RiskLevel;
-  metrics: {
-    totalExtractedUsd: string;
-    sandwichSuccessRate: string;
-    targetedProtocols: number;
-    avgResponseMs: number;
-  };
 }
 
 export interface ReceiptSearchResult {

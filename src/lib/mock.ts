@@ -104,12 +104,24 @@ export const MOCK_VALIDATOR_DETAIL: ValidatorDetail = {
   activeSinceEpoch:  412,
   riskScore:         96,
   riskLevel:         'critical',
-  metrics: {
-    totalExtractedUsd:   '$4.2M',
-    sandwichSuccessRate: '98.4%',
-    targetedProtocols:   142,
-    avgResponseMs:       12.5,
+  metricsRaw: {
+    sandwichInvolvementRate: 0.87,
+    wideSandwichRate: 0.34,
+    consecutiveLeaderAbuse: 12,
+    totalExtractedSol: 28500,
+    avgExtractionPerSlot: 0.42,
+    recentTrend: 'increasing',
+    observedSlots: 5400,
   },
+  metricsNormalized: {
+    sandwichInvolvementRate: 87,
+    wideSandwichRate: 68,
+    consecutiveLeaderAbuse: 75,
+    totalExtractedSol: 92,
+    avgExtractionPerSlot: 84,
+    recentTrend: 'increasing',
+  },
+  lastUpdated: Date.now(),
 };
 
 // ─── Receipt ──────────────────────────────────────────────────────────────
