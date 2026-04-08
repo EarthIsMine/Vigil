@@ -372,5 +372,6 @@ export interface ReceiptSearchResult {
   totalLossUsd: number;
   totalLossSol: number;
   avgLossPerTx: number;
+  worstAttack: MevReceipt;  // BE가 전체 기준 loss DESC로 제공
   receipts: MevReceipt[];
 }
