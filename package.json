@@ -4,9 +4,13 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:server": "pnpm --filter server dev",
+    "dev:all": "pnpm dev & pnpm dev:server",
     "build": "next build",
+    "build:server": "pnpm --filter server build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "lint:server": "pnpm --filter server lint"
   },
   "dependencies": {
     "chart.js": "^4.5.1",
