@@ -17,11 +17,11 @@ DESIGN.md
 /coverage
 
 # next.js
-/.next/
-/out/
+frontend/.next/
+frontend/out/
 
 # production
-/build
+frontend/build
 
 # misc
 .DS_Store
@@ -37,7 +37,7 @@ yarn-error.log*
 .env*
 
 # vercel
-.vercel
+frontend/.vercel
 
 # typescript
 *.tsbuildinfo

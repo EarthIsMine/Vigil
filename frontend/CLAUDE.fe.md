@@ -38,9 +38,9 @@ src/
 ```
 
 ## 빌드/실행
-- `npm run dev` — 개발 서버 (localhost:3000)
-- `npm run build` — 프로덕션 빌드
-- `npm run lint` — ESLint
+- `pnpm --filter vigil-frontend dev` — 개발 서버 (localhost:3000)
+- `pnpm --filter vigil-frontend build` — 프로덕션 빌드
+- `pnpm --filter vigil-frontend lint` — ESLint
 - `NEXT_PUBLIC_API_URL` 미설정 시 자동으로 mock 데이터 사용
 
 ## API 서비스 패턴

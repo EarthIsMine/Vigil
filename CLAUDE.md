@@ -19,8 +19,8 @@ Solana MEV 감지·분석 플랫폼. 샌드위치 공격을 실시간 탐지하�
 
 | 레이어 | 경로 | 스택 |
 |--------|------|------|
-| FE | `singapore/` | Next.js, TypeScript, Tailwind, Recharts |
-| BE | TBD | Nest.js, TypeScript, Helius RPC |
+| FE | `frontend/` | Next.js, TypeScript, Tailwind, Chart.js |
+| BE | `server/` | Nest.js, TypeScript, Helius RPC |
 
 ## 도메인 용어
 | 용어 | 설명 |
@@ -55,5 +55,5 @@ Solana MEV 감지·분석 플랫폼. 샌드위치 공격을 실시간 탐지하�
 - 커밋 메시지: `feat:`, `fix:`, `refactor:`, `docs:` 접두사 사용
 
 ## 상세 가이드
-- FE: @src/CLAUDE.fe.md
+- FE: @frontend/CLAUDE.fe.md
 - BE: @server/CLAUDE.md
