@@ -1100,21 +1100,22 @@ function trendColor(changePercent: number, invertGood = true): string {
 
 ## 10. API 엔드포인트 매핑
 
+> **규칙**: BE는 `app.setGlobalPrefix('api/v1')` 적용. FE는 `NEXT_PUBLIC_API_URL`에 `/api/v1` 포함 (예: `https://api.vigil.xxx/api/v1`). 아래 경로는 prefix 이후 상대 경로.
+
 | 프론트 페이지 | API 엔드포인트 | 메서드 | 용도 |
 |-------------|--------------|--------|------|
-| 대시보드 | `/api/v1/stats` | GET | 상단 통계 카드 |
-| 대시보드 | `/api/v1/attacks` | GET | 공격 목록 (필터/페이지네이션) |
-| 대시보드 | `/api/v1/attacks/timeseries` | GET | 시계열 차트 데이터 |
-| 대시보드 | `/api/v1/attacks/by-dex` | GET | DEX별 파이차트 |
-| 밸리데이터 | `/api/v1/validators` | GET | 밸리데이터 리스크 목록 |
-| 밸리데이터 | `/api/v1/validators/:identity` | GET | 밸리데이터 상세 |
-| 밸리데이터 | `/api/v1/validators/:identity/slots` | GET | 슬롯 타임라인 |
-| 영수증 | `/api/v1/receipt/:txSignature` | GET | TX별 영수증 |
-| 영수증 | `/api/v1/receipt/wallet/:address` | GET | 지갑별 영수증 목록 |
-| 벤치마크 | `/api/v1/benchmark` | GET | 보호 도구 비교 |
-| 벤치마크 | `/api/v1/benchmark/:tool` | GET | 도구별 상세 |
-| 보호 RPC | `/api/v1/leader-schedule` | GET | 현재 리더 스케줄 |
-| 실시간 | `ws://api.vigil.so/feed` | WS | 실시간 공격 피드 |
+| 대시보드 | `/dashboard/stats` | GET | 상단 통계 카드 |
+| 대시보드 | `/attacks/recent?limit=` | GET | 공격 목록 (필터/페이지네이션) |
+| 대시보드 | `/dashboard/timeseries?range=` | GET | 시계열 차트 데이터 |
+| 대시보드 | `/pools/leaderboard?limit=` | GET | DEX/풀별 리더보드 |
+| 밸리데이터 | `/validators/leaderboard?limit=` | GET | 밸리데이터 리스크 목록 |
+| 밸리데이터 | `/validators/:identity` | GET | 밸리데이터 상세 |
+| 밸리데이터 | `/validators/:identity/slots` | GET | 슬롯 타임라인 |
+| 영수증 | `/receipts/search?wallet=&range=` | GET | 지갑별 영수증 검색 |
+| 분석 | `/analytics/timeseries?range=` | GET | 분석 시계열 |
+| 분석 | `/analytics/protocols?limit=` | GET | 프로토콜별 리더보드 |
+| 분석 | `/analytics/epochs?limit=` | GET | 에포크별 요약 |
+| 실시간 | `ws://.../feed` | WS | 실시간 공격 피드 |
 
 ---
 
