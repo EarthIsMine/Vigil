@@ -1,6 +1,5 @@
 'use client';
 
-import IconSidebar from '@/components/shared/IconSidebar';
 import ReceiptSearchForm from '@/components/receipt/ReceiptSearchForm';
 import ReceiptResultsHeader from '@/components/receipt/ReceiptResultsHeader';
 import ReceiptSummaryCards from '@/components/receipt/ReceiptSummaryCards';
@@ -14,8 +13,7 @@ export default function ReceiptPage() {
 
   return (
     <div className="min-h-screen bg-vigil-bg text-white">
-      <IconSidebar activePath="/receipt" />
-      <main className="md:ml-16 pt-14">
+      <main className="pt-14">
         {!search.showResults ? (
           <ReceiptSearchForm
             query={search.query}
