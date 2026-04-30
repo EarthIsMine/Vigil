@@ -11,8 +11,8 @@ export default function TransactionTable({ receipts }: { receipts: MevReceipt[] 
           const lossAmt = r.mevAnalysis.loss.lossAmount;
           return (
             <div key={r.receiptId} className="flex items-center gap-4 p-3 bg-vigil-bg/50 rounded-lg border border-vigil-border-dark">
-              <div className="flex-1">
-                <div className="font-mono text-sm text-white mb-1">{r.txSignature}</div>
+              <div className="flex-1 min-w-0">
+                <div className="font-mono text-sm text-white mb-1 truncate">{r.txSignature}</div>
                 <div className="text-xs text-vigil-muted">
                   {r.victim.tokenIn.symbol} → {r.victim.tokenOut.symbol} swap · {r.victim.dex}
                 </div>

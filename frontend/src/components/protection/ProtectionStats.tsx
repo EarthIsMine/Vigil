@@ -2,7 +2,7 @@ import { PROTECTION_STATS } from '@/app/protection/constants';
 
 export default function ProtectionStats() {
   return (
-    <section id="stats" className="py-20 relative">
+    <section id="stats" className="py-20 relative fade-up fade-up-d1">
       <div className="container mx-auto px-6">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
           {PROTECTION_STATS.map((stat) => (

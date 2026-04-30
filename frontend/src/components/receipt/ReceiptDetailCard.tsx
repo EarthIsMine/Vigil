@@ -10,8 +10,8 @@ interface ReceiptDetailCardProps {
 
 export default function ReceiptDetailCard({ result, featuredReceipt, featuredSandwich }: ReceiptDetailCardProps) {
   return (
-    <div className="w-96 space-y-6">
-      <div className="sticky top-32">
+    <div className="w-full lg:w-96 space-y-6">
+      <div className="lg:sticky lg:top-32">
         <div className="glass receipt-card p-6 rounded-xl border border-vigil-border-dark fade-up fade-up-d3">
           {/* Header */}
           <div className="flex items-start justify-between mb-6">

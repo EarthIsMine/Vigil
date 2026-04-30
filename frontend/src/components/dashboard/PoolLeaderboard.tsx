@@ -2,7 +2,7 @@ import type { PoolLeaderboardEntry } from '@/lib/types';
 
 export default function PoolLeaderboard({ pools }: { pools: PoolLeaderboardEntry[] }) {
   return (
-    <div className="bg-surface-100 border border-outline rounded-lg p-6">
+    <div className="bg-surface-100 border border-outline rounded-lg p-6 fade-up fade-up-d3">
       <h2 className="font-display text-xl font-bold text-on-surf mb-6">Most Targeted Pools</h2>
       <div className="space-y-4">
         {pools.map((p) => (

@@ -1,6 +1,6 @@
 export default function AnalyticsHeader() {
   return (
-    <div className="flex items-center justify-between mb-8 fade-up">
+    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8 fade-up">
       <div>
         <h1 className="font-display font-bold text-3xl text-white mb-1">Network Analytics</h1>
         <p className="text-sm text-vigil-muted">Solana MEV extraction · Epoch-level data</p>

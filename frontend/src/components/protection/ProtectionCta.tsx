@@ -2,7 +2,7 @@ import Link from 'next/link';
 
 export default function ProtectionCta() {
   return (
-    <section id="cta" className="py-20 relative">
+    <section id="cta" className="py-20 relative fade-up fade-up-d4">
       <div className="container mx-auto px-6">
         <div className="bg-vigil-card border border-vigil-border rounded-2xl p-12 text-center card-glow relative overflow-hidden">
           <div className="absolute inset-0 hero-glow opacity-30"></div>

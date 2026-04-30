@@ -9,7 +9,7 @@ export default function ValidatorStatCards({ validator }: { validator: Validator
   ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 fade-up fade-up-d2">
       {stats.map((s) => (
         <div key={s.label} className="bg-[#111827] border border-white/[0.06] rounded-lg p-5">
           <div className="text-[#8892ab] text-xs font-mono uppercase tracking-wider mb-3">{s.label}</div>

@@ -10,7 +10,7 @@ export default function ReceiptResultsHeader({ query, onBack }: ReceiptResultsHe
         <button onClick={onBack} className="p-2 hover:bg-vigil-card-dark rounded-lg transition">
           <span className="material-symbols-outlined text-xl text-vigil-muted">arrow_back</span>
         </button>
-        <div className="flex-1 max-w-md">
+        <div className="flex-1 sm:max-w-md">
           <input
             type="text"
             value={query}

@@ -8,7 +8,7 @@ export default function DocsContent() {
   return (
     <div>
       {/* INTRODUCTION */}
-      <section id="introduction" className="mb-16">
+      <section id="introduction" className="mb-16 fade-up">
         <h1 className="font-display font-bold text-4xl text-on-surf mb-3">Vigil API Reference</h1>
         <p className="text-muted text-base leading-relaxed mb-8">
           The Vigil API provides programmatic access to MEV-protected transaction submission,
@@ -48,7 +48,7 @@ export default function DocsContent() {
       </section>
 
       {/* AUTHENTICATION */}
-      <section id="authentication" className="mb-16">
+      <section id="authentication" className="mb-16 fade-up fade-up-d1">
         <div className="flex items-center gap-2 mb-4">
           <span className="material-symbols-outlined text-primary">lock</span>
           <h2 className="font-display font-bold text-2xl text-on-surf">Authentication</h2>
@@ -78,7 +78,7 @@ export default function DocsContent() {
       </section>
 
       {/* SEND TRANSACTION */}
-      <section id="send-transaction" className="mb-16">
+      <section id="send-transaction" className="mb-16 fade-up fade-up-d2">
         <div className="flex items-center gap-3 mb-4">
           <MethodBadge method="POST" />
           <h2 className="font-display font-bold text-2xl text-on-surf">Send Transaction</h2>
@@ -114,7 +114,7 @@ export default function DocsContent() {
       </section>
 
       {/* MEV RECEIPT */}
-      <section id="mev-receipt" className="mb-16">
+      <section id="mev-receipt" className="mb-16 fade-up fade-up-d3">
         <div className="flex items-center gap-3 mb-4">
           <MethodBadge method="GET" />
           <h2 className="font-display font-bold text-2xl text-on-surf">MEV Receipt</h2>
@@ -152,7 +152,7 @@ export default function DocsContent() {
       </section>
 
       {/* PROTECTION STATUS */}
-      <section id="protection-status" className="mb-16">
+      <section id="protection-status" className="mb-16 fade-up fade-up-d4">
         <div className="flex items-center gap-3 mb-4">
           <MethodBadge method="GET" />
           <h2 className="font-display font-bold text-2xl text-on-surf">Protection Status</h2>
@@ -178,7 +178,7 @@ export default function DocsContent() {
       </section>
 
       {/* RATE LIMITS */}
-      <section id="rate-limits" className="mb-16">
+      <section id="rate-limits" className="mb-16 fade-up fade-up-d4">
         <div className="flex items-center gap-2 mb-4">
           <span className="material-symbols-outlined text-primary">speed</span>
           <h2 className="font-display font-bold text-2xl text-on-surf">Rate Limits</h2>
@@ -212,7 +212,7 @@ export default function DocsContent() {
       </section>
 
       {/* SETTINGS */}
-      <section id="settings" className="mb-16">
+      <section id="settings" className="mb-16 fade-up fade-up-d4">
         <div className="flex items-center gap-2 mb-4">
           <span className="material-symbols-outlined text-primary">settings</span>
           <h2 className="font-display font-bold text-2xl text-on-surf">Settings</h2>

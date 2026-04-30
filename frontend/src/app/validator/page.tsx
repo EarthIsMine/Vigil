@@ -18,7 +18,7 @@ export default function ValidatorPage() {
     <div className="min-h-screen bg-[#0a0e1a] text-white">
       <ValidatorSidebar validator={validator} riskColor={riskColor} />
       <main className="pt-14 lg:pl-[220px]">
-        <div className="p-6 max-w-[1600px] mx-auto">
+        <div className="p-4 sm:p-6 max-w-[1600px] mx-auto">
           <ValidatorBreadcrumb name={validator?.name ?? '...'} />
           <ValidatorHeader validator={validator} riskColor={riskColor} />
           <ValidatorStatCards validator={validator} />

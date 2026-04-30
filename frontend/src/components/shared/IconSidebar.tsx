@@ -15,7 +15,7 @@ const NAV_ITEMS = [
 
 export default function IconSidebar({ activePath }: IconSidebarProps) {
   return (
-    <aside className="fixed left-0 top-14 bottom-0 w-16 bg-vigil-card-dark border-r border-vigil-border-dark flex flex-col items-center py-6 gap-6 z-40">
+    <aside className="fixed left-0 top-14 bottom-0 w-16 bg-vigil-card-dark border-r border-vigil-border-dark hidden md:flex flex-col items-center py-6 gap-6 z-40">
       {NAV_ITEMS.map((item) => {
         const isActive = activePath === item.href;
         return (

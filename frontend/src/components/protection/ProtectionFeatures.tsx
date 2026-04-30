@@ -17,7 +17,7 @@ const FEATURE_ICONS: Record<string, React.ReactNode> = {
 
 export default function ProtectionFeatures() {
   return (
-    <section id="features" className="py-20 relative">
+    <section id="features" className="py-20 relative fade-up fade-up-d3">
       <div className="container mx-auto px-6">
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Left - Feature List */}

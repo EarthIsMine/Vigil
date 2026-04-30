@@ -11,7 +11,7 @@ function CheckIcon() {
 
 export default function ProtectionHero() {
   return (
-    <section id="hero" className="relative pt-24 pb-20 overflow-hidden">
+    <section id="hero" className="relative pt-24 pb-20 overflow-hidden fade-up">
       <div className="absolute inset-0 grid-bg opacity-20"></div>
       <div className="absolute inset-0 hero-glow"></div>
       <div className="scan-line"></div>

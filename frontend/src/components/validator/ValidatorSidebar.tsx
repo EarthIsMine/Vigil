@@ -8,7 +8,7 @@ interface ValidatorSidebarProps {
 
 export default function ValidatorSidebar({ validator, riskColor }: ValidatorSidebarProps) {
   return (
-    <aside className="fixed left-0 top-14 w-[220px] h-[calc(100vh-3.5rem)] bg-[#0a0e1a] border-r border-white/10 flex flex-col">
+    <aside className="fixed left-0 top-14 w-[220px] h-[calc(100vh-3.5rem)] bg-[#0a0e1a] border-r border-white/10 hidden lg:flex flex-col">
       <div className="flex-1 p-4">
         <div className="mb-6">
           <div className="flex items-center gap-2 px-3 py-2 bg-white/5 rounded mb-4">

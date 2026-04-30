@@ -2,7 +2,7 @@ import { TELEMETRY_DATA } from '@/app/validator/constants';
 
 export default function TelemetryTable() {
   return (
-    <div className="bg-[#0a0e1a] border border-white/10 rounded-lg overflow-hidden mb-6">
+    <div className="bg-[#0a0e1a] border border-white/10 rounded-lg overflow-hidden mb-6 fade-up fade-up-d4">
       <div className="p-6 border-b border-white/10">
         <h2 className="text-xl font-bold">Telemetry</h2>
       </div>

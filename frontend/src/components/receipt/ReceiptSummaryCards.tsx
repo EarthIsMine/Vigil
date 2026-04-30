@@ -2,7 +2,7 @@ import type { ReceiptSearchResult } from '@/lib/types';
 
 export default function ReceiptSummaryCards({ result }: { result: ReceiptSearchResult }) {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 fade-up">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 fade-up">
       <div className="receipt-card p-4 rounded-xl border border-vigil-border-dark">
         <div className="text-xs text-vigil-muted mb-2">Total MEV Lost</div>
         <div className="font-display font-bold text-2xl text-white mb-1">

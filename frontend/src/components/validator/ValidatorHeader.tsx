@@ -8,7 +8,7 @@ interface ValidatorHeaderProps {
 export default function ValidatorHeader({ validator, riskColor }: ValidatorHeaderProps) {
   return (
     <div
-      className="bg-[#0a0e1a] rounded-lg p-6 mb-6 relative overflow-hidden border"
+      className="bg-[#0a0e1a] rounded-lg p-6 mb-6 relative overflow-hidden border fade-up fade-up-d1"
       style={{ borderColor: `${riskColor}4d` }}
     >
       <div className="absolute inset-0 pointer-events-none" style={{ background: `${riskColor}0d` }} />

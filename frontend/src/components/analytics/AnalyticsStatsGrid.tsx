@@ -12,7 +12,7 @@ const STATS = [
 
 export default function AnalyticsStatsGrid({ epochs }: AnalyticsStatsGridProps) {
   return (
-    <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8 fade-up fade-up-d1">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8 fade-up fade-up-d1">
       {STATS.slice(0, 2).map((s) => (
         <div key={s.label} className="receipt-card p-5 rounded-xl border border-vigil-border-dark">
           <div className="text-xs text-vigil-muted mb-2 font-mono uppercase tracking-wider">{s.label}</div>

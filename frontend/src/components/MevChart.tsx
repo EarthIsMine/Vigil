@@ -133,7 +133,7 @@ export default function MevChart({ labels: externalLabels, dataValues: externalD
   };
 
   return (
-    <div className="h-[400px]">
+    <div className="h-[250px] sm:h-[300px] lg:h-[400px]">
       <Line ref={chartRef} data={data} options={options} />
     </div>
   );

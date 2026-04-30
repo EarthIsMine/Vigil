@@ -2,7 +2,7 @@ import { NAV_SECTIONS } from '@/app/api-docs/constants';
 
 export default function DocsSidebar({ activeSection }: { activeSection: string }) {
   return (
-    <aside className="w-56 flex-shrink-0 bg-surface-100 fixed top-14 bottom-0 left-0 overflow-y-auto py-6 px-4 hidden lg:block">
+    <aside className="w-56 flex-shrink-0 bg-surface-100 fixed top-14 bottom-0 left-0 overflow-y-auto py-6 px-4 hidden lg:block fade-up">
       {NAV_SECTIONS.map((group) => (
         <div key={group.group} className="mb-6">
           <p className="text-[10px] uppercase tracking-widest text-muted font-semibold mb-2 px-3 font-mono">

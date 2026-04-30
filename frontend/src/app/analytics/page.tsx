@@ -15,8 +15,8 @@ export default function AnalyticsPage() {
   return (
     <div className="min-h-screen bg-vigil-bg text-white">
       <IconSidebar activePath="/analytics" />
-      <main className="ml-16 pt-14">
-        <div className="p-6 max-w-7xl mx-auto">
+      <main className="md:ml-16 pt-14">
+        <div className="p-4 sm:p-6 max-w-7xl mx-auto">
           <AnalyticsHeader />
           <AnalyticsStatsGrid epochs={epochs} />
           <AnalyticsChart />

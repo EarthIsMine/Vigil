@@ -15,7 +15,7 @@ export default function ReceiptPage() {
   return (
     <div className="min-h-screen bg-vigil-bg text-white">
       <IconSidebar activePath="/receipt" />
-      <main className="ml-16 pt-14">
+      <main className="md:ml-16 pt-14">
         {!search.showResults ? (
           <ReceiptSearchForm
             query={search.query}
@@ -26,8 +26,8 @@ export default function ReceiptPage() {
         ) : (
           <div className="min-h-[calc(100vh-3.5rem)]">
             <ReceiptResultsHeader query={search.query} onBack={search.goBack} />
-            <div className="flex gap-6 p-6 max-w-7xl mx-auto">
-              <div className="flex-1 space-y-6">
+            <div className="flex flex-col lg:flex-row gap-6 p-4 sm:p-6 max-w-7xl mx-auto">
+              <div className="flex-1 min-w-0 space-y-6">
                 {search.result && <ReceiptSummaryCards result={search.result} />}
                 {search.result && <TransactionTable receipts={search.result.receipts} />}
                 <ReceiptBottomCta />
