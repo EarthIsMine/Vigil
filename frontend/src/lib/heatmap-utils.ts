@@ -17,12 +17,18 @@ export function getAttackCount(dayIndex: number, hour: number): number {
   return Math.floor(baseRandom * 100 * multiplier);
 }
 
+export function getHeatColor(count: number): string {
+  if (count === 0) return 'bg-white/[0.03]';
+  if (count < 20) return 'bg-red-500/10';
+  if (count < 40) return 'bg-red-500/20';
+  if (count < 60) return 'bg-red-500/35';
+  if (count < 80) return 'bg-red-500/50';
+  return 'bg-red-500/70';
+}
+
+/** @deprecated Use getHeatColor instead */
 export function getColorClass(count: number): string {
-  if (count === 0) return 'bg-[#1a1f2e]';
-  if (count < 25) return 'bg-[#ef4444]/20';
-  if (count < 50) return 'bg-[#ef4444]/40';
-  if (count < 75) return 'bg-[#ef4444]/60';
-  return 'bg-[#ef4444]';
+  return getHeatColor(count);
 }
 
 export function generateHeatmapData(days = 7, hours = 24): number[][] {

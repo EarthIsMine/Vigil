@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { seededRandom, getAttackCount, getColorClass, generateHeatmapData } from '../heatmap-utils';
+import { seededRandom, getAttackCount, getColorClass, getHeatColor, generateHeatmapData } from '../heatmap-utils';
 
 describe('seededRandom', () => {
   it('returns deterministic values for same seed', () => {
@@ -37,12 +37,16 @@ describe('getAttackCount', () => {
   });
 });
 
-describe('getColorClass', () => {
-  it('returns bg-[#1a1f2e] for 0', () => expect(getColorClass(0)).toBe('bg-[#1a1f2e]'));
-  it('returns /20 for low counts', () => expect(getColorClass(10)).toContain('/20'));
-  it('returns /40 for medium counts', () => expect(getColorClass(30)).toContain('/40'));
-  it('returns /60 for high counts', () => expect(getColorClass(60)).toContain('/60'));
-  it('returns full red for very high', () => expect(getColorClass(100)).toBe('bg-[#ef4444]'));
+describe('getHeatColor', () => {
+  it('returns transparent for 0', () => expect(getHeatColor(0)).toBe('bg-white/[0.03]'));
+  it('returns low opacity for small counts', () => expect(getHeatColor(10)).toBe('bg-red-500/10'));
+  it('returns medium opacity for mid counts', () => expect(getHeatColor(30)).toBe('bg-red-500/20'));
+  it('returns higher opacity for high counts', () => expect(getHeatColor(65)).toBe('bg-red-500/50'));
+  it('returns highest opacity for very high', () => expect(getHeatColor(100)).toBe('bg-red-500/70'));
+});
+
+describe('getColorClass (deprecated alias)', () => {
+  it('delegates to getHeatColor', () => expect(getColorClass(0)).toBe(getHeatColor(0)));
 });
 
 describe('generateHeatmapData', () => {

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { getColorClass, generateHeatmapData } from '@/lib/heatmap-utils';
+import { getHeatColor, generateHeatmapData } from '@/lib/heatmap-utils';
 
 interface TooltipData {
   day: string;
@@ -17,12 +17,11 @@ interface HeatmapProps {
 }
 
 const DEFAULT_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+const HOURS = Array.from({ length: 24 }, (_, i) => i);
 
 export default function Heatmap({ data: externalData, days = DEFAULT_DAYS }: HeatmapProps) {
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
   const data = externalData ?? generateHeatmapData();
-
-  const hours = Array.from({ length: 24 }, (_, i) => i);
 
   const handleMouseEnter = (dayIndex: number, hour: number, event: React.MouseEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
@@ -31,92 +30,74 @@ export default function Heatmap({ data: externalData, days = DEFAULT_DAYS }: Hea
       hour,
       count: data[dayIndex][hour],
       x: rect.left + rect.width / 2,
-      y: rect.top - 10,
+      y: rect.top - 8,
     });
-  };
-
-  const handleMouseLeave = () => {
-    setTooltip(null);
   };
 
   return (
     <div className="relative">
-      <div className="flex">
-        {/* Hour labels */}
-        <div className="flex flex-col pr-2">
-          <div className="h-6" />
-          {hours.filter(h => h % 3 === 0).map((hour) => (
-            <div
-              key={hour}
-              className="text-xs text-[#8892ab] text-right"
-              style={{ height: `${24 * 3}px`, lineHeight: `${24 * 3}px` }}
-            >
-              {hour.toString().padStart(2, '0')}:00
+      <div className="overflow-x-auto">
+        {/* Hour labels (x-axis) */}
+        <div className="flex ml-10 mb-1.5">
+          {HOURS.map((h) => (
+            <div key={h} className="flex-1 text-center text-[10px] text-[#8892ab]/60 font-mono">
+              {h % 3 === 0 ? `${h.toString().padStart(2, '0')}` : ''}
             </div>
           ))}
         </div>
 
-        {/* Heatmap grid */}
-        <div className="flex-1">
-          {/* Day labels */}
-          <div className="flex mb-2">
-            {days.map((day) => (
-              <div key={day} className="flex-1 text-center text-xs text-[#8892ab]">
-                {day}
-              </div>
-            ))}
-          </div>
-
-          {/* Grid */}
-          <div className="grid grid-cols-7 gap-1">
-            {days.map((day, dayIndex) => (
-              <div key={day} className="flex flex-col gap-1">
-                {hours.map((hour) => {
+        {/* Day rows */}
+        <div className="flex flex-col gap-[2px]">
+          {days.map((day, dayIndex) => (
+            <div key={day} className="flex items-center">
+              <div className="w-10 text-right pr-3 text-[11px] text-[#8892ab] font-mono shrink-0">{day}</div>
+              <div className="flex flex-1 gap-[2px]">
+                {HOURS.map((hour) => {
                   const count = data[dayIndex]?.[hour] ?? 0;
                   return (
                     <div
                       key={hour}
-                      className={`w-full h-6 rounded ${getColorClass(count)} cursor-pointer transition-all hover:ring-2 hover:ring-[#ef4444]/50`}
+                      className={`flex-1 aspect-square rounded-[3px] ${getHeatColor(count)} cursor-pointer transition-opacity hover:opacity-80 hover:ring-1 hover:ring-white/20`}
                       onMouseEnter={(e) => handleMouseEnter(dayIndex, hour, e)}
-                      onMouseLeave={handleMouseLeave}
+                      onMouseLeave={() => setTooltip(null)}
                     />
                   );
                 })}
               </div>
-            ))}
-          </div>
+            </div>
+          ))}
         </div>
       </div>
 
       {/* Tooltip */}
       {tooltip && (
         <div
-          className="fixed z-50 bg-[#0a0e1a] border border-white/20 rounded-lg px-3 py-2 shadow-lg pointer-events-none"
+          className="fixed z-50 bg-[#1a1f33] border border-white/10 rounded-md px-2.5 py-1.5 shadow-xl pointer-events-none"
           style={{
             left: `${tooltip.x}px`,
             top: `${tooltip.y}px`,
             transform: 'translate(-50%, -100%)',
           }}
         >
-          <div className="text-xs font-medium">{tooltip.day}</div>
-          <div className="text-xs text-[#8892ab]">
-            {tooltip.hour.toString().padStart(2, '0')}:00
+          <div className="text-[11px] text-white font-medium">
+            {tooltip.day} · {tooltip.hour.toString().padStart(2, '0')}:00
           </div>
-          <div className="text-sm font-bold text-[#ef4444] mt-1">
+          <div className="text-[11px] text-[#8892ab]">
             {tooltip.count} attacks
           </div>
         </div>
       )}
 
       {/* Legend */}
-      <div className="flex items-center gap-2 mt-4 text-xs text-[#8892ab]">
+      <div className="flex items-center justify-end gap-1.5 mt-3 text-[10px] text-[#8892ab]">
         <span>Less</span>
-        <div className="flex gap-1">
-          <div className="w-4 h-4 bg-[#1a1f2e] rounded" />
-          <div className="w-4 h-4 bg-[#ef4444]/20 rounded" />
-          <div className="w-4 h-4 bg-[#ef4444]/40 rounded" />
-          <div className="w-4 h-4 bg-[#ef4444]/60 rounded" />
-          <div className="w-4 h-4 bg-[#ef4444] rounded" />
+        <div className="flex gap-[2px]">
+          <div className="w-3 h-3 bg-white/[0.03] rounded-[2px]" />
+          <div className="w-3 h-3 bg-red-500/10 rounded-[2px]" />
+          <div className="w-3 h-3 bg-red-500/20 rounded-[2px]" />
+          <div className="w-3 h-3 bg-red-500/35 rounded-[2px]" />
+          <div className="w-3 h-3 bg-red-500/50 rounded-[2px]" />
+          <div className="w-3 h-3 bg-red-500/70 rounded-[2px]" />
         </div>
         <span>More</span>
       </div>
