@@ -15,7 +15,7 @@
 
 ## 폴더 구조
 ```
-server/
+backend/
 ├── src/
 │   ├── main.ts
 │   ├── app.module.ts
@@ -91,10 +91,10 @@ Helius WS 구독 (슬롯)
 | GET | `/attacks/recent?limit=` | 최근 공격 목록 |
 
 ## 빌드/실행
-- `npm run start:dev` — 개발 서버 (watch 모드)
-- `npm run build` — 프로덕션 빌드
-- `npm run test` — 유닛 테스트
-- `npm run test:e2e` — E2E 테스트
+- `pnpm --filter backend dev` — 개발 서버 (watch 모드)
+- `pnpm --filter backend build` — 프로덕션 빌드
+- `pnpm --filter backend test` — 유닛 테스트
+- `pnpm --filter backend test:e2e` — E2E 테스트
 - `npx prisma migrate dev` — DB 마이그레이션
 - `npx prisma generate` — Prisma 클라이언트 생성
 

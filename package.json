@@ -4,12 +4,12 @@
   "private": true,
   "scripts": {
     "dev": "pnpm --filter vigil-frontend dev",
-    "dev:server": "pnpm --filter server dev",
-    "dev:all": "pnpm --filter vigil-frontend dev & pnpm --filter server dev",
+    "dev:backend": "pnpm --filter backend dev",
+    "dev:all": "pnpm --filter vigil-frontend dev & pnpm --filter backend dev",
     "build": "pnpm --filter vigil-frontend build",
-    "build:server": "pnpm --filter server build",
+    "build:backend": "pnpm --filter backend build",
     "start": "pnpm --filter vigil-frontend start",
     "lint": "pnpm --filter vigil-frontend lint",
-    "lint:server": "pnpm --filter server lint"
+    "lint:backend": "pnpm --filter backend lint"
   }
 }
