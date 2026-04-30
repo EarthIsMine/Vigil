@@ -375,3 +375,14 @@ export interface ReceiptSearchResult {
   worstAttack: MevReceipt;  // BE가 전체 기준 loss DESC로 제공
   receipts: MevReceipt[];
 }
+
+// --- Analytics ---
+
+export interface EpochSummary {
+  epoch: number;
+  extracted: string;
+  sandwich: number;
+  frontrun: number;
+  backrun: number;
+  dominantClient: string;
+}

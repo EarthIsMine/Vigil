@@ -11,6 +11,7 @@ import {
   Tooltip,
   Filler,
   Legend,
+  TooltipItem,
 } from 'chart.js';
 import { Line } from 'react-chartjs-2';
 
@@ -25,19 +26,30 @@ ChartJS.register(
   Legend
 );
 
-export default function MevChart() {
-  const chartRef = useRef<ChartJS<'line'>>(null);
-
-  // Generate 24 hours of data
-  const labels = Array.from({ length: 24 }, (_, i) => {
+function generateDefaultLabels(): string[] {
+  return Array.from({ length: 24 }, (_, i) => {
     const hour = new Date();
     hour.setHours(hour.getHours() - (23 - i));
     return hour.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
   });
+}
 
-  const dataValues = Array.from({ length: 24 }, () =>
+function generateDefaultData(): number[] {
+  return Array.from({ length: 24 }, () =>
     Math.floor(Math.random() * 150000) + 50000
   );
+}
+
+interface MevChartProps {
+  labels?: string[];
+  dataValues?: number[];
+}
+
+export default function MevChart({ labels: externalLabels, dataValues: externalData }: MevChartProps) {
+  const chartRef = useRef<ChartJS<'line'>>(null);
+
+  const labels = externalLabels ?? generateDefaultLabels();
+  const dataValues = externalData ?? generateDefaultData();
 
   useEffect(() => {
     const chart = chartRef.current;
@@ -76,9 +88,7 @@ export default function MevChart() {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-      legend: {
-        display: false,
-      },
+      legend: { display: false },
       tooltip: {
         backgroundColor: '#1a1f33',
         titleColor: '#c8d0e6',
@@ -88,47 +98,32 @@ export default function MevChart() {
         padding: 12,
         displayColors: false,
         callbacks: {
-          label: function (context: any) {
-            return '$' + context.parsed.y.toLocaleString();
+          label: function (context: TooltipItem<'line'>) {
+            return '$' + (context.parsed.y ?? 0).toLocaleString();
           },
         },
       },
     },
     scales: {
       x: {
-        grid: {
-          display: false,
-        },
+        grid: { display: false },
         ticks: {
           color: '#8892ab',
           maxTicksLimit: 8,
-          font: {
-            family: 'JetBrains Mono',
-            size: 11,
-          },
+          font: { family: 'JetBrains Mono', size: 11 },
         },
-        border: {
-          display: false,
-        },
+        border: { display: false },
       },
       y: {
-        grid: {
-          color: '#1a1f33',
-          drawBorder: false,
-        },
+        grid: { color: '#1a1f33', drawBorder: false },
         ticks: {
           color: '#8892ab',
-          callback: function (value: any) {
-            return '$' + (value / 1000) + 'K';
+          callback: function (value: string | number) {
+            return '$' + (Number(value) / 1000) + 'K';
           },
-          font: {
-            family: 'JetBrains Mono',
-            size: 11,
-          },
+          font: { family: 'JetBrains Mono', size: 11 },
         },
-        border: {
-          display: false,
-        },
+        border: { display: false },
       },
     },
     interaction: {

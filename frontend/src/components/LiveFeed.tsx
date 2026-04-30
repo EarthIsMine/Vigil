@@ -1,19 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-
-type AttackType = 'Sandwich' | 'Frontrun' | 'Protected' | 'Backrun';
-
-interface Attack {
-  id: string;
-  type: AttackType;
-  victim: string;
-  attacker: string;
-  amount: string;
-  time: string;
-}
-
-const attackTypes: AttackType[] = ['Sandwich', 'Frontrun', 'Protected', 'Backrun'];
+import type { Attack, AttackType } from '@/hooks/useLiveFeed';
+import { useLiveFeed } from '@/hooks/useLiveFeed';
 
 const getAttackColor = (type: AttackType) => {
   switch (type) {
@@ -30,53 +18,13 @@ const getAttackColor = (type: AttackType) => {
   }
 };
 
-const BASE58_CHARS = '123456789ABCDEFGHJKLMNPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz';
+interface LiveFeedProps {
+  attacks?: Attack[];
+}
 
-const generateSolanaAddress = () => {
-  const len = 32 + Math.floor(Math.random() * 12);
-  return Array.from({ length: len }, () =>
-    BASE58_CHARS[Math.floor(Math.random() * BASE58_CHARS.length)]
-  ).join('');
-};
-
-const generateRandomAttack = (): Attack => {
-  const type = attackTypes[Math.floor(Math.random() * attackTypes.length)];
-  const amount = (Math.random() * 8 + 0.05).toFixed(3);
-  const now = new Date();
-
-  return {
-    id: Date.now().toString() + Math.random(),
-    type,
-    victim: generateSolanaAddress(),
-    attacker: generateSolanaAddress(),
-    amount: amount + ' SOL',
-    time: now.toLocaleTimeString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      second: '2-digit'
-    }),
-  };
-};
-
-export default function LiveFeed() {
-  const [attacks, setAttacks] = useState<Attack[]>([]);
-
-  useEffect(() => {
-    // Initialize with some attacks
-    const initialAttacks = Array.from({ length: 5 }, () => generateRandomAttack());
-    setAttacks(initialAttacks);
-
-    // Add new attack every 5 seconds
-    const interval = setInterval(() => {
-      setAttacks((prev) => {
-        const newAttack = generateRandomAttack();
-        const updated = [newAttack, ...prev];
-        return updated.slice(0, 20); // Keep max 20 items
-      });
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, []);
+export default function LiveFeed({ attacks: externalAttacks }: LiveFeedProps) {
+  const generatedAttacks = useLiveFeed();
+  const attacks = externalAttacks ?? generatedAttacks;
 
   return (
     <div className="space-y-3">

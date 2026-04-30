@@ -1,15 +1,8 @@
 import { apiFetch, withFallback } from '../api';
 import { MOCK_TIMESERIES, MOCK_POOL_LEADERBOARD } from '../mock';
-import type { TimeSeriesDataPoint, PoolLeaderboardEntry } from '../types';
+import type { TimeSeriesDataPoint, PoolLeaderboardEntry, EpochSummary } from '../types';
 
-export interface EpochSummary {
-  epoch: number;
-  extracted: string;
-  sandwich: number;
-  frontrun: number;
-  backrun: number;
-  dominantClient: string;
-}
+export type { EpochSummary } from '../types';
 
 const MOCK_EPOCH_SUMMARY: EpochSummary[] = [
   { epoch: 642, extracted: '$2.14M', sandwich: 847, frontrun: 312, backrun: 1204, dominantClient: 'Jito-Agave' },

@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { getColorClass, generateHeatmapData } from '@/lib/heatmap-utils';
 
 interface TooltipData {
   day: string;
@@ -10,50 +11,27 @@ interface TooltipData {
   y: number;
 }
 
-export default function Heatmap() {
+interface HeatmapProps {
+  data?: number[][];
+  days?: string[];
+}
+
+const DEFAULT_DAYS = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+
+export default function Heatmap({ data: externalData, days = DEFAULT_DAYS }: HeatmapProps) {
   const [tooltip, setTooltip] = useState<TooltipData | null>(null);
+  const data = externalData ?? generateHeatmapData();
 
-  const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
   const hours = Array.from({ length: 24 }, (_, i) => i);
-
-  // Seeded random function for consistent data
-  const seededRandom = (seed: number): number => {
-    const x = Math.sin(seed) * 10000;
-    return x - Math.floor(x);
-  };
-
-  // Generate attack count based on day and hour
-  const getAttackCount = (dayIndex: number, hour: number): number => {
-    const isWeekend = dayIndex >= 5; // Saturday and Sunday
-    const isPeakHour = hour >= 13 && hour <= 21;
-
-    const seed = dayIndex * 100 + hour;
-    const baseRandom = seededRandom(seed);
-
-    let multiplier = 1;
-    if (isPeakHour) multiplier *= 2.5;
-    if (isWeekend) multiplier *= 0.4;
-
-    return Math.floor(baseRandom * 100 * multiplier);
-  };
-
-  // Get color class based on attack count
-  const getColorClass = (count: number): string => {
-    if (count === 0) return 'bg-[#1a1f2e]';
-    if (count < 25) return 'bg-[#ef4444]/20';
-    if (count < 50) return 'bg-[#ef4444]/40';
-    if (count < 75) return 'bg-[#ef4444]/60';
-    return 'bg-[#ef4444]';
-  };
 
   const handleMouseEnter = (dayIndex: number, hour: number, event: React.MouseEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
     setTooltip({
       day: days[dayIndex],
       hour,
-      count: getAttackCount(dayIndex, hour),
+      count: data[dayIndex][hour],
       x: rect.left + rect.width / 2,
-      y: rect.top - 10
+      y: rect.top - 10,
     });
   };
 
@@ -66,7 +44,7 @@ export default function Heatmap() {
       <div className="flex">
         {/* Hour labels */}
         <div className="flex flex-col pr-2">
-          <div className="h-6" /> {/* Spacer for day labels */}
+          <div className="h-6" />
           {hours.filter(h => h % 3 === 0).map((hour) => (
             <div
               key={hour}
@@ -94,7 +72,7 @@ export default function Heatmap() {
             {days.map((day, dayIndex) => (
               <div key={day} className="flex flex-col gap-1">
                 {hours.map((hour) => {
-                  const count = getAttackCount(dayIndex, hour);
+                  const count = data[dayIndex]?.[hour] ?? 0;
                   return (
                     <div
                       key={hour}
@@ -117,7 +95,7 @@ export default function Heatmap() {
           style={{
             left: `${tooltip.x}px`,
             top: `${tooltip.y}px`,
-            transform: 'translate(-50%, -100%)'
+            transform: 'translate(-50%, -100%)',
           }}
         >
           <div className="text-xs font-medium">{tooltip.day}</div>

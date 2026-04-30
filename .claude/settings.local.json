@@ -3,7 +3,13 @@
     "allow": [
       "Bash(git mv:*)",
       "Bash(pnpm install:*)",
-      "Bash(kill:*)"
+      "Bash(kill:*)",
+      "Bash(pnpm --filter vigil-frontend add:*)",
+      "Bash(pnpm test)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm build:*)",
+      "Bash(pnpm --filter vigil-frontend test:*)",
+      "Bash(pnpm --filter vigil-frontend lint:*)"
     ]
   }
 }
