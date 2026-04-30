@@ -52,36 +52,6 @@ export default function ReceiptPage() {
 
   return (
     <div className="min-h-screen bg-vigil-bg text-white">
-      {/* Top Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-vigil-card-dark/80 backdrop-blur-xl border-b border-vigil-border-dark">
-        <div className="flex items-center justify-between h-14 px-5">
-          <div className="flex items-center gap-6">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-accent-blue to-accent-cyan flex items-center justify-center">
-                <span className="material-symbols-outlined text-white text-lg">shield</span>
-              </div>
-              <span className="font-display font-bold text-lg tracking-tight text-white">VIGIL</span>
-              <span className="px-1.5 py-0.5 bg-vigil-accent/20 border border-vigil-accent/30 rounded text-[10px] font-mono font-semibold text-vigil-accent">
-                BETA
-              </span>
-            </Link>
-            <div className="hidden md:flex items-center gap-1 ml-4">
-              <Link href="/dashboard"  className="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-vigil-muted hover:text-white">Dashboard</Link>
-              <Link href="/receipt"    className="nav-link px-3 py-1.5 text-sm font-medium rounded-md active text-vigil-accent">MEV Receipt</Link>
-              <Link href="/protection" className="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-vigil-muted hover:text-white">Protection</Link>
-              <Link href="/analytics"  className="nav-link px-3 py-1.5 text-sm font-medium rounded-md text-vigil-muted hover:text-white">Analytics</Link>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <button className="relative p-2 hover:bg-vigil-card-dark rounded-lg transition">
-              <span className="material-symbols-outlined text-xl text-vigil-muted">notifications</span>
-              <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-vigil-red rounded-full"></span>
-            </button>
-            <div className="w-8 h-8 rounded-full bg-gradient-to-br from-vigil-accent to-accent-cyan"></div>
-          </div>
-        </div>
-      </nav>
-
       {/* Left Sidebar */}
       <aside className="fixed left-0 top-14 bottom-0 w-16 bg-vigil-card-dark border-r border-vigil-border-dark flex flex-col items-center py-6 gap-6 z-40">
         <Link href="/dashboard" className="p-3 rounded-lg hover:bg-vigil-accent/10 transition text-vigil-muted hover:text-white">

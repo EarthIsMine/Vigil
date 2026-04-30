@@ -1,40 +1,13 @@
 import Link from 'next/link';
+import ScrollDownIndicator from '@/components/ScrollDownIndicator';
 
 export default function ProtectionPage() {
   return (
     <div className="bg-vigil-black min-h-screen">
-      {/* Navigation */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-vigil-black/80 backdrop-blur-xl border-b border-vigil-border">
-        <div className="container mx-auto px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-vigil-green to-vigil-emerald flex items-center justify-center">
-              <svg className="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
-              </svg>
-            </div>
-            <span className="font-display text-xl font-bold text-white">Vigil</span>
-          </Link>
-
-          <div className="hidden md:flex items-center gap-8">
-            <a href="#features" className="text-sm text-vigil-muted hover:text-white transition-colors">Features</a>
-            <a href="#how-it-works" className="text-sm text-vigil-muted hover:text-white transition-colors">How It Works</a>
-            <a href="#pricing" className="text-sm text-vigil-muted hover:text-white transition-colors">Pricing</a>
-            <Link href="/dashboard" className="text-sm text-vigil-muted hover:text-white transition-colors">Dashboard</Link>
-          </div>
-
-          <div className="flex items-center gap-4">
-            <Link href="/docs" className="text-sm text-vigil-muted hover:text-white transition-colors">
-              Docs
-            </Link>
-            <Link href="/dashboard" className="px-4 py-2 bg-vigil-green hover:bg-vigil-emerald text-white rounded-lg text-sm font-medium transition-colors">
-              Get Started
-            </Link>
-          </div>
-        </div>
-      </nav>
+      <ScrollDownIndicator sectionIds={['stats', 'how-it-works', 'features', 'pricing', 'cta']} />
 
       {/* Hero Section */}
-      <section className="relative pt-32 pb-20 overflow-hidden">
+      <section id="hero" className="relative pt-24 pb-20 overflow-hidden">
         <div className="absolute inset-0 grid-bg opacity-20"></div>
         <div className="absolute inset-0 hero-glow"></div>
         <div className="scan-line"></div>
@@ -128,10 +101,11 @@ export default function ProtectionPage() {
             </div>
           </div>
         </div>
+
       </section>
 
       {/* Live Protection Stats */}
-      <section className="py-20 relative">
+      <section id="stats" className="py-20 relative">
         <div className="container mx-auto px-6">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
             <div className="bg-vigil-card border border-vigil-border rounded-xl p-6 card-glow float-up">
@@ -501,7 +475,7 @@ export default function ProtectionPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-20 relative">
+      <section id="cta" className="py-20 relative">
         <div className="container mx-auto px-6">
           <div className="bg-vigil-card border border-vigil-border rounded-2xl p-12 text-center card-glow relative overflow-hidden">
             <div className="absolute inset-0 hero-glow opacity-30"></div>

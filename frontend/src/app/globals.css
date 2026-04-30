@@ -66,6 +66,7 @@
 }
 
 /* ── Base styles ── */
+html { scroll-behavior: smooth; scroll-padding-top: 4.5rem; }
 body {
   background: #0a0e1a;
   color: #c8d0e6;
@@ -152,6 +153,15 @@ body {
 .validator-stat-card-cyan::before { background: linear-gradient(90deg, #22d3ee, transparent); }
 
 .glow-red { box-shadow: 0 0 24px rgba(239,68,68,0.15); }
+
+/* ── Scroll-down indicator ── */
+@keyframes bounce-down {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(8px); }
+}
+.scroll-down-arrow {
+  animation: bounce-down 2s ease-in-out infinite;
+}
 
 /* ── Protection page ── */
 .gradient-text {

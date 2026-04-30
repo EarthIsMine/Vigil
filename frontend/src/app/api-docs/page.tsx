@@ -171,24 +171,6 @@ export default function ApiDocsPage() {
   return (
     <div className="min-h-screen bg-surface-100 text-on-surf">
 
-      {/* NAV */}
-      <nav className="fixed top-0 left-0 right-0 z-50 h-14 flex items-center justify-between px-6 bg-surface-100/90 backdrop-blur-md border-b border-outline/15">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-secondary text-2xl">shield</span>
-            <span className="font-display font-bold text-lg tracking-tight text-on-surf">VIGIL</span>
-          </Link>
-          <span className="text-muted text-sm hidden sm:inline">/ API Reference</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <span className="font-mono text-xs text-muted bg-surface px-2.5 py-1">v1.0.0</span>
-          <Link href="/dashboard" className="text-sm text-muted hover:text-on-surf transition-colors">Dashboard</Link>
-          <button className="text-sm bg-primary text-surface font-semibold px-4 py-1.5 hover:bg-primary/90 transition-colors">
-            Get API Key
-          </button>
-        </div>
-      </nav>
-
       <div className="flex pt-14 min-h-screen">
 
         {/* LEFT SIDEBAR */}

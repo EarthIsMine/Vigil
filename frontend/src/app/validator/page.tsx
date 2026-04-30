@@ -26,31 +26,6 @@ export default function ValidatorPage() {
 
   return (
     <div className="min-h-screen bg-[#0a0e1a] text-white">
-      {/* Nav Bar */}
-      <nav className="fixed top-0 left-0 right-0 h-14 bg-[#0a0e1a] border-b border-white/10 z-50">
-        <div className="flex items-center justify-between h-full px-4">
-          <div className="flex items-center gap-8">
-            <Link href="/dashboard" className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-[#3b82f6] rounded flex items-center justify-center">
-                <span className="material-symbols-outlined text-white text-lg">security</span>
-              </div>
-              <span className="font-bold text-xl">VIGIL</span>
-            </Link>
-            <div className="flex items-center gap-6">
-              <Link href="/dashboard" className="text-[#8892ab] hover:text-white transition-colors">Dashboard</Link>
-              <Link href="/validator" className="text-white font-medium">Validators</Link>
-              <Link href="/protection" className="text-[#8892ab] hover:text-white transition-colors">Protection</Link>
-              <Link href="/receipt" className="text-[#8892ab] hover:text-white transition-colors">Receipts</Link>
-              <Link href="/api-docs" className="text-[#8892ab] hover:text-white transition-colors">API</Link>
-            </div>
-          </div>
-          <div className="flex items-center gap-3">
-            <span className="px-2 py-1 bg-[#22c55e]/20 text-[#22c55e] rounded text-xs font-medium">MAINNET-BETA</span>
-            <span className="text-[#8892ab] text-sm">Epoch 642</span>
-          </div>
-        </div>
-      </nav>
-
       {/* Sidebar */}
       <aside className="fixed left-0 top-14 w-[220px] h-[calc(100vh-3.5rem)] bg-[#0a0e1a] border-r border-white/10 flex flex-col">
         <div className="flex-1 p-4">

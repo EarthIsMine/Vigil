@@ -60,7 +60,8 @@ export async function withFallback<T>(
     return await fetcher();
   } catch (err) {
     if (process.env.NODE_ENV === 'development') {
-      console.warn(`[Vigil] ${label} — using mock data`, err);
+      const msg = err instanceof Error ? err.message : String(err);
+      console.warn(`[Vigil] ${label} — using mock data (${msg})`);
     }
     return mock;
   }

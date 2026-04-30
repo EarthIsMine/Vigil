@@ -1,4 +1,3 @@
-import Nav from '@/components/Nav';
 import MevChart from '@/components/MevChart';
 import LiveFeed from '@/components/LiveFeed';
 import {
@@ -35,8 +34,6 @@ export default async function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-surface">
-      <Nav />
-
       {/* Sidebar */}
       <aside className="fixed left-0 top-16 h-[calc(100vh-4rem)] w-56 bg-surface-100 border-r border-outline hidden lg:block overflow-y-auto">
         <div className="p-4 space-y-6">
