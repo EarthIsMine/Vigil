@@ -3,21 +3,18 @@ import { render, screen } from '@testing-library/react';
 import ValidatorPagination from '../ValidatorPagination';
 
 describe('ValidatorPagination', () => {
-  it('renders count text', () => {
-    render(<ValidatorPagination />);
-    expect(screen.getByText('Showing 1–8 of 4,745 attacks')).toBeInTheDocument();
+  it('renders count text with data', () => {
+    render(<ValidatorPagination total={50} shown={20} />);
+    expect(screen.getByText('Showing 1–20 of 50 attacks')).toBeInTheDocument();
   });
 
-  it('renders page buttons', () => {
-    render(<ValidatorPagination />);
-    expect(screen.getByText('1')).toBeInTheDocument();
-    expect(screen.getByText('2')).toBeInTheDocument();
-    expect(screen.getByText('3')).toBeInTheDocument();
-    expect(screen.getByText('593')).toBeInTheDocument();
+  it('renders empty state when no attacks', () => {
+    render(<ValidatorPagination total={0} shown={20} />);
+    expect(screen.getByText('No attacks detected yet')).toBeInTheDocument();
   });
 
-  it('disables previous button', () => {
-    render(<ValidatorPagination />);
-    expect(screen.getByText('Previous')).toBeDisabled();
+  it('caps shown at total when total is smaller', () => {
+    render(<ValidatorPagination total={5} shown={20} />);
+    expect(screen.getByText('Showing 1–5 of 5 attacks')).toBeInTheDocument();
   });
 });

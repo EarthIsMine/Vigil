@@ -1,6 +1,5 @@
 'use client';
 
-import ValidatorSidebar from '@/components/validator/ValidatorSidebar';
 import ValidatorBreadcrumb from '@/components/validator/ValidatorBreadcrumb';
 import ValidatorHeader from '@/components/validator/ValidatorHeader';
 import ValidatorStatCards from '@/components/validator/ValidatorStatCards';
@@ -12,20 +11,19 @@ import ValidatorFooter from '@/components/validator/ValidatorFooter';
 import { useValidatorData } from '@/hooks/useValidatorData';
 
 export default function ValidatorPage() {
-  const { validator, riskColor } = useValidatorData();
+  const { validator, riskColor, attacks, pools } = useValidatorData();
 
   return (
     <div className="min-h-screen bg-[#0a0e1a] text-white">
-      <ValidatorSidebar validator={validator} riskColor={riskColor} />
-      <main className="pt-14 lg:pl-[220px]">
+      <main className="pt-14">
         <div className="p-4 sm:p-6 max-w-[1600px] mx-auto">
           <ValidatorBreadcrumb name={validator?.name ?? '...'} />
           <ValidatorHeader validator={validator} riskColor={riskColor} />
           <ValidatorStatCards validator={validator} />
-          <ValidatorHeatmapSection />
-          <ValidatorAttackDistribution />
-          <TelemetryTable />
-          <ValidatorPagination />
+          <ValidatorHeatmapSection attacks={attacks} />
+          <ValidatorAttackDistribution attacks={attacks} pools={pools} />
+          <TelemetryTable attacks={attacks} />
+          <ValidatorPagination total={attacks.length} shown={20} />
           <ValidatorFooter />
         </div>
       </main>
