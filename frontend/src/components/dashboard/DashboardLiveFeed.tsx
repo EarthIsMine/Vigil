@@ -1,6 +1,11 @@
 import LiveFeed from '@/components/LiveFeed';
+import type { MevAttack } from '@/lib/types';
 
-export default function DashboardLiveFeed() {
+interface DashboardLiveFeedProps {
+  attacks: MevAttack[];
+}
+
+export default function DashboardLiveFeed({ attacks }: DashboardLiveFeedProps) {
   return (
     <div className="bg-surface-100 border border-outline rounded-lg p-6 fade-up fade-up-d4">
       <div className="flex items-center justify-between mb-6">
@@ -10,7 +15,7 @@ export default function DashboardLiveFeed() {
           <span className="text-xs font-mono text-muted">Live</span>
         </div>
       </div>
-      <LiveFeed />
+      <LiveFeed attacks={attacks} />
     </div>
   );
 }
