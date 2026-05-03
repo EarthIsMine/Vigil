@@ -47,9 +47,11 @@ function createInitialAttacks(): Attack[] {
 }
 
 export function useLiveFeed(intervalMs = 5000, maxItems = 20): Attack[] {
-  const [attacks, setAttacks] = useState<Attack[]>(createInitialAttacks);
+  const [attacks, setAttacks] = useState<Attack[]>([]);
 
   useEffect(() => {
+    setAttacks(createInitialAttacks());
+
     const interval = setInterval(() => {
       setAttacks((prev) => {
         const newAttack = generateRandomAttack();

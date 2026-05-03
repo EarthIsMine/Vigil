@@ -1,44 +1,59 @@
 'use client';
 
-import type { Attack, AttackType } from '@/hooks/useLiveFeed';
-import { useLiveFeed } from '@/hooks/useLiveFeed';
+import type { MevAttack, MevType } from '@/lib/types';
 
-const getAttackColor = (type: AttackType) => {
+const TYPE_LABELS: Record<string, string> = {
+  sandwich_single: 'Sandwich',
+  sandwich_wide: 'Wide Sandwich',
+  sandwich_auth_hop: 'Auth Hop',
+  backrun: 'Backrun',
+  liquidation: 'Liquidation',
+  jit_liquidity: 'JIT Liquidity',
+};
+
+const getTypeColor = (type: MevType) => {
   switch (type) {
-    case 'Sandwich':
+    case 'sandwich_single':
+    case 'sandwich_wide':
+    case 'sandwich_auth_hop':
       return 'text-error';
-    case 'Frontrun':
-      return 'text-warning';
-    case 'Protected':
-      return 'text-secondary';
-    case 'Backrun':
+    case 'backrun':
       return 'text-primary';
     default:
-      return 'text-on-surf';
+      return 'text-warning';
   }
 };
 
 interface LiveFeedProps {
-  attacks?: Attack[];
+  attacks?: MevAttack[];
 }
 
-export default function LiveFeed({ attacks: externalAttacks }: LiveFeedProps) {
-  const generatedAttacks = useLiveFeed();
-  const attacks = externalAttacks ?? generatedAttacks;
+export default function LiveFeed({ attacks }: LiveFeedProps) {
+  if (!attacks || attacks.length === 0) {
+    return (
+      <div className="text-center py-8 text-muted font-mono text-sm">
+        No attacks detected yet. Waiting for data...
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-3">
       {attacks.map((attack) => (
         <div
-          key={attack.id}
+          key={attack.signature}
           className="bg-surface-200 border border-outline rounded-lg p-4 hover:bg-surface-300 transition-colors"
         >
           <div className="flex items-start justify-between mb-2">
-            <span className={`font-mono text-sm font-semibold ${getAttackColor(attack.type)}`}>
-              {attack.type}
+            <span className={`font-mono text-sm font-semibold ${getTypeColor(attack.type)}`}>
+              {TYPE_LABELS[attack.type] ?? attack.type}
             </span>
             <span className="font-mono text-xs text-muted">
-              {attack.time}
+              {new Date(attack.timestamp).toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+              })}
             </span>
           </div>
 
@@ -46,7 +61,7 @@ export default function LiveFeed({ attacks: externalAttacks }: LiveFeedProps) {
             <div className="flex items-center gap-2">
               <span className="font-mono text-xs text-muted">Victim:</span>
               <code className="font-mono text-xs text-on-surf bg-surface-400 px-2 py-0.5 rounded">
-                {attack.victim.slice(0, 10)}...{attack.victim.slice(-8)}
+                {attack.victim.signer.slice(0, 10)}...{attack.victim.signer.slice(-8)}
               </code>
             </div>
 
@@ -57,10 +72,20 @@ export default function LiveFeed({ attacks: externalAttacks }: LiveFeedProps) {
               </code>
             </div>
 
-            <div className="flex items-center gap-2 mt-2">
-              <span className="font-mono text-xs text-muted">Amount:</span>
-              <span className="font-mono text-sm font-semibold text-primary">
-                {attack.amount}
+            <div className="flex items-center justify-between mt-2">
+              <div className="flex items-center gap-2">
+                <span className="font-mono text-xs text-muted">Loss:</span>
+                <span className="font-mono text-sm font-semibold text-primary">
+                  {attack.extractedSol.toFixed(4)} SOL
+                </span>
+                {attack.extractedUsd > 0 && (
+                  <span className="font-mono text-xs text-muted">
+                    (${attack.extractedUsd.toFixed(2)})
+                  </span>
+                )}
+              </div>
+              <span className="font-mono text-xs text-muted">
+                {attack.dex}
               </span>
             </div>
           </div>

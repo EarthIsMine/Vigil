@@ -8,8 +8,10 @@ export default function PoolLeaderboard({ pools }: { pools: PoolLeaderboardEntry
         {pools.map((p) => (
           <div key={p.pool} className="p-4 bg-surface-200 border border-outline rounded-lg hover:bg-surface-300 transition-colors">
             <div className="flex items-center justify-between mb-2">
-              <div>
-                <h3 className="font-mono font-semibold text-on-surf">{p.pool}</h3>
+              <div className="min-w-0 flex-1 mr-3">
+                <h3 className="font-mono font-semibold text-on-surf truncate" title={p.pool}>
+                  {p.pool.slice(0, 8)}...{p.pool.slice(-4)}
+                </h3>
                 <p className="text-xs text-muted">{p.dex}</p>
               </div>
               <span className="text-xs font-mono text-secondary">{p.trend}</span>

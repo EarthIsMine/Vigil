@@ -1,0 +1,151 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model MevAttack {
+  id                       Int      @id @default(autoincrement())
+  signature                String   @unique // = attack_signature (victim tx sig)
+  type                     String   // sandwich | wide_sandwich | backrun | authority_hop
+  slot                     BigInt
+  timestampMs              BigInt?  @map("timestamp_ms")
+  severity                 String?  // low | medium | high | critical
+
+  attacker                 String
+  dex                      String
+  pool                     String
+  leaderIdentity           String?  @map("leader_identity") // slot_leader
+
+  // Victim top-level promotions
+  victimSigner             String   @map("victim_signer")
+  victimAmountIn           Float    @map("victim_amount_in")
+  victimAmountOut          Float    @map("victim_amount_out")
+  victimExpectedAmountOut  Float?   @map("victim_expected_amount_out")
+
+  // AMM-replay economics (§4 추가 필드)
+  victimLossLamports       Float?   @map("victim_loss_lamports")
+  victimLossLamportsLower  Float?   @map("victim_loss_lamports_lower")
+  victimLossLamportsUpper  Float?   @map("victim_loss_lamports_upper")
+  attackerProfit           Float?   @map("attacker_profit")
+  priceImpactBps           Int?     @map("price_impact_bps")
+
+  // Confidence & provenance
+  bundleProvenance         String?  @map("bundle_provenance")
+  confidence               Float?
+  confidenceLevel          String?  @map("confidence_level")
+
+  // jsonb fields (§4)
+  detectionMethod          Json?    @map("detection_method")
+  evidence                 Json?
+  ammReplay                Json?    @map("amm_replay")
+  whirlpoolReplay          Json?    @map("whirlpool_replay")
+  dlmmReplay               Json?    @map("dlmm_replay")
+
+  // For frontend queries
+  extractedSol             Float?   @map("extracted_sol")
+  extractedUsd             Float?   @map("extracted_usd")
+
+  // Relations
+  sandwichDetail           SandwichDetail?
+  receipts                 MevReceipt[]
+
+  createdAt                DateTime @default(now()) @map("created_at")
+
+  @@index([slot])
+  @@index([timestampMs])
+  @@index([attacker])
+  @@index([victimSigner])
+  @@index([pool])
+  @@index([leaderIdentity])
+  @@index([dex])
+  @@map("mev_attacks")
+}
+
+model SandwichDetail {
+  id               Int     @id @default(autoincrement())
+  attackSignature  String  @unique @map("attack_signature")
+  frontrunTx       String  @map("frontrun_tx")
+  backrunTx        String  @map("backrun_tx")
+  attackerProfit   Float?  @map("attacker_profit")
+  frontrunSlot     BigInt? @map("frontrun_slot")
+  backrunSlot      BigInt? @map("backrun_slot")
+  isWideSandwich   Boolean @default(false) @map("is_wide_sandwich")
+
+  attack           MevAttack @relation(fields: [attackSignature], references: [signature])
+
+  @@map("sandwich_details")
+}
+
+model MevReceipt {
+  id                 Int      @id @default(autoincrement())
+  victimTxSignature  String   @unique @map("victim_tx_signature")
+  attackSignature    String   @map("attack_signature")
+  timestampMs        BigInt?  @map("timestamp_ms")
+  victimWallet       String   @map("victim_wallet")
+  victimAction       String   @map("victim_action")
+  victimDex          String   @map("victim_dex")
+  tokenInMint        String?  @map("token_in_mint")
+  tokenOutMint       String?  @map("token_out_mint")
+  amountIn           Float    @map("amount_in")
+  expectedAmountOut  Float?   @map("expected_amount_out")
+  actualAmountOut    Float    @map("actual_amount_out")
+  slippage           Float?
+  mevDetected        Boolean  @default(true) @map("mev_detected")
+  mevType            String   @map("mev_type")
+  severity           String
+  lossAmount         Float?   @map("loss_amount")
+  lossAmountLower    Float?   @map("loss_amount_lower")
+  lossAmountUpper    Float?   @map("loss_amount_upper")
+  lossPercent        Float?   @map("loss_percent")
+  lossConfidence     String   @map("loss_confidence")
+  validatorIdentity  String?  @map("validator_identity")
+
+  attack             MevAttack @relation(fields: [attackSignature], references: [signature])
+
+  createdAt          DateTime @default(now()) @map("created_at")
+
+  @@index([victimWallet])
+  @@index([timestampMs])
+  @@index([attackSignature])
+  @@map("mev_receipts")
+}
+
+model ValidatorStats {
+  id                     Int      @id @default(autoincrement())
+  identity               String   @unique
+  name                   String   @default("")
+  voteAccount            String   @default("") @map("vote_account")
+  client                 String   @default("")
+
+  totalSlotsSeen         Int      @default(0) @map("total_slots_seen")
+  slotsWithSandwich      Int      @default(0) @map("slots_with_sandwich")
+  slotsWithWideSandwich  Int      @default(0) @map("slots_with_wide_sandwich")
+  totalExtractedLamports Float    @default(0) @map("total_extracted_lamports")
+  totalAttacksInSlots    Int      @default(0) @map("total_attacks_in_slots")
+
+  riskScore              Float?   @map("risk_score")
+  riskLevel              String   @default("unrated") @map("risk_level")
+
+  lastUpdated            DateTime @default(now()) @updatedAt @map("last_updated")
+
+  @@map("validator_stats")
+}
+
+model PoolStats {
+  id                Int      @id @default(autoincrement())
+  pool              String   @unique
+  dex               String
+  attackCount       Int      @default(0) @map("attack_count")
+  totalLossLamports Float    @default(0) @map("total_loss_lamports")
+  totalLossUsd      Float    @default(0) @map("total_loss_usd")
+  lastAttackAt      DateTime? @map("last_attack_at")
+
+  lastUpdated       DateTime @default(now()) @updatedAt @map("last_updated")
+
+  @@index([attackCount(sort: Desc)])
+  @@map("pool_stats")
+}

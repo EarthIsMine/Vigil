@@ -29,6 +29,7 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
 
   try {
     const res = await fetch(`${API_BASE}${path}`, {
+      cache: 'no-store',
       ...init,
       signal: controller.signal,
     });

@@ -38,13 +38,19 @@ export default function ValidatorHeader({ validator, riskColor }: ValidatorHeade
                     </span>
                   </div>
                   <div className="space-y-1">
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className="text-[#8892ab]">Vote Account:</span>
-                      <span className="font-mono">{validator.voteAccount}</span>
-                    </div>
+                    {validator.voteAccount && (
+                      <div className="flex items-center gap-2 text-sm">
+                        <span className="text-[#8892ab]">Vote Account:</span>
+                        <span className="font-mono" title={validator.voteAccount}>
+                          {validator.voteAccount.slice(0, 8)}...{validator.voteAccount.slice(-4)}
+                        </span>
+                      </div>
+                    )}
                     <div className="flex items-center gap-2 text-sm">
                       <span className="text-[#8892ab]">Identity:</span>
-                      <span className="font-mono">{validator.identity}</span>
+                      <span className="font-mono" title={validator.identity}>
+                        {validator.identity.slice(0, 8)}...{validator.identity.slice(-4)}
+                      </span>
                     </div>
                   </div>
                 </div>

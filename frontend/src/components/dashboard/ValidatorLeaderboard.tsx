@@ -11,10 +11,16 @@ export default function ValidatorLeaderboard({ validators }: { validators: Valid
               <span className="font-mono text-sm font-bold text-primary">{v.rank}</span>
             </div>
             <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <code className="font-mono text-sm text-on-surf">{v.identity}</code>
-                <span className="text-xs text-muted">•</span>
-                <span className="text-xs text-muted">{v.name}</span>
+              <div className="flex items-center gap-2 mb-1 truncate">
+                <code className="font-mono text-sm text-on-surf truncate" title={v.identity}>
+                  {v.identity.slice(0, 8)}...{v.identity.slice(-4)}
+                </code>
+                {v.name && v.name !== `${v.identity.slice(0, 8)}...` && (
+                  <>
+                    <span className="text-xs text-muted flex-shrink-0">•</span>
+                    <span className="text-xs text-muted truncate">{v.name}</span>
+                  </>
+                )}
               </div>
               <div className="flex items-center gap-3">
                 <span className="font-mono text-xs px-1.5 py-0.5 rounded text-secondary bg-sec-dim">

@@ -4,12 +4,15 @@
   "private": true,
   "scripts": {
     "dev": "nest start --watch",
+    "start:dev": "nest start --watch",
     "build": "nest build",
     "start": "node dist/main",
     "start:prod": "node dist/main",
     "lint": "eslint \"{src,test}/**/*.ts\"",
     "test": "jest",
-    "test:e2e": "jest --config ./test/jest-e2e.json"
+    "test:e2e": "jest --config ./test/jest-e2e.json",
+    "prisma:generate": "prisma generate",
+    "prisma:migrate": "prisma migrate dev"
   },
   "dependencies": {
     "@nestjs/common": "^11.0.0",
@@ -19,7 +22,8 @@
     "@nestjs/platform-socket.io": "^11.0.0",
     "@prisma/client": "^6.0.0",
     "reflect-metadata": "^0.2.0",
-    "rxjs": "^7.8.0"
+    "rxjs": "^7.8.0",
+    "socket.io": "^4.7.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^11.0.0",

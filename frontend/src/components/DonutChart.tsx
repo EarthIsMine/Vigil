@@ -1,5 +1,6 @@
 'use client';
 
+import { useRef } from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, Plugin, TooltipItem } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 
@@ -21,7 +22,7 @@ export default function DonutChart({
   labels = DEFAULT_LABELS,
   data = DEFAULT_DATA,
   colors = DEFAULT_COLORS,
-  centerText = '4,745',
+  centerText = '0',
   centerSubText = 'total attacks',
 }: DonutChartProps) {
   const chartData = {
@@ -37,26 +38,34 @@ export default function DonutChart({
     ],
   };
 
+  const centerTextRef = useRef(centerText);
+  const centerSubTextRef = useRef(centerSubText);
+  centerTextRef.current = centerText;
+  centerSubTextRef.current = centerSubText;
+
   const centerTextPlugin: Plugin<'doughnut'> = {
     id: 'centerText',
     beforeDraw: (chart) => {
       const { width, height, ctx } = chart;
       ctx.restore();
 
+      const text = centerTextRef.current;
+      const subText = centerSubTextRef.current;
+
       const fontSize = height / 160;
       ctx.font = `bold ${fontSize.toFixed(2)}em sans-serif`;
       ctx.textBaseline = 'middle';
       ctx.fillStyle = '#ffffff';
 
-      const textX = Math.round((width - ctx.measureText(centerText).width) / 2);
+      const textX = Math.round((width - ctx.measureText(text).width) / 2);
       const textY = height / 2 - 10;
-      ctx.fillText(centerText, textX, textY);
+      ctx.fillText(text, textX, textY);
 
       ctx.font = `${(fontSize * 0.5).toFixed(2)}em sans-serif`;
       ctx.fillStyle = '#8892ab';
-      const subTextX = Math.round((width - ctx.measureText(centerSubText).width) / 2);
+      const subTextX = Math.round((width - ctx.measureText(subText).width) / 2);
       const subTextY = height / 2 + 15;
-      ctx.fillText(centerSubText, subTextX, subTextY);
+      ctx.fillText(subText, subTextX, subTextY);
 
       ctx.save();
     },
@@ -91,8 +100,7 @@ export default function DonutChart({
             const value = context.parsed || 0;
             const total = context.dataset.data.reduce((a: number, b: number) => a + b, 0);
             const percentage = ((value / total) * 100).toFixed(1);
-            const count = Math.round((value / 100) * 4745);
-            return `${label}: ${percentage}% (${count} attacks)`;
+            return `${label}: ${percentage}% (${value} attacks)`;
           },
         },
       },
