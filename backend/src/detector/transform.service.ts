@@ -36,6 +36,10 @@ export class TransformService {
     const timestampMs = attack.timestamp_ms ?? Date.now();
     const attackType = attack.attack_type ?? 'sandwich';
     const severity = attack.severity ?? null;
+    // Phoenix CLOB and other un-enriched DEXes emit null victim_loss_lamports
+    // per detector v1.0.0 CHANGELOG "Deferred" section — CLOB sandwich pattern
+    // (limit-order placement) does not match the frontrun/victim/backrun model.
+    // Preserve null end-to-end so stats aren't polluted with synthetic zeros.
     const lossLamports = attack.victim_loss_lamports;
     const extractedSol = lossLamports != null ? lossLamports / 1e9 : null;
     const extractedUsd = extractedSol != null ? extractedSol * solPrice : null;
