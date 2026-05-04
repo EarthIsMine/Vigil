@@ -55,9 +55,9 @@ export class ValidatorService {
       name: v.name || v.identity.slice(0, 8) + '...',
       voteAccount: v.voteAccount || '',
       client: v.client || 'unknown',
-      stake: '0',
-      commission: 0,
-      activeSinceEpoch: 0,
+      stake: (Number(v.stake) / 1e9).toLocaleString('en-US', { maximumFractionDigits: 0 }) + ' SOL',
+      commission: v.commission,
+      activeSinceEpoch: v.activeSinceEpoch,
       metricsRaw: {
         sandwichInvolvementRate: sandwichRate,
         wideSandwichRate: wideRate,

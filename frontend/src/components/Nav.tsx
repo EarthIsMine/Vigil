@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useLatestSlot } from "@/hooks/useLatestSlot";
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
@@ -15,6 +16,7 @@ const navLinks = [
 export default function Nav() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const latestSlot = useLatestSlot();
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-surface-100/80 backdrop-blur-xl border-b border-outline/30">
@@ -43,7 +45,9 @@ export default function Nav() {
         <div className="flex items-center gap-3">
           <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-sec-dim/40 border border-secondary/20 rounded-full">
             <span className="w-2 h-2 rounded-full bg-secondary pulse-dot"></span>
-            <span className="text-xs font-mono text-secondary">Block 19,482,731</span>
+            <span className="text-xs font-mono text-secondary">
+              {latestSlot ? `Slot ${latestSlot.toLocaleString('en-US')}` : 'Connecting...'}
+            </span>
           </div>
           <button className="flex items-center gap-2 px-3 py-1.5 bg-surface-300 hover:bg-surface-400 border border-outline/40 rounded-lg text-sm text-on-surf transition">
             <span className="material-symbols-outlined text-base">account_balance_wallet</span>

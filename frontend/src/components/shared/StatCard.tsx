@@ -17,7 +17,9 @@ export default function StatCard({ title, value, change, subtitle, className = '
           </span>
         )}
         {!change && subtitle && (
-          <span className="text-xs font-mono text-muted">{subtitle}</span>
+          <span className="text-xs font-mono text-muted truncate max-w-[120px]" title={subtitle}>
+            {subtitle.length > 12 ? `${subtitle.slice(0, 6)}...${subtitle.slice(-4)}` : subtitle}
+          </span>
         )}
       </div>
       <p className="font-display text-3xl font-bold text-on-surf">{value}</p>

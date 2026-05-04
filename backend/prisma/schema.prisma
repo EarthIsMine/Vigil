@@ -121,6 +121,10 @@ model ValidatorStats {
   voteAccount            String   @default("") @map("vote_account")
   client                 String   @default("")
 
+  stake                  BigInt   @default(0)
+  commission             Int      @default(0)
+  activeSinceEpoch       Int      @default(0) @map("active_since_epoch")
+
   totalSlotsSeen         Int      @default(0) @map("total_slots_seen")
   slotsWithSandwich      Int      @default(0) @map("slots_with_sandwich")
   slotsWithWideSandwich  Int      @default(0) @map("slots_with_wide_sandwich")
