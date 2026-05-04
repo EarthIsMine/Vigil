@@ -1,25 +1,23 @@
+'use client';
+
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardStatsGrid from '@/components/dashboard/DashboardStatsGrid';
 import DashboardChart from '@/components/dashboard/DashboardChart';
 import ValidatorLeaderboard from '@/components/dashboard/ValidatorLeaderboard';
 import PoolLeaderboard from '@/components/dashboard/PoolLeaderboard';
 import DashboardLiveFeed from '@/components/dashboard/DashboardLiveFeed';
-import {
-  getDashboardStats,
-  getTimeSeries,
-  getValidatorLeaderboard,
-  getPoolLeaderboard,
-  getLiveFeed,
-} from '@/lib/services/dashboard';
+import { useDashboardData } from '@/hooks/useDashboardData';
 
-export default async function DashboardPage() {
-  const [stats, timeseries, validators, pools, liveFeed] = await Promise.all([
-    getDashboardStats(),
-    getTimeSeries('24h'),
-    getValidatorLeaderboard(),
-    getPoolLeaderboard(),
-    getLiveFeed(20),
-  ]);
+export default function DashboardPage() {
+  const { stats, timeseries, validators, pools, liveFeed, loading } = useDashboardData();
+
+  if (loading || !stats) {
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center">
+        <div className="text-muted font-mono text-sm">Loading dashboard...</div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-surface">
