@@ -176,7 +176,7 @@ export class DetectorService implements OnModuleInit, OnModuleDestroy {
 
         // Upsert validator stats
         if (attack.slot_leader) {
-          const loss = attack.victim_loss_lamports ?? 0;
+          const loss = attack.victim_loss_lamports;
           await tx.validatorStats.upsert({
             where: { identity: attack.slot_leader },
             create: {
@@ -184,22 +184,22 @@ export class DetectorService implements OnModuleInit, OnModuleDestroy {
               totalSlotsSeen: 1,
               slotsWithSandwich: attack.attack_type !== 'backrun' ? 1 : 0,
               slotsWithWideSandwich: attack.is_wide_sandwich ? 1 : 0,
-              totalExtractedLamports: loss,
+              totalExtractedLamports: loss ?? 0,
               totalAttacksInSlots: 1,
             },
             update: {
               totalSlotsSeen: { increment: 1 },
               slotsWithSandwich: { increment: attack.attack_type !== 'backrun' ? 1 : 0 },
               slotsWithWideSandwich: { increment: attack.is_wide_sandwich ? 1 : 0 },
-              totalExtractedLamports: { increment: loss },
+              ...(loss != null && { totalExtractedLamports: { increment: loss } }),
               totalAttacksInSlots: { increment: 1 },
             },
           });
         }
 
         // Upsert pool stats
-        const lossLamports = attack.victim_loss_lamports ?? 0;
-        const lossUsd = (lossLamports / 1e9) * solPrice;
+        const lossLamports = attack.victim_loss_lamports;
+        const lossUsd = lossLamports != null ? (lossLamports / 1e9) * solPrice : null;
 
         await tx.poolStats.upsert({
           where: { pool: attack.pool },
@@ -207,14 +207,16 @@ export class DetectorService implements OnModuleInit, OnModuleDestroy {
             pool: attack.pool,
             dex: attack.dex,
             attackCount: 1,
-            totalLossLamports: lossLamports,
-            totalLossUsd: lossUsd,
+            totalLossLamports: lossLamports ?? 0,
+            totalLossUsd: lossUsd ?? 0,
             lastAttackAt: new Date(frontendPayload.timestamp),
           },
           update: {
             attackCount: { increment: 1 },
-            totalLossLamports: { increment: lossLamports },
-            totalLossUsd: { increment: lossUsd },
+            ...(lossLamports != null && {
+              totalLossLamports: { increment: lossLamports },
+              totalLossUsd: { increment: lossUsd! },
+            }),
             lastAttackAt: new Date(frontendPayload.timestamp),
           },
         });
@@ -223,8 +225,11 @@ export class DetectorService implements OnModuleInit, OnModuleDestroy {
       // Broadcast to WebSocket clients
       this.gateway.broadcastAttack(frontendPayload);
 
+      const lossDisplay = frontendPayload.extractedUsd != null
+        ? `$${frontendPayload.extractedUsd.toFixed(2)}`
+        : 'unenriched';
       this.logger.debug(
-        `Ingested: slot=${attack.slot} dex=${attack.dex} loss=$${frontendPayload.extractedUsd.toFixed(2)}`,
+        `Ingested: slot=${attack.slot} dex=${attack.dex} loss=${lossDisplay}`,
       );
     } catch (err) {
       this.logger.error(`DB write failed: ${(err as Error).message}`);

@@ -8,8 +8,8 @@ export interface FrontendMevAttack {
   type: string;
   timestamp: number;
   slot: number;
-  extractedUsd: number;
-  extractedSol: number;
+  extractedUsd: number | null;
+  extractedSol: number | null;
   victim: {
     signer: string;
     amountIn: number;
@@ -36,9 +36,13 @@ export class TransformService {
     const timestampMs = attack.timestamp_ms ?? Date.now();
     const attackType = attack.attack_type ?? 'sandwich';
     const severity = attack.severity ?? null;
-    const lossLamports = attack.victim_loss_lamports ?? 0;
-    const extractedSol = lossLamports / 1e9;
-    const extractedUsd = extractedSol * solPrice;
+    // Phoenix CLOB and other un-enriched DEXes emit null victim_loss_lamports
+    // per detector v1.0.0 CHANGELOG "Deferred" section — CLOB sandwich pattern
+    // (limit-order placement) does not match the frontrun/victim/backrun model.
+    // Preserve null end-to-end so stats aren't polluted with synthetic zeros.
+    const lossLamports = attack.victim_loss_lamports;
+    const extractedSol = lossLamports != null ? lossLamports / 1e9 : null;
+    const extractedUsd = extractedSol != null ? extractedSol * solPrice : null;
     const expectedAmountOut = this.getExpectedAmountOut(attack);
 
     const dbAttack: Prisma.MevAttackCreateInput = {
