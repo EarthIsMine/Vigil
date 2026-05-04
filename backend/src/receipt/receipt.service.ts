@@ -96,7 +96,7 @@ export class ReceiptService {
         loss: {
           expectedAmountOut: expectedOut,
           actualAmountOut: r.actualAmountOut,
-          lossAmount: lossLamports,
+          lossAmount: lossSol,
           lossUsd,
           lossPercent,
           confidence: r.lossConfidence === 'high' ? 'exact' : 'estimated',

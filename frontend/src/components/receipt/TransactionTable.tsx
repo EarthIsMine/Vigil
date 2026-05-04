@@ -14,12 +14,12 @@ export default function TransactionTable({ receipts }: { receipts: MevReceipt[] 
               <div className="flex-1 min-w-0">
                 <div className="font-mono text-sm text-white mb-1 truncate">{r.txSignature}</div>
                 <div className="text-xs text-vigil-muted">
-                  {r.victim.tokenIn.symbol} → {r.victim.tokenOut.symbol} swap · {r.victim.dex}
+                  swap · {r.victim.dex}
                 </div>
               </div>
               <div className="text-right">
                 <div className={`font-mono text-sm font-semibold ${cls}`}>
-                  {lossAmt > 0 ? `-${lossAmt.toFixed(3)} ${r.victim.tokenOut.symbol}` : '0.000'}
+                  {lossAmt > 0 ? `-${lossAmt.toFixed(3)} SOL` : '0.000'}
                 </div>
                 <div className={`text-xs ${cls}`}>{label}</div>
               </div>

@@ -20,7 +20,7 @@ export default function ReceiptDetailCard({ result, featuredReceipt, featuredSan
                 <span className="material-symbols-outlined text-2xl text-vigil-accent">receipt_long</span>
                 <h3 className="font-display font-bold text-lg">MEV RECEIPT</h3>
               </div>
-              <div className="font-mono text-xs text-vigil-muted">
+              <div className="font-mono text-xs text-vigil-muted truncate max-w-[280px]">
                 #{featuredReceipt?.receiptId ?? '—'}
               </div>
             </div>
@@ -38,7 +38,11 @@ export default function ReceiptDetailCard({ result, featuredReceipt, featuredSan
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-vigil-muted">TX Hash</span>
-              <span className="text-white font-mono">{featuredReceipt?.txSignature ?? '—'}</span>
+              <span className="text-white font-mono truncate max-w-[180px] inline-block align-bottom" title={featuredReceipt?.txSignature}>
+                {featuredReceipt?.txSignature
+                  ? `${featuredReceipt.txSignature.slice(0, 8)}...${featuredReceipt.txSignature.slice(-6)}`
+                  : '—'}
+              </span>
             </div>
             <div className="flex justify-between text-sm">
               <span className="text-vigil-muted">Validator Risk</span>
@@ -88,7 +92,7 @@ export default function ReceiptDetailCard({ result, featuredReceipt, featuredSan
                 <span className="text-vigil-muted">Your Loss</span>
                 <span className="text-vigil-red font-mono font-semibold">
                   {featuredReceipt
-                    ? `${featuredReceipt.mevAnalysis.loss.lossAmount.toFixed(3)} ${featuredReceipt.victim.tokenOut.symbol}`
+                    ? `${featuredReceipt.mevAnalysis.loss.lossAmount.toFixed(3)} SOL`
                     : '—'}
                 </span>
               </div>
