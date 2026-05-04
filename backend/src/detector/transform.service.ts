@@ -8,8 +8,8 @@ export interface FrontendMevAttack {
   type: string;
   timestamp: number;
   slot: number;
-  extractedUsd: number;
-  extractedSol: number;
+  extractedUsd: number | null;
+  extractedSol: number | null;
   victim: {
     signer: string;
     amountIn: number;
@@ -36,9 +36,9 @@ export class TransformService {
     const timestampMs = attack.timestamp_ms ?? Date.now();
     const attackType = attack.attack_type ?? 'sandwich';
     const severity = attack.severity ?? null;
-    const lossLamports = attack.victim_loss_lamports ?? 0;
-    const extractedSol = lossLamports / 1e9;
-    const extractedUsd = extractedSol * solPrice;
+    const lossLamports = attack.victim_loss_lamports;
+    const extractedSol = lossLamports != null ? lossLamports / 1e9 : null;
+    const extractedUsd = extractedSol != null ? extractedSol * solPrice : null;
     const expectedAmountOut = this.getExpectedAmountOut(attack);
 
     const dbAttack: Prisma.MevAttackCreateInput = {
