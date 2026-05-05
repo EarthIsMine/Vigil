@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import type { ValidatorLeaderboardEntry } from '@/lib/types';
 
 export default function ValidatorLeaderboard({ validators }: { validators: ValidatorLeaderboardEntry[] }) {
@@ -6,7 +7,11 @@ export default function ValidatorLeaderboard({ validators }: { validators: Valid
       <h2 className="font-display text-xl font-bold text-on-surf mb-6">Risky Validators Leaderboard</h2>
       <div className="space-y-4">
         {validators.map((v) => (
-          <div key={v.rank} className="flex items-center gap-4 p-4 bg-surface-200 border border-outline rounded-lg hover:bg-surface-300 transition-colors">
+          <Link
+            key={v.rank}
+            href={`/validator/${encodeURIComponent(v.identity)}`}
+            className="flex items-center gap-4 p-4 bg-surface-200 border border-outline rounded-lg hover:bg-surface-300 transition-colors"
+          >
             <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-primary-dim rounded-full">
               <span className="font-mono text-sm font-bold text-primary">{v.rank}</span>
             </div>
@@ -39,7 +44,7 @@ export default function ValidatorLeaderboard({ validators }: { validators: Valid
               <p className="font-mono font-semibold text-error">{v.extractedUsd}</p>
               <p className="font-mono text-xs text-muted">Risk: {v.riskScore}</p>
             </div>
-          </div>
+          </Link>
         ))}
       </div>
     </div>
