@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import Nav from "@/components/Nav";
+import ConnectionStatusProvider from "@/components/ConnectionStatusProvider";
 import "./globals.css";
 
 const spaceGrotesk = Space_Grotesk({
@@ -40,8 +41,10 @@ export default function RootLayout({
         />
       </head>
       <body className="font-body antialiased min-h-screen">
-        <Nav />
-        {children}
+        <ConnectionStatusProvider>
+          <Nav />
+          {children}
+        </ConnectionStatusProvider>
       </body>
     </html>
   );
