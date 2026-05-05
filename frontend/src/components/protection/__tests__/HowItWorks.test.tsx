@@ -15,10 +15,13 @@ describe('HowItWorks', () => {
     expect(screen.getByText('MEV Rebates')).toBeInTheDocument();
   });
 
-  it('renders step statistics', () => {
+  it('renders step highlights without fabricated numbers', () => {
     render(<HowItWorks />);
-    expect(screen.getByText('99.8%')).toBeInTheDocument();
-    expect(screen.getByText('2,847')).toBeInTheDocument();
-    expect(screen.getByText('$2.4M')).toBeInTheDocument();
+    expect(screen.getByText('Pre-submission scoring')).toBeInTheDocument();
+    expect(screen.getByText('Direct Block Engine routing')).toBeInTheDocument();
+    expect(screen.getByText('Automatic rebate distribution')).toBeInTheDocument();
+    expect(screen.queryByText('99.8%')).not.toBeInTheDocument();
+    expect(screen.queryByText('2,847')).not.toBeInTheDocument();
+    expect(screen.queryByText('$2.4M')).not.toBeInTheDocument();
   });
 });

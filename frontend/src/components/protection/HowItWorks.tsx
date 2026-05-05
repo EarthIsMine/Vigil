@@ -51,8 +51,7 @@ export default function HowItWorks() {
               <h3 className="font-display text-xl font-bold text-white mb-3">{step.title}</h3>
               <p className="text-vigil-muted mb-6">{step.description}</p>
               <div className="pt-4 border-t border-vigil-border">
-                <div className="text-sm text-vigil-muted">{step.statLabel}</div>
-                <div className={`text-2xl font-display font-bold ${step.color}`}>{step.statValue}</div>
+                <div className={`text-sm font-display font-bold ${step.color}`}>{step.highlight}</div>
               </div>
             </div>
           ))}

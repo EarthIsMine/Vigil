@@ -3,19 +3,19 @@ import { render, screen } from '@testing-library/react';
 import ProtectionStats from '../ProtectionStats';
 
 describe('ProtectionStats', () => {
-  it('renders all four stat cards', () => {
+  it('renders all four qualitative stat cards', () => {
     render(<ProtectionStats />);
-    expect(screen.getByText('$4.21B')).toBeInTheDocument();
-    expect(screen.getByText('842,109')).toBeInTheDocument();
-    expect(screen.getByText('<0.4ms')).toBeInTheDocument();
-    expect(screen.getByText('99.99%')).toBeInTheDocument();
+    expect(screen.getByText('Real-Time Detection')).toBeInTheDocument();
+    expect(screen.getByText('Sub-Millisecond Routing')).toBeInTheDocument();
+    expect(screen.getByText('Jito Bundle Submission')).toBeInTheDocument();
+    expect(screen.getByText('Open Audit Trail')).toBeInTheDocument();
   });
 
-  it('renders stat labels', () => {
+  it('does not render fabricated marketing numbers', () => {
     render(<ProtectionStats />);
-    expect(screen.getByText('Total Protected')).toBeInTheDocument();
-    expect(screen.getByText('Attacks Blocked')).toBeInTheDocument();
-    expect(screen.getByText('Avg Latency')).toBeInTheDocument();
-    expect(screen.getByText('Network Health')).toBeInTheDocument();
+    expect(screen.queryByText('$4.21B')).not.toBeInTheDocument();
+    expect(screen.queryByText('842,109')).not.toBeInTheDocument();
+    expect(screen.queryByText('<0.4ms')).not.toBeInTheDocument();
+    expect(screen.queryByText('99.99%')).not.toBeInTheDocument();
   });
 });
