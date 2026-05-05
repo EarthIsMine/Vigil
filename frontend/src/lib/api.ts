@@ -15,6 +15,24 @@ export class ApiError extends Error {
   }
 }
 
+export type ConnectionSource = 'live' | 'mock';
+type ConnectionListener = (source: ConnectionSource) => void;
+
+const connectionListeners = new Set<ConnectionListener>();
+
+export function subscribeConnectionSource(listener: ConnectionListener): () => void {
+  connectionListeners.add(listener);
+  return () => {
+    connectionListeners.delete(listener);
+  };
+}
+
+function emitConnectionSource(source: ConnectionSource) {
+  connectionListeners.forEach((listener) => {
+    listener(source);
+  });
+}
+
 /**
  * apiFetch — wraps fetch with timeout + error normalisation.
  * Throws ApiError on non-2xx or timeout so service layer can catch and fallback.
@@ -58,12 +76,15 @@ export async function withFallback<T>(
   mock: T,
 ): Promise<T> {
   try {
-    return await fetcher();
+    const data = await fetcher();
+    emitConnectionSource('live');
+    return data;
   } catch (err) {
     if (process.env.NODE_ENV === 'development') {
       const msg = err instanceof Error ? err.message : String(err);
       console.warn(`[Vigil] ${label} — using mock data (${msg})`);
     }
+    emitConnectionSource('mock');
     return mock;
   }
 }
