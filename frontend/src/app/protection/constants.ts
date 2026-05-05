@@ -1,8 +1,28 @@
 export const PROTECTION_STATS = [
-  { value: '$4.21B', label: 'Total Protected', delay: '' },
-  { value: '842,109', label: 'Attacks Blocked', delay: 'float-up-d1' },
-  { value: '<0.4ms', label: 'Avg Latency', delay: 'float-up-d2' },
-  { value: '99.99%', label: 'Network Health', delay: 'float-up-d3' },
+  {
+    title: 'Real-Time Detection',
+    description:
+      'Every swap is scored against pool state and searcher activity before submission.',
+    delay: '',
+  },
+  {
+    title: 'Sub-Millisecond Routing',
+    description:
+      'Risk scoring runs alongside your TX pipeline with no measurable round-trip overhead.',
+    delay: 'float-up-d1',
+  },
+  {
+    title: 'Jito Bundle Submission',
+    description:
+      'High-risk swaps are wrapped and submitted directly to the Block Engine.',
+    delay: 'float-up-d2',
+  },
+  {
+    title: 'Open Audit Trail',
+    description:
+      'Every blocked attack is recorded and exportable from your dashboard.',
+    delay: 'float-up-d3',
+  },
 ] as const;
 
 export const HERO_FEATURES = [
@@ -18,8 +38,7 @@ export interface HowItWorksStep {
   borderColor: string;
   title: string;
   description: string;
-  statLabel: string;
-  statValue: string;
+  highlight: string;
   icon: 'eye' | 'route' | 'rebate';
   delay: string;
 }
@@ -33,8 +52,7 @@ export const HOW_IT_WORKS_STEPS: HowItWorksStep[] = [
     title: 'Real-Time TX Analysis',
     description:
       'Every swap is analyzed via Helius gRPC before submission — pool state, searcher activity, and slippage exposure are scored in under 1ms.',
-    statLabel: 'Detection Rate',
-    statValue: '99.8%',
+    highlight: 'Pre-submission scoring',
     icon: 'eye',
     delay: '',
   },
@@ -46,8 +64,7 @@ export const HOW_IT_WORKS_STEPS: HowItWorksStep[] = [
     title: 'Jito Bundle Submission',
     description:
       'High-risk TXs are wrapped in a Jito bundle and submitted directly to the Block Engine — invisible to searchers until the block is finalized.',
-    statLabel: 'Network Nodes',
-    statValue: '2,847',
+    highlight: 'Direct Block Engine routing',
     icon: 'route',
     delay: 'float-up-d1',
   },
@@ -59,8 +76,7 @@ export const HOW_IT_WORKS_STEPS: HowItWorksStep[] = [
     title: 'MEV Rebates',
     description:
       'Extract value from your own transactions. When MEV is available, you get the rebate instead of the attackers. Automatic distribution.',
-    statLabel: 'Total Rebates',
-    statValue: '$2.4M',
+    highlight: 'Automatic rebate distribution',
     icon: 'rebate',
     delay: 'float-up-d2',
   },
@@ -177,9 +193,16 @@ export const PRICING_TIERS: PricingTier[] = [
   },
 ];
 
+export interface FooterLink {
+  label: string;
+  href: string;
+  isInternal?: boolean;
+  disabled?: boolean;
+}
+
 export interface FooterLinkGroup {
   title: string;
-  links: { label: string; href: string; isInternal?: boolean }[];
+  links: FooterLink[];
 }
 
 export const FOOTER_LINKS: FooterLinkGroup[] = [
@@ -196,27 +219,27 @@ export const FOOTER_LINKS: FooterLinkGroup[] = [
     title: 'Developers',
     links: [
       { label: 'Documentation', href: '/docs', isInternal: true },
-      { label: 'API Reference', href: '#' },
-      { label: 'SDK', href: '#' },
-      { label: 'GitHub', href: '#' },
+      { label: 'API Reference', href: '#', disabled: true },
+      { label: 'SDK', href: '#', disabled: true },
+      { label: 'GitHub', href: '#', disabled: true },
     ],
   },
   {
     title: 'Company',
     links: [
-      { label: 'About', href: '#' },
-      { label: 'Blog', href: '#' },
-      { label: 'Careers', href: '#' },
+      { label: 'About', href: '#', disabled: true },
+      { label: 'Blog', href: '#', disabled: true },
+      { label: 'Careers', href: '#', disabled: true },
       { label: 'Contact', href: '/contact', isInternal: true },
     ],
   },
   {
     title: 'Legal',
     links: [
-      { label: 'Privacy', href: '#' },
-      { label: 'Terms', href: '#' },
-      { label: 'Security', href: '#' },
-      { label: 'Compliance', href: '#' },
+      { label: 'Privacy', href: '#', disabled: true },
+      { label: 'Terms', href: '#', disabled: true },
+      { label: 'Security', href: '#', disabled: true },
+      { label: 'Compliance', href: '#', disabled: true },
     ],
   },
 ];
