@@ -197,9 +197,14 @@ export class DetectorService implements OnModuleInit, OnModuleDestroy {
           });
         }
 
-        // Upsert pool stats
+        // Upsert pool stats. When solPrice is unavailable (boot window or
+        // CoinGecko outage), accumulate SOL only — totalLossUsd stays a lower
+        // bound rather than being synthesized from a stale fallback.
         const lossLamports = attack.victim_loss_lamports;
-        const lossUsd = lossLamports != null ? (lossLamports / 1e9) * solPrice : null;
+        const lossUsd =
+          lossLamports != null && solPrice != null
+            ? (lossLamports / 1e9) * solPrice
+            : null;
 
         await tx.poolStats.upsert({
           where: { pool: attack.pool },
@@ -215,7 +220,7 @@ export class DetectorService implements OnModuleInit, OnModuleDestroy {
             attackCount: { increment: 1 },
             ...(lossLamports != null && {
               totalLossLamports: { increment: lossLamports },
-              totalLossUsd: { increment: lossUsd! },
+              ...(lossUsd != null && { totalLossUsd: { increment: lossUsd } }),
             }),
             lastAttackAt: new Date(frontendPayload.timestamp),
           },

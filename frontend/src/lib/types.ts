@@ -34,8 +34,10 @@ export interface MevAttack {
   type: MevType;
   timestamp: number;
   slot: number;
-  extractedUsd: number;
-  extractedSol: number;
+  // null when SOL/USD price is unavailable (boot window, CoinGecko outage)
+  // or when victim_loss_lamports could not be enriched (e.g. Phoenix CLOB).
+  extractedUsd: number | null;
+  extractedSol: number | null;
   victim: {
     signer: string;
     amountIn: number;
@@ -92,7 +94,7 @@ export interface MevFilters {
 
 export interface DashboardStats {
   totalMevExtracted24h: {
-    usd: number;
+    usd: number | null; // null = SOL/USD price unavailable
     sol: number;
     changePercent: number | null; // null = 비교 불가
   };
@@ -101,7 +103,7 @@ export interface DashboardStats {
     changePercent: number | null;
   };
   averageLossPerTx: {
-    usd: number;
+    usd: number | null;
     changePercent: number | null;
   };
   activeAttackers24h: {
@@ -193,7 +195,7 @@ export interface LossEstimate {
   expectedAmountOut: number;
   actualAmountOut: number;
   lossAmount: number;
-  lossUsd: number;
+  lossUsd: number | null;        // null = SOL/USD price unavailable
   lossPercent: number;           // (expected - actual) / expected * 100
   confidence: SimulationConfidence;
 }
@@ -242,7 +244,7 @@ export interface SandwichAttackDetail {
   frontrunTx: string;
   backrunTx: string;
   attackerProfit: number;
-  attackerProfitUsd: number;
+  attackerProfitUsd: number | null;
   pool: string;
   frontrunSlot: number;
   backrunSlot: number;
@@ -253,7 +255,7 @@ export interface NonSandwichAttackDetail {
   kind: 'other';
   attackerAddress: string;
   attackerProfit: number;
-  attackerProfitUsd: number;
+  attackerProfitUsd: number | null;
   pool: string;
   slot: number;
 }
@@ -348,7 +350,7 @@ export interface ValidatorLeaderboardEntry {
   client: string;
   riskScore: number;
   riskLevel: RiskLevel;
-  extractedUsd: string;
+  extractedUsd: string | null; // null = SOL/USD price unavailable
 }
 
 export interface PoolLeaderboardEntry {
@@ -369,10 +371,10 @@ export interface ValidatorDetail extends ValidatorRiskScore {
 export interface ReceiptSearchResult {
   totalTxScanned: number;
   totalAttacked: number;
-  totalLossUsd: number;
+  totalLossUsd: number | null;
   totalLossSol: number;
-  avgLossPerTx: number;
-  worstAttack: MevReceipt;  // BE가 전체 기준 loss DESC로 제공
+  avgLossPerTx: number | null;
+  worstAttack: MevReceipt | null;  // BE가 전체 기준 loss DESC로 제공
   receipts: MevReceipt[];
 }
 

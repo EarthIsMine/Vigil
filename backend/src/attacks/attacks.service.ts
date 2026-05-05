@@ -20,8 +20,8 @@ export class AttacksService {
       type: this.transform.toFrontendType(a.type),
       timestamp: Number(a.timestampMs ?? 0),
       slot: Number(a.slot),
-      extractedUsd: a.extractedUsd ?? 0,
-      extractedSol: a.extractedSol ?? 0,
+      extractedUsd: a.extractedUsd,
+      extractedSol: a.extractedSol,
       victim: {
         signer: a.victimSigner,
         amountIn: a.victimAmountIn,

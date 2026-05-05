@@ -48,7 +48,7 @@ export default function TelemetryTable({ attacks }: Props) {
                   {atk.signature.slice(0, 8)}...
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">
-                  {atk.extractedSol.toFixed(4)}
+                  {atk.extractedSol != null ? atk.extractedSol.toFixed(4) : '—'}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-mono text-[#8892ab]">
                   {atk.slot.toLocaleString()}

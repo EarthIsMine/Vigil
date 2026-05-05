@@ -42,13 +42,14 @@ export class ReceiptService {
       0,
     );
     const totalLossSol = totalLossLamports / 1e9;
-    const totalLossUsd = totalLossSol * solPrice;
+    const totalLossUsd = solPrice != null ? totalLossSol * solPrice : null;
 
     const formattedReceipts = receipts.map((r) => this.formatReceipt(r, solPrice));
 
+    // Rank by SOL loss when USD isn't available — same ordering since rate is uniform.
     const worstReceipt = formattedReceipts.length > 0
       ? formattedReceipts.reduce((worst, curr) =>
-          (curr.mevAnalysis.loss.lossUsd > worst.mevAnalysis.loss.lossUsd ? curr : worst),
+          curr.mevAnalysis.loss.lossAmount > worst.mevAnalysis.loss.lossAmount ? curr : worst,
         )
       : null;
 
@@ -57,16 +58,17 @@ export class ReceiptService {
       totalAttacked: receipts.filter((r) => r.mevDetected).length,
       totalLossUsd,
       totalLossSol,
-      avgLossPerTx: receipts.length > 0 ? totalLossUsd / receipts.length : 0,
+      avgLossPerTx:
+        receipts.length > 0 && totalLossUsd != null ? totalLossUsd / receipts.length : null,
       worstAttack: worstReceipt ?? formattedReceipts[0] ?? null,
       receipts: formattedReceipts,
     };
   }
 
-  private formatReceipt(r: any, solPrice: number) {
+  private formatReceipt(r: any, solPrice: number | null) {
     const lossLamports = r.lossAmount ?? 0;
     const lossSol = lossLamports / 1e9;
-    const lossUsd = lossSol * solPrice;
+    const lossUsd = solPrice != null ? lossSol * solPrice : null;
     const expectedOut = r.expectedAmountOut ?? r.actualAmountOut;
     const lossPercent = expectedOut > 0
       ? ((expectedOut - r.actualAmountOut) / expectedOut) * 100
@@ -121,7 +123,8 @@ export class ReceiptService {
         frontrunTx: detail?.frontrunTx ?? '',
         backrunTx: detail?.backrunTx ?? '',
         attackerProfit: (r.attack?.attackerProfit ?? 0) / 1e9,
-        attackerProfitUsd: ((r.attack?.attackerProfit ?? 0) / 1e9) * solPrice,
+        attackerProfitUsd:
+          solPrice != null ? ((r.attack?.attackerProfit ?? 0) / 1e9) * solPrice : null,
         pool: r.attack?.pool ?? '',
         frontrunSlot: Number(detail?.frontrunSlot ?? r.attack?.slot ?? 0n),
         backrunSlot: Number(detail?.backrunSlot ?? r.attack?.slot ?? 0n),

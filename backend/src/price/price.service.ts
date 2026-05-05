@@ -3,7 +3,7 @@ import { Injectable, Logger, OnModuleInit, OnModuleDestroy } from '@nestjs/commo
 @Injectable()
 export class PriceService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(PriceService.name);
-  private solUsd = 150; // sensible default
+  private solUsd: number | null = null;
   private interval: NodeJS.Timeout;
 
   onModuleInit() {
@@ -15,8 +15,12 @@ export class PriceService implements OnModuleInit, OnModuleDestroy {
     clearInterval(this.interval);
   }
 
-  getSolUsd(): number {
+  getSolUsd(): number | null {
     return this.solUsd;
+  }
+
+  isReady(): boolean {
+    return this.solUsd !== null;
   }
 
   private async refresh() {
@@ -30,7 +34,8 @@ export class PriceService implements OnModuleInit, OnModuleDestroy {
         this.logger.debug(`SOL/USD updated: $${this.solUsd}`);
       }
     } catch (err) {
-      this.logger.warn(`Price fetch failed, keeping $${this.solUsd}`);
+      const display = this.solUsd != null ? `$${this.solUsd}` : 'unavailable';
+      this.logger.warn(`Price fetch failed, keeping ${display}`);
     }
   }
 }
