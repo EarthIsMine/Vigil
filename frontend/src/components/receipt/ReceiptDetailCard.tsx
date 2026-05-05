@@ -109,7 +109,7 @@ export default function ReceiptDetailCard({ result, featuredReceipt, featuredSan
                 {result ? `${result.totalLossSol.toFixed(3)} SOL` : '—'}
               </div>
               <div className="text-xs text-vigil-muted">
-                {result ? `$${result.totalLossUsd.toFixed(2)}` : ''}
+                {result?.totalLossUsd != null ? `$${result.totalLossUsd.toFixed(2)}` : ''}
               </div>
             </div>
           </div>

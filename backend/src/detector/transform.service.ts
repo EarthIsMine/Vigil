@@ -31,7 +31,7 @@ export interface TransformResult {
 
 @Injectable()
 export class TransformService {
-  transform(attack: SandwichAttack, solPrice: number): TransformResult {
+  transform(attack: SandwichAttack, solPrice: number | null): TransformResult {
     const signature = attack.attack_signature ?? attack.victim.signature;
     const timestampMs = attack.timestamp_ms ?? Date.now();
     const attackType = attack.attack_type ?? 'sandwich';
@@ -40,9 +40,11 @@ export class TransformService {
     // per detector v1.0.0 CHANGELOG "Deferred" section — CLOB sandwich pattern
     // (limit-order placement) does not match the frontrun/victim/backrun model.
     // Preserve null end-to-end so stats aren't polluted with synthetic zeros.
+    // solPrice is null when CoinGecko hasn't returned yet — do not synthesize USD.
     const lossLamports = attack.victim_loss_lamports;
     const extractedSol = lossLamports != null ? lossLamports / 1e9 : null;
-    const extractedUsd = extractedSol != null ? extractedSol * solPrice : null;
+    const extractedUsd =
+      extractedSol != null && solPrice != null ? extractedSol * solPrice : null;
     const expectedAmountOut = this.getExpectedAmountOut(attack);
 
     const dbAttack: Prisma.MevAttackCreateInput = {

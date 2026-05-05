@@ -76,9 +76,9 @@ export default function LiveFeed({ attacks }: LiveFeedProps) {
               <div className="flex items-center gap-2">
                 <span className="font-mono text-xs text-muted">Loss:</span>
                 <span className="font-mono text-sm font-semibold text-primary">
-                  {attack.extractedSol.toFixed(4)} SOL
+                  {attack.extractedSol != null ? `${attack.extractedSol.toFixed(4)} SOL` : '—'}
                 </span>
-                {attack.extractedUsd > 0 && (
+                {attack.extractedUsd != null && attack.extractedUsd > 0 && (
                   <span className="font-mono text-xs text-muted">
                     (${attack.extractedUsd.toFixed(2)})
                   </span>

@@ -8,7 +8,7 @@ export default function ReceiptSummaryCards({ result }: { result: ReceiptSearchR
         <div className="font-display font-bold text-2xl text-white mb-1">
           {result.totalLossSol.toFixed(3)} SOL
         </div>
-        <div className="text-xs text-vigil-muted">${result.totalLossUsd.toFixed(2)}</div>
+        <div className="text-xs text-vigil-muted">{result.totalLossUsd != null ? `$${result.totalLossUsd.toFixed(2)}` : '—'}</div>
       </div>
       <div className="receipt-card p-4 rounded-xl border border-vigil-border-dark">
         <div className="text-xs text-vigil-muted mb-2">Attack Frequency</div>
@@ -23,7 +23,7 @@ export default function ReceiptSummaryCards({ result }: { result: ReceiptSearchR
       <div className="receipt-card p-4 rounded-xl border border-vigil-border-dark">
         <div className="text-xs text-vigil-muted mb-2">Avg Loss / Attack</div>
         <div className="font-display font-bold text-2xl text-accent-yellow mb-1">
-          ${result.avgLossPerTx.toFixed(2)}
+          {result.avgLossPerTx != null ? `$${result.avgLossPerTx.toFixed(2)}` : '—'}
         </div>
         <div className="text-xs text-vigil-muted">per transaction</div>
       </div>

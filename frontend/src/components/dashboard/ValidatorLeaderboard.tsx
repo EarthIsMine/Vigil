@@ -41,7 +41,7 @@ export default function ValidatorLeaderboard({ validators }: { validators: Valid
               </div>
             </div>
             <div className="flex-shrink-0 text-right">
-              <p className="font-mono font-semibold text-error">{v.extractedUsd}</p>
+              <p className="font-mono font-semibold text-error">{v.extractedUsd ?? '—'}</p>
               <p className="font-mono text-xs text-muted">Risk: {v.riskScore}</p>
             </div>
           </Link>

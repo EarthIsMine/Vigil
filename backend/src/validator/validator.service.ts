@@ -20,6 +20,10 @@ export class ValidatorService {
     return validators.map((v, i) => {
       const extractedSol = Number(v.totalExtractedLamports) / 1e9;
       const riskScore = this.computeRiskScore(v);
+      const extractedUsd =
+        solPrice != null
+          ? `$${(extractedSol * solPrice).toLocaleString('en-US', { maximumFractionDigits: 0 })}`
+          : null;
 
       return {
         rank: i + 1,
@@ -28,7 +32,7 @@ export class ValidatorService {
         client: v.client || 'unknown',
         riskScore,
         riskLevel: this.getRiskLevel(riskScore),
-        extractedUsd: `$${(extractedSol * solPrice).toLocaleString('en-US', { maximumFractionDigits: 0 })}`,
+        extractedUsd,
       };
     });
   }

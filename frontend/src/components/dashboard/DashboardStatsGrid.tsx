@@ -16,7 +16,7 @@ export default function DashboardStatsGrid({ stats }: DashboardStatsGridProps) {
       <StatCard title="MEV Extracted" value={formatUsd(stats.totalMevExtracted24h.usd)} change={extracted} />
       <StatCard title="Total Attacks" value={stats.totalAttacks24h.count.toLocaleString()} change={attacks} />
       <StatCard title="Active Attackers" value={stats.activeAttackers24h.count} subtitle={stats.activeAttackers24h.topAttacker} />
-      <StatCard title="Avg Victim Loss" value={`$${stats.averageLossPerTx.usd.toFixed(2)}`} change={avgLoss} />
+      <StatCard title="Avg Victim Loss" value={stats.averageLossPerTx.usd != null ? `$${stats.averageLossPerTx.usd.toFixed(2)}` : '—'} change={avgLoss} />
     </div>
   );
 }

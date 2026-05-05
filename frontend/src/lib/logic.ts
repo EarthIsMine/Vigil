@@ -44,8 +44,8 @@ export function aggregateStats(
     (a) => a.timestamp > now - ms * 2 && a.timestamp <= now - ms
   );
 
-  const totalCurrent = current.reduce((sum, a) => sum + a.extractedUsd, 0);
-  const totalPrevious = previous.reduce((sum, a) => sum + a.extractedUsd, 0);
+  const totalCurrent = current.reduce((sum, a) => sum + (a.extractedUsd ?? 0), 0);
+  const totalPrevious = previous.reduce((sum, a) => sum + (a.extractedUsd ?? 0), 0);
 
   const currentCount = current.length;
   const previousCount = previous.length;
@@ -64,7 +64,7 @@ export function aggregateStats(
   // topAttacker: attacker with highest total extraction
   const attackerTotals = new Map<string, number>();
   current.forEach((a) => {
-    attackerTotals.set(a.attacker, (attackerTotals.get(a.attacker) ?? 0) + a.extractedUsd);
+    attackerTotals.set(a.attacker, (attackerTotals.get(a.attacker) ?? 0) + (a.extractedUsd ?? 0));
   });
   let topAttacker = '';
   let topAmount = 0;
@@ -78,7 +78,7 @@ export function aggregateStats(
   return {
     totalMevExtracted24h: {
       usd: totalCurrent,
-      sol: current.reduce((sum, a) => sum + a.extractedSol, 0),
+      sol: current.reduce((sum, a) => sum + (a.extractedSol ?? 0), 0),
       changePercent: calcChange(totalCurrent, totalPrevious),
     },
     totalAttacks24h: {
@@ -151,22 +151,22 @@ export function bucketByTime(
     .map(([ts, bucket]) => ({
       timestamp: ts,
       label: formatTimestamp(ts, interval),
-      totalUsd: bucket.reduce((s, a) => s + a.extractedUsd, 0),
+      totalUsd: bucket.reduce((s, a) => s + (a.extractedUsd ?? 0), 0),
       sandwichSingleUsd: bucket
         .filter((a) => a.type === MevType.SANDWICH_SINGLE)
-        .reduce((s, a) => s + a.extractedUsd, 0),
+        .reduce((s, a) => s + (a.extractedUsd ?? 0), 0),
       sandwichWideUsd: bucket
         .filter((a) => a.type === MevType.SANDWICH_WIDE)
-        .reduce((s, a) => s + a.extractedUsd, 0),
+        .reduce((s, a) => s + (a.extractedUsd ?? 0), 0),
       backrunUsd: bucket
         .filter((a) => a.type === MevType.BACKRUN)
-        .reduce((s, a) => s + a.extractedUsd, 0),
+        .reduce((s, a) => s + (a.extractedUsd ?? 0), 0),
       otherUsd: bucket
         .filter(
           (a) =>
             ![MevType.SANDWICH_SINGLE, MevType.SANDWICH_WIDE, MevType.BACKRUN].includes(a.type)
         )
-        .reduce((s, a) => s + a.extractedUsd, 0),
+        .reduce((s, a) => s + (a.extractedUsd ?? 0), 0),
       attackCount: bucket.length,
     }));
 }
@@ -271,7 +271,8 @@ export function shortenAddress(addr: string, chars = 4): string {
   return `${addr.slice(0, chars)}...${addr.slice(-chars)}`;
 }
 
-export function formatUsd(amount: number): string {
+export function formatUsd(amount: number | null | undefined): string {
+  if (amount == null) return '—';
   if (amount >= 1_000_000) return `$${(amount / 1_000_000).toFixed(2)}M`;
   if (amount >= 1_000) return `$${(amount / 1_000).toFixed(2)}K`;
   return `$${amount.toFixed(2)}`;
