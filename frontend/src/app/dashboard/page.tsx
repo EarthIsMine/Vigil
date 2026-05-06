@@ -8,9 +8,11 @@ import PoolLeaderboard from '@/components/dashboard/PoolLeaderboard';
 import DashboardLiveFeed from '@/components/dashboard/DashboardLiveFeed';
 import ErrorBanner from '@/components/shared/ErrorBanner';
 import { useDashboardData } from '@/hooks/useDashboardData';
+import { useLiveAttacks } from '@/hooks/useLiveAttacks';
 
 export default function DashboardPage() {
-  const { stats, timeseries, validators, pools, liveFeed, loading, error } = useDashboardData();
+  const { stats, timeseries, validators, pools, loading, error } = useDashboardData();
+  const liveFeed = useLiveAttacks(20);
 
   if (loading) {
     return (
