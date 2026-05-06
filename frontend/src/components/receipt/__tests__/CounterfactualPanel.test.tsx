@@ -111,7 +111,8 @@ describe('CounterfactualPanel', () => {
     render(<CounterfactualPanel trace={trace} />);
     fireEvent.click(screen.getByRole('button', { name: /Counterfactual replay/ }));
 
-    // Math.max(0, 50 - 60) = 0 → formatAmount(0) → '0.000000'
-    expect(screen.getByText('0.000000')).toBeInTheDocument();
+    // Math.max(0, 50 - 60) = 0 → formatAmount(0) → '0'
+    const extractedRow = screen.getByText('Sandwich extracted').parentElement!;
+    expect(extractedRow).toHaveTextContent('0');
   });
 });

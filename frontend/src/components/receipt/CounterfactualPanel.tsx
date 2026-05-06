@@ -14,7 +14,7 @@ interface CounterfactualPanelProps {
 
 const KIND_LABEL: Record<ReplayTrace['kind'], string> = {
   amm: 'Constant-product AMM',
-  whirlpool: 'Orca Whirlpool (CLMM)',
+  whirlpool: 'Orca Whirlpool',
   dlmm: 'Meteora DLMM',
 };
 
@@ -163,6 +163,7 @@ function DlmmDetail({ data }: { data: DlmmReplayData }) {
 
 function formatAmount(value: number): string {
   if (!Number.isFinite(value)) return '—';
+  if (value === 0) return '0';
   if (Math.abs(value) >= 1) return value.toFixed(4);
   return value.toFixed(6);
 }

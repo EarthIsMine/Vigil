@@ -44,6 +44,7 @@ export function useValidatorById(identity: string): ValidatorByIdState {
         if (!alive) return;
         if (err instanceof ApiError && err.status === 404) {
           setShouldNotFound(true);
+          setLoading(false);
           return;
         }
         setError("Couldn't load validator");
