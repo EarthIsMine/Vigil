@@ -42,12 +42,13 @@ function generateRandomAttack(): Attack {
   };
 }
 
-function createInitialAttacks(): Attack[] {
-  return Array.from({ length: 5 }, () => generateRandomAttack());
+function createInitialAttacks(maxItems: number): Attack[] {
+  const count = Math.min(5, Math.max(0, maxItems));
+  return Array.from({ length: count }, () => generateRandomAttack());
 }
 
 export function useLiveFeed(intervalMs = 5000, maxItems = 20): Attack[] {
-  const [attacks, setAttacks] = useState<Attack[]>(() => createInitialAttacks());
+  const [attacks, setAttacks] = useState<Attack[]>(() => createInitialAttacks(maxItems));
 
   useEffect(() => {
     const interval = setInterval(() => {
