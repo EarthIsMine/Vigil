@@ -31,7 +31,7 @@ export default function ConfidenceBadge({ level }: ConfidenceBadgeProps) {
   return (
     <span
       role="status"
-      aria-label={`Detection confidence: ${level}`}
+      aria-label={`Detection confidence: ${style.label}`}
       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-mono font-semibold ${style.cls}`}
     >
       <span className="material-symbols-outlined text-sm leading-none" aria-hidden="true">

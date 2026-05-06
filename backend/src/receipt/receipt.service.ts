@@ -94,7 +94,7 @@ export class ReceiptService {
           dlmmReplay: attack.dlmmReplay,
           victimLossLamports: attack.victimLossLamports,
         })
-      : 'unenriched';
+      : null;
 
     return {
       receiptId: r.victimTxSignature,
@@ -146,9 +146,12 @@ export class ReceiptService {
         attackerAddress: attack?.attacker ?? '',
         frontrunTx: detail?.frontrunTx ?? '',
         backrunTx: detail?.backrunTx ?? '',
-        attackerProfit: (attack?.attackerProfit ?? 0) / 1e9,
+        attackerProfit:
+          attack?.attackerProfit != null ? attack.attackerProfit / 1e9 : null,
         attackerProfitUsd:
-          solPrice != null ? ((attack?.attackerProfit ?? 0) / 1e9) * solPrice : null,
+          attack?.attackerProfit != null && solPrice != null
+            ? (attack.attackerProfit / 1e9) * solPrice
+            : null,
         pool: attack?.pool ?? '',
         frontrunSlot: Number(detail?.frontrunSlot ?? attack?.slot ?? 0n),
         backrunSlot: Number(detail?.backrunSlot ?? attack?.slot ?? 0n),

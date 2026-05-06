@@ -2,12 +2,12 @@ import type { MevReceipt } from '@/lib/types';
 import { txTypeLabel } from '@/lib/format';
 
 function lossDisplay(r: MevReceipt): { text: string; isUnenriched: boolean } {
-  if (r.lossSource === 'unenriched') {
+  if (r.mevAnalysis.detected && r.lossSource === 'unenriched') {
     return { text: 'Loss not estimated', isUnenriched: true };
   }
   const lossAmt = r.mevAnalysis.loss.lossAmount;
   return {
-    text: lossAmt > 0 ? `-${lossAmt.toFixed(3)} SOL` : '0.000',
+    text: lossAmt > 0 ? `-${lossAmt.toFixed(3)} SOL` : '0.000 SOL',
     isUnenriched: false,
   };
 }

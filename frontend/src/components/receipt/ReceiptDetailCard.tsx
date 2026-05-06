@@ -12,11 +12,25 @@ interface ReceiptDetailCardProps {
 
 export default function ReceiptDetailCard({ result, featuredReceipt, featuredSandwich }: ReceiptDetailCardProps) {
   const isUnenriched = featuredReceipt?.lossSource === 'unenriched';
+  const lossAmount = featuredReceipt?.mevAnalysis.loss.lossAmount;
   const lossLabel = featuredReceipt
     ? isUnenriched
       ? 'Loss not estimated'
-      : `${featuredReceipt.mevAnalysis.loss.lossAmount.toFixed(3)} SOL`
+      : typeof lossAmount === 'number' && Number.isFinite(lossAmount)
+        ? `${lossAmount.toFixed(3)} SOL`
+        : '—'
     : '—';
+  const sandwichProfit = featuredSandwich?.attackerProfit;
+  const otherProfit =
+    featuredReceipt?.attackDetail.kind === 'other'
+      ? featuredReceipt.attackDetail.attackerProfit
+      : null;
+  const profitLabel =
+    typeof sandwichProfit === 'number'
+      ? `${sandwichProfit.toFixed(3)} SOL`
+      : typeof otherProfit === 'number'
+        ? `${otherProfit.toFixed(3)} SOL`
+        : '—';
   return (
     <div className="w-full lg:w-96 space-y-6">
       <div className="lg:sticky lg:top-32">
@@ -90,11 +104,7 @@ export default function ReceiptDetailCard({ result, featuredReceipt, featuredSan
               <div className="flex justify-between text-sm">
                 <span className="text-vigil-muted">Attacker Profit</span>
                 <span className="text-vigil-red font-mono font-semibold">
-                  {featuredSandwich
-                    ? `${featuredSandwich.attackerProfit.toFixed(3)} SOL`
-                    : featuredReceipt?.attackDetail.kind === 'other'
-                      ? `${featuredReceipt.attackDetail.attackerProfit.toFixed(3)} SOL`
-                      : '—'}
+                  {profitLabel}
                 </span>
               </div>
               <div className="flex justify-between text-sm">

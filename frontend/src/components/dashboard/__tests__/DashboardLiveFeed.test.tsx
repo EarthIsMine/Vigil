@@ -23,6 +23,10 @@ const ATTACKS: MevAttack[] = [
     dex: 'Orca',
     pool: 'SOL/USDC',
     severity: Severity.HIGH,
+    confidenceLevel: null,
+    detectionMethod: null,
+    bundleProvenance: null,
+    lossSource: null,
   },
 ];
 

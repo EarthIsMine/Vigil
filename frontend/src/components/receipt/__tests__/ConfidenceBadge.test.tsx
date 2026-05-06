@@ -31,8 +31,11 @@ describe('ConfidenceBadge', () => {
     expect(container).toBeEmptyDOMElement();
   });
 
-  it('exposes accessible status label', () => {
+  it('exposes accessible status label using the visible badge text', () => {
     render(<ConfidenceBadge level="high" />);
-    expect(screen.getByRole('status')).toHaveAttribute('aria-label', 'Detection confidence: high');
+    expect(screen.getByRole('status')).toHaveAttribute(
+      'aria-label',
+      'Detection confidence: Verified',
+    );
   });
 });

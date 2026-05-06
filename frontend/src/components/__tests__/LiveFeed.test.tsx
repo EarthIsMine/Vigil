@@ -17,6 +17,10 @@ function mockAttack(overrides: Partial<MevAttack> = {}): MevAttack {
     dex: 'Orca',
     pool: 'SOL/USDC',
     severity: Severity.HIGH,
+    confidenceLevel: null,
+    detectionMethod: null,
+    bundleProvenance: null,
+    lossSource: null,
     ...overrides,
   };
 }
