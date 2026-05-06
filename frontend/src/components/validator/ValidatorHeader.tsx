@@ -5,82 +5,92 @@ interface ValidatorHeaderProps {
   riskColor: string;
 }
 
+const RISK_LABEL: Record<string, string> = {
+  critical: 'Critical risk',
+  high: 'High risk',
+  medium: 'Medium risk',
+  low: 'Low risk',
+  unrated: 'Unrated',
+};
+
 export default function ValidatorHeader({ validator, riskColor }: ValidatorHeaderProps) {
-  return (
-    <div
-      className="bg-[#0a0e1a] rounded-lg p-6 mb-6 relative overflow-hidden border fade-up fade-up-d1"
-      style={{ borderColor: `${riskColor}4d` }}
-    >
-      <div className="absolute inset-0 pointer-events-none" style={{ background: `${riskColor}0d` }} />
-      <div className="relative">
-        {validator === null ? (
-          <div className="animate-pulse space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-white/10 rounded-lg" />
-              <div className="space-y-2">
-                <div className="h-6 w-48 bg-white/10 rounded" />
-                <div className="h-4 w-32 bg-white/10 rounded" />
-              </div>
-            </div>
-          </div>
-        ) : (
-          <>
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center gap-4">
-                <div className="w-16 h-16 rounded-lg flex items-center justify-center" style={{ background: `${riskColor}33` }}>
-                  <span className="material-symbols-outlined text-3xl" style={{ color: riskColor }}>gpp_bad</span>
-                </div>
-                <div>
-                  <div className="flex items-center gap-3 mb-2">
-                    <h1 className="text-2xl font-bold">{validator.name}</h1>
-                    <span className="px-2 py-1 rounded text-xs font-bold" style={{ background: `${riskColor}33`, color: riskColor }}>
-                      {validator.riskLevel.toUpperCase()}
-                    </span>
-                  </div>
-                  <div className="space-y-1">
-                    {validator.voteAccount && (
-                      <div className="flex items-center gap-2 text-sm">
-                        <span className="text-[#8892ab]">Vote Account:</span>
-                        <span className="font-mono" title={validator.voteAccount}>
-                          {validator.voteAccount.slice(0, 8)}...{validator.voteAccount.slice(-4)}
-                        </span>
-                      </div>
-                    )}
-                    <div className="flex items-center gap-2 text-sm">
-                      <span className="text-[#8892ab]">Identity:</span>
-                      <span className="font-mono" title={validator.identity}>
-                        {validator.identity.slice(0, 8)}...{validator.identity.slice(-4)}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <button className="px-4 py-2 bg-white/5 hover:bg-white/10 rounded transition-colors">
-                  <span className="material-symbols-outlined text-sm">share</span>
-                </button>
-                <button className="px-4 py-2 hover:opacity-80 rounded transition-colors" style={{ background: `${riskColor}33`, color: riskColor }}>
-                  <span className="material-symbols-outlined text-sm">flag</span>
-                </button>
-              </div>
-            </div>
-            <div className="flex items-center gap-4 flex-wrap">
-              <div className="px-3 py-1 bg-white/5 rounded text-sm">
-                <span className="text-[#8892ab]">Stake:</span> <span className="font-medium">{validator.stake}</span>
-              </div>
-              <div className="px-3 py-1 bg-white/5 rounded text-sm">
-                <span className="text-[#8892ab]">Client:</span> <span className="font-medium">{validator.client}</span>
-              </div>
-              <div className="px-3 py-1 bg-white/5 rounded text-sm">
-                <span className="text-[#8892ab]">Commission:</span> <span className="font-medium">{validator.commission}%</span>
-              </div>
-              <div className="px-3 py-1 bg-white/5 rounded text-sm">
-                <span className="text-[#8892ab]">Active since:</span> <span className="font-medium">Epoch {validator.activeSinceEpoch}</span>
-              </div>
-            </div>
-          </>
-        )}
+  if (validator === null) {
+    return (
+      <div className="mb-12 fade-up fade-up-d1 animate-pulse">
+        <div className="h-12 w-80 bg-white/5 rounded mb-4" />
+        <div className="h-5 w-60 bg-white/5 rounded" />
       </div>
+    );
+  }
+
+  const riskLabel = RISK_LABEL[validator.riskLevel] ?? validator.riskLevel;
+
+  return (
+    <header className="mb-12 fade-up fade-up-d1">
+      <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-6">
+        <div className="min-w-0">
+          <p className="text-sm text-vigil-muted mb-2 font-mono" title={validator.identity}>
+            {validator.identity.slice(0, 8)}…{validator.identity.slice(-4)}
+          </p>
+          <h1 className="font-display font-bold text-4xl md:text-5xl tracking-tight text-white truncate">
+            {validator.name}
+          </h1>
+        </div>
+
+        <div className="flex items-baseline gap-4 shrink-0">
+          <div className="text-right">
+            <p className="text-xs text-vigil-muted mb-1">Risk score</p>
+            <p
+              className="font-display font-bold text-5xl tabular-nums"
+              style={{ color: riskColor }}
+            >
+              {validator.riskScore}
+            </p>
+          </div>
+          <span
+            className="text-sm font-medium pb-2"
+            style={{ color: riskColor }}
+          >
+            {riskLabel}
+          </span>
+        </div>
+      </div>
+
+      <dl className="flex flex-wrap items-baseline gap-x-8 gap-y-2 text-sm text-vigil-muted border-t border-vigil-border pt-5">
+        <Datum label="Stake" value={validator.stake} />
+        <Datum label="Client" value={validator.client} />
+        <Datum label="Commission" value={`${validator.commission}%`} />
+        <Datum label="Active since" value={`Epoch ${validator.activeSinceEpoch}`} />
+        {validator.voteAccount && (
+          <Datum
+            label="Vote account"
+            value={`${validator.voteAccount.slice(0, 8)}…${validator.voteAccount.slice(-4)}`}
+            mono
+            title={validator.voteAccount}
+          />
+        )}
+      </dl>
+    </header>
+  );
+}
+
+function Datum({
+  label,
+  value,
+  mono = false,
+  title,
+}: {
+  label: string;
+  value: string;
+  mono?: boolean;
+  title?: string;
+}) {
+  return (
+    <div className="flex items-baseline gap-2">
+      <dt>{label}</dt>
+      <dd className={`text-white ${mono ? 'font-mono' : 'font-medium'}`} title={title}>
+        {value}
+      </dd>
     </div>
   );
 }

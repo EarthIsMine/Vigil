@@ -2,11 +2,28 @@ import type { MevAttack } from '@/lib/types';
 
 const TYPE_LABELS: Record<string, string> = {
   sandwich_single: 'Sandwich',
-  sandwich_wide: 'Wide Sandwich',
-  sandwich_auth_hop: 'Auth Hop',
+  sandwich_wide: 'Wide sandwich',
+  sandwich_auth_hop: 'Auth hop',
   backrun: 'Backrun',
   liquidation: 'Liquidation',
-  jit_liquidity: 'JIT Liquidity',
+  jit_liquidity: 'JIT liquidity',
+};
+
+const TYPE_COLOR: Record<string, string> = {
+  sandwich_single: 'text-error',
+  sandwich_wide: 'text-warning',
+  sandwich_auth_hop: 'text-warning',
+  backrun: 'text-primary',
+  liquidation: 'text-vigil-purple',
+  jit_liquidity: 'text-accent-green',
+};
+
+const SEVERITY_DOT: Record<string, string> = {
+  critical: 'bg-error',
+  high: 'bg-warning',
+  medium: 'bg-yellow-500',
+  low: 'bg-accent-green',
+  info: 'bg-vigil-muted',
 };
 
 interface Props {
@@ -15,66 +32,77 @@ interface Props {
 
 export default function TelemetryTable({ attacks }: Props) {
   return (
-    <div className="bg-[#0a0e1a] border border-white/10 rounded-lg overflow-hidden mb-6 fade-up fade-up-d4">
-      <div className="p-6 border-b border-white/10">
-        <h2 className="text-xl font-bold">Telemetry</h2>
-      </div>
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-white/5">
-            <tr>
-              {['Timestamp', 'Type', 'DEX / Pool', 'Victim TX', 'Loss (SOL)', 'Slot', 'Severity'].map((h) => (
-                <th key={h} className={`px-6 py-3 text-xs font-medium text-[#8892ab] uppercase tracking-wider ${h === 'Loss (SOL)' || h === 'Slot' ? 'text-right' : h === 'Severity' ? 'text-center' : 'text-left'}`}>
-                  {h}
-                </th>
+    <section className="mb-14 fade-up fade-up-d4">
+      <h2 className="font-display text-2xl font-bold text-white mb-1">Recent attacks</h2>
+      <p className="text-sm text-vigil-muted mb-6">
+        Latest {Math.min(20, attacks.length)} events on this validator.
+      </p>
+
+      {attacks.length === 0 ? (
+        <p className="text-sm text-vigil-muted py-8">
+          No attacks detected yet. Waiting for data…
+        </p>
+      ) : (
+        <div className="overflow-x-auto -mx-4 px-4">
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="text-xs text-vigil-muted text-left border-b border-vigil-border">
+                <th className="font-normal py-3 pr-6">Time</th>
+                <th className="font-normal py-3 pr-6">Type</th>
+                <th className="font-normal py-3 pr-6">Pool</th>
+                <th className="font-normal py-3 pr-6">Victim TX</th>
+                <th className="font-normal py-3 pr-6 text-right">Loss (SOL)</th>
+                <th className="font-normal py-3 pr-6 text-right">Slot</th>
+                <th className="font-normal py-3 text-center">Severity</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-vigil-border/60">
+              {attacks.slice(0, 20).map((atk) => (
+                <tr key={atk.signature} className="hover:bg-white/[0.02] transition-colors">
+                  <td className="py-3 pr-6 font-mono text-vigil-muted whitespace-nowrap">
+                    {new Date(atk.timestamp).toLocaleString('en-US', {
+                      month: '2-digit',
+                      day: '2-digit',
+                      hour: '2-digit',
+                      minute: '2-digit',
+                    })}
+                  </td>
+                  <td className={`py-3 pr-6 font-medium whitespace-nowrap ${TYPE_COLOR[atk.type] ?? 'text-vigil-muted'}`}>
+                    {TYPE_LABELS[atk.type] ?? atk.type}
+                  </td>
+                  <td className="py-3 pr-6 whitespace-nowrap text-white">
+                    <span className="text-vigil-muted">{atk.dex}</span>{' '}
+                    <span className="font-mono text-xs">{atk.pool.slice(0, 6)}…</span>
+                  </td>
+                  <td className="py-3 pr-6 font-mono text-xs text-primary whitespace-nowrap">
+                    {atk.signature.slice(0, 10)}…
+                  </td>
+                  <td className="py-3 pr-6 text-right tabular-nums text-white whitespace-nowrap">
+                    {atk.extractedSol != null ? atk.extractedSol.toFixed(4) : '—'}
+                  </td>
+                  <td className="py-3 pr-6 text-right font-mono tabular-nums text-vigil-muted whitespace-nowrap">
+                    {atk.slot.toLocaleString()}
+                  </td>
+                  <td className="py-3 text-center whitespace-nowrap">
+                    <span
+                      className="inline-flex items-center gap-2 text-xs text-vigil-muted"
+                      title={atk.severity}
+                    >
+                      <span
+                        className={`inline-block w-2 h-2 rounded-full ${
+                          SEVERITY_DOT[atk.severity] ?? 'bg-vigil-muted'
+                        }`}
+                        aria-hidden="true"
+                      />
+                      <span className="capitalize">{atk.severity}</span>
+                    </span>
+                  </td>
+                </tr>
               ))}
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/10">
-            {attacks.slice(0, 20).map((atk) => (
-              <tr key={atk.signature} className="hover:bg-white/5 transition-colors">
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-[#8892ab]">
-                  {new Date(atk.timestamp).toLocaleString('en-US', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit', second: '2-digit' })}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`px-2 py-1 rounded text-xs font-medium ${
-                    atk.type.startsWith('sandwich') ? 'bg-[#ef4444]/20 text-[#ef4444]' : 'bg-[#f97316]/20 text-[#f97316]'
-                  }`}>{TYPE_LABELS[atk.type] ?? atk.type}</span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm">
-                  {atk.dex} — {atk.pool.slice(0, 6)}...
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm font-mono text-[#22d3ee]">
-                  {atk.signature.slice(0, 8)}...
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-medium">
-                  {atk.extractedSol != null ? atk.extractedSol.toFixed(4) : '—'}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-right font-mono text-[#8892ab]">
-                  {atk.slot.toLocaleString()}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-center">
-                  <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-medium ${
-                    atk.severity === 'critical' ? 'bg-[#ef4444]/20 text-[#ef4444]' :
-                    atk.severity === 'high' ? 'bg-[#f97316]/20 text-[#f97316]' :
-                    atk.severity === 'medium' ? 'bg-[#eab308]/20 text-[#eab308]' :
-                    'bg-[#22c55e]/20 text-[#22c55e]'
-                  }`}>
-                    {atk.severity}
-                  </span>
-                </td>
-              </tr>
-            ))}
-            {attacks.length === 0 && (
-              <tr>
-                <td colSpan={7} className="px-6 py-8 text-center text-sm text-[#8892ab]">
-                  No attacks detected yet. Waiting for data...
-                </td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
   );
 }

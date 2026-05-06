@@ -9,11 +9,11 @@ interface Props {
 
 const TYPE_LABELS: Record<string, string> = {
   sandwich_single: 'Sandwich',
-  sandwich_wide: 'Wide Sandwich',
-  sandwich_auth_hop: 'Auth Hop',
+  sandwich_wide: 'Wide sandwich',
+  sandwich_auth_hop: 'Auth hop',
   backrun: 'Backrun',
   liquidation: 'Liquidation',
-  jit_liquidity: 'JIT Liquidity',
+  jit_liquidity: 'JIT liquidity',
 };
 
 const TYPE_COLORS: Record<string, string> = {
@@ -38,18 +38,20 @@ export default function ValidatorAttackDistribution({ attacks, pools }: Props) {
   const total = data.reduce((a, b) => a + b, 0);
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 fade-up fade-up-d4">
-      <div className="bg-[#0a0e1a] border border-white/10 rounded-lg p-6">
-        <h2 className="text-xl font-bold mb-4">Attack Type Distribution</h2>
+    <section className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-14 fade-up fade-up-d4">
+      <div>
+        <h2 className="font-display text-2xl font-bold text-white mb-6">
+          Attack types
+        </h2>
         <DonutChart
           labels={labels.length > 0 ? labels : ['No data']}
           data={data.length > 0 ? data : [1]}
           colors={colors.length > 0 ? colors : ['#384460']}
           centerText={total.toLocaleString()}
-          centerSubText="total attacks"
+          centerSubText="total"
         />
       </div>
       <TargetedPools pools={pools} />
-    </div>
+    </section>
   );
 }

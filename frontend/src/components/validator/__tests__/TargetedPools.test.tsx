@@ -12,19 +12,24 @@ const MOCK_POOLS: PoolLeaderboardEntry[] = [
 describe('TargetedPools', () => {
   it('renders the heading', () => {
     render(<TargetedPools pools={MOCK_POOLS} />);
-    expect(screen.getByText('Most Targeted Pools')).toBeInTheDocument();
+    expect(screen.getByText('Most targeted pools')).toBeInTheDocument();
   });
 
-  it('renders all pools', () => {
+  it('renders the dex for each pool row', () => {
     render(<TargetedPools pools={MOCK_POOLS} />);
-    expect(screen.getByText('Orca — OrcaPool...CDEF')).toBeInTheDocument();
-    expect(screen.getByText('Raydium — RaydPool...FEDC')).toBeInTheDocument();
-    expect(screen.getByText('Marinade — MariPool...ABCD')).toBeInTheDocument();
+    expect(screen.getByText('Orca')).toBeInTheDocument();
+    expect(screen.getByText('Raydium')).toBeInTheDocument();
+    expect(screen.getByText('Marinade')).toBeInTheDocument();
   });
 
-  it('renders attack counts', () => {
+  it('truncates long pool addresses', () => {
     render(<TargetedPools pools={MOCK_POOLS} />);
-    expect(screen.getByText('1247')).toBeInTheDocument();
+    expect(screen.getByText('OrcaPool…CDEF')).toBeInTheDocument();
+  });
+
+  it('renders attack counts with thousands separator', () => {
+    render(<TargetedPools pools={MOCK_POOLS} />);
+    expect(screen.getByText('1,247')).toBeInTheDocument();
     expect(screen.getByText('982')).toBeInTheDocument();
     expect(screen.getByText('543')).toBeInTheDocument();
   });
