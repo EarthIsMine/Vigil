@@ -1,12 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { PriceService } from '../price/price.service';
+import { TransformService } from '../detector/transform.service';
 
 @Injectable()
 export class ReceiptService {
   constructor(
     private readonly prisma: PrismaService,
     private readonly price: PriceService,
+    private readonly transform: TransformService,
   ) {}
 
   async search(wallet: string, range: string) {
@@ -74,7 +76,25 @@ export class ReceiptService {
       ? ((expectedOut - r.actualAmountOut) / expectedOut) * 100
       : 0;
 
-    const detail = r.attack?.sandwichDetail;
+    const attack = r.attack;
+    const detail = attack?.sandwichDetail;
+    const confidenceLevel = attack
+      ? this.transform.normalizeConfidenceLevel(attack.confidenceLevel)
+      : null;
+    const detectionMethod = attack
+      ? this.transform.normalizeDetectionMethod(attack.detectionMethod)
+      : null;
+    const bundleProvenance = attack
+      ? this.transform.normalizeBundleProvenance(attack.bundleProvenance)
+      : null;
+    const lossSource = attack
+      ? this.transform.determineLossSource({
+          ammReplay: attack.ammReplay,
+          whirlpoolReplay: attack.whirlpoolReplay,
+          dlmmReplay: attack.dlmmReplay,
+          victimLossLamports: attack.victimLossLamports,
+        })
+      : null;
 
     return {
       receiptId: r.victimTxSignature,
@@ -117,17 +137,24 @@ export class ReceiptService {
       },
       shareUrl: '',
       shareImageUrl: '',
+      confidenceLevel,
+      detectionMethod,
+      bundleProvenance,
+      lossSource,
       attackDetail: {
         kind: 'sandwich',
-        attackerAddress: r.attack?.attacker ?? '',
+        attackerAddress: attack?.attacker ?? '',
         frontrunTx: detail?.frontrunTx ?? '',
         backrunTx: detail?.backrunTx ?? '',
-        attackerProfit: (r.attack?.attackerProfit ?? 0) / 1e9,
+        attackerProfit:
+          attack?.attackerProfit != null ? attack.attackerProfit / 1e9 : null,
         attackerProfitUsd:
-          solPrice != null ? ((r.attack?.attackerProfit ?? 0) / 1e9) * solPrice : null,
-        pool: r.attack?.pool ?? '',
-        frontrunSlot: Number(detail?.frontrunSlot ?? r.attack?.slot ?? 0n),
-        backrunSlot: Number(detail?.backrunSlot ?? r.attack?.slot ?? 0n),
+          attack?.attackerProfit != null && solPrice != null
+            ? (attack.attackerProfit / 1e9) * solPrice
+            : null,
+        pool: attack?.pool ?? '',
+        frontrunSlot: Number(detail?.frontrunSlot ?? attack?.slot ?? 0n),
+        backrunSlot: Number(detail?.backrunSlot ?? attack?.slot ?? 0n),
         isWideSandwich: detail?.isWideSandwich ?? false,
       },
     };

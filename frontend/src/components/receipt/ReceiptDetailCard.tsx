@@ -1,6 +1,8 @@
 import { MevType } from '@/lib/types';
 import type { ReceiptSearchResult, MevReceipt, SandwichAttackDetail } from '@/lib/types';
 import { txTypeLabel, getRiskColorHex } from '@/lib/format';
+import ConfidenceBadge from './ConfidenceBadge';
+import EvidencePanel from './EvidencePanel';
 
 interface ReceiptDetailCardProps {
   result: ReceiptSearchResult | null;
@@ -9,6 +11,26 @@ interface ReceiptDetailCardProps {
 }
 
 export default function ReceiptDetailCard({ result, featuredReceipt, featuredSandwich }: ReceiptDetailCardProps) {
+  const isUnenriched = featuredReceipt?.lossSource === 'unenriched';
+  const lossAmount = featuredReceipt?.mevAnalysis.loss.lossAmount;
+  const lossLabel = featuredReceipt
+    ? isUnenriched
+      ? 'Loss not estimated'
+      : typeof lossAmount === 'number' && Number.isFinite(lossAmount)
+        ? `${lossAmount.toFixed(3)} SOL`
+        : '—'
+    : '—';
+  const sandwichProfit = featuredSandwich?.attackerProfit;
+  const otherProfit =
+    featuredReceipt?.attackDetail.kind === 'other'
+      ? featuredReceipt.attackDetail.attackerProfit
+      : null;
+  const profitLabel =
+    typeof sandwichProfit === 'number'
+      ? `${sandwichProfit.toFixed(3)} SOL`
+      : typeof otherProfit === 'number'
+        ? `${otherProfit.toFixed(3)} SOL`
+        : '—';
   return (
     <div className="w-full lg:w-96 space-y-6">
       <div className="lg:sticky lg:top-32">
@@ -24,6 +46,7 @@ export default function ReceiptDetailCard({ result, featuredReceipt, featuredSan
                 #{featuredReceipt?.receiptId ?? '—'}
               </div>
             </div>
+            <ConfidenceBadge level={featuredReceipt?.confidenceLevel ?? null} />
           </div>
 
           {/* Details */}
@@ -81,22 +104,38 @@ export default function ReceiptDetailCard({ result, featuredReceipt, featuredSan
               <div className="flex justify-between text-sm">
                 <span className="text-vigil-muted">Attacker Profit</span>
                 <span className="text-vigil-red font-mono font-semibold">
-                  {featuredSandwich
-                    ? `${featuredSandwich.attackerProfit.toFixed(3)} SOL`
-                    : featuredReceipt?.attackDetail.kind === 'other'
-                      ? `${featuredReceipt.attackDetail.attackerProfit.toFixed(3)} SOL`
-                      : '—'}
+                  {profitLabel}
                 </span>
               </div>
               <div className="flex justify-between text-sm">
                 <span className="text-vigil-muted">Your Loss</span>
-                <span className="text-vigil-red font-mono font-semibold">
-                  {featuredReceipt
-                    ? `${featuredReceipt.mevAnalysis.loss.lossAmount.toFixed(3)} SOL`
-                    : '—'}
+                <span
+                  className={`font-mono font-semibold ${isUnenriched ? 'text-vigil-muted' : 'text-vigil-red'}`}
+                  title={isUnenriched ? 'CLOB attack — loss not estimated' : undefined}
+                >
+                  {lossLabel}
+                  {isUnenriched && (
+                    <span
+                      className="material-symbols-outlined text-sm align-middle ml-1"
+                      aria-hidden="true"
+                    >
+                      info
+                    </span>
+                  )}
                 </span>
               </div>
             </div>
+          </div>
+
+          <div className="receipt-dashed my-6"></div>
+
+          {/* Evidence — Why we flagged this */}
+          <div className="mb-6">
+            <EvidencePanel
+              detectionMethod={featuredReceipt?.detectionMethod ?? null}
+              bundleProvenance={featuredReceipt?.bundleProvenance ?? null}
+              lossSource={featuredReceipt?.lossSource ?? null}
+            />
           </div>
 
           <div className="receipt-dashed my-6"></div>

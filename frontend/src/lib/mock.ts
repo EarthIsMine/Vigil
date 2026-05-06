@@ -15,6 +15,10 @@ import type {
   MevAttack,
   ValidatorDetail,
   ReceiptSearchResult,
+  ConfidenceLevel,
+  DetectionMethod,
+  BundleProvenance,
+  LossSource,
 } from './types';
 
 // ─── Dashboard ────────────────────────────────────────────────────────────
@@ -72,6 +76,25 @@ const SEVERITIES: Severity[] = [
   Severity.CRITICAL,
   Severity.MEDIUM,
 ];
+const CONFIDENCE_LEVELS: ConfidenceLevel[] = ['high', 'medium', 'low', 'high'];
+const DETECTION_METHODS: DetectionMethod[] = [
+  'header',
+  'cross_slot_window',
+  'jito_bundle',
+  'header',
+];
+const BUNDLE_PROVENANCES: BundleProvenance[] = [
+  'atomic',
+  'organic',
+  'tip_race',
+  'spanning',
+];
+const LOSS_SOURCES: LossSource[] = [
+  'amm_replay',
+  'whirlpool_replay',
+  'dlmm_replay',
+  'pool_amount_out',
+];
 
 export const MOCK_LIVE_FEED: MevAttack[] = Array.from({ length: 8 }, (_, i) => ({
   signature: `mock-sig-${i}-${Date.now()}`,
@@ -90,6 +113,10 @@ export const MOCK_LIVE_FEED: MevAttack[] = Array.from({ length: 8 }, (_, i) => (
   dex:  ['Orca', 'Raydium', 'Meteora'][i % 3],
   extractedUsd: parseFloat((Math.random() * 800 + 20).toFixed(2)),
   extractedSol: parseFloat((Math.random() * 6 + 0.1).toFixed(3)),
+  confidenceLevel: CONFIDENCE_LEVELS[i % 4],
+  detectionMethod: DETECTION_METHODS[i % 4],
+  bundleProvenance: BUNDLE_PROVENANCES[i % 4],
+  lossSource: LOSS_SOURCES[i % 4],
 }));
 
 // ─── Validator Detail ─────────────────────────────────────────────────────
@@ -173,6 +200,10 @@ export const MOCK_RECEIPT_RESULT: ReceiptSearchResult = {
     },
     shareUrl:      '/receipt/VGL-2026-04-07-0001',
     shareImageUrl: '/receipt/VGL-2026-04-07-0001/image',
+    confidenceLevel:   'high',
+    detectionMethod:   'jito_bundle',
+    bundleProvenance:  'atomic',
+    lossSource:        'whirlpool_replay',
     attackDetail: {
       kind:               'sandwich',
       attackerAddress:    'Atk...xyz',
@@ -228,6 +259,10 @@ export const MOCK_RECEIPT_RESULT: ReceiptSearchResult = {
       },
       shareUrl:      '/receipt/VGL-2026-04-07-0001',
       shareImageUrl: '/receipt/VGL-2026-04-07-0001/image',
+      confidenceLevel:   'high',
+      detectionMethod:   'jito_bundle',
+      bundleProvenance:  'atomic',
+      lossSource:        'whirlpool_replay',
       attackDetail: {
         kind:               'sandwich',
         attackerAddress:    'Atk...xyz',
@@ -275,6 +310,10 @@ export const MOCK_RECEIPT_RESULT: ReceiptSearchResult = {
       },
       shareUrl:      '/receipt/VGL-2026-04-07-0002',
       shareImageUrl: '/receipt/VGL-2026-04-07-0002/image',
+      confidenceLevel:   null,
+      detectionMethod:   null,
+      bundleProvenance:  null,
+      lossSource:        null,
       attackDetail: {
         kind:               'other',
         attackerAddress:    '',
@@ -325,6 +364,10 @@ export const MOCK_RECEIPT_RESULT: ReceiptSearchResult = {
       },
       shareUrl:      '/receipt/VGL-2026-04-07-0003',
       shareImageUrl: '/receipt/VGL-2026-04-07-0003/image',
+      confidenceLevel:   'medium',
+      detectionMethod:   'cross_slot_window',
+      bundleProvenance:  'tip_race',
+      lossSource:        'amm_replay',
       attackDetail: {
         kind:               'sandwich',
         attackerAddress:    'Atk...abc',

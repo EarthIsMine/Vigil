@@ -32,6 +32,15 @@ export class AttacksService {
       dex: a.dex,
       pool: a.pool,
       severity: a.severity ?? 'low',
+      confidenceLevel: this.transform.normalizeConfidenceLevel(a.confidenceLevel),
+      detectionMethod: this.transform.normalizeDetectionMethod(a.detectionMethod),
+      bundleProvenance: this.transform.normalizeBundleProvenance(a.bundleProvenance),
+      lossSource: this.transform.determineLossSource({
+        ammReplay: a.ammReplay,
+        whirlpoolReplay: a.whirlpoolReplay,
+        dlmmReplay: a.dlmmReplay,
+        victimLossLamports: a.victimLossLamports,
+      }),
     }));
   }
 }

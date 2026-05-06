@@ -43,6 +43,10 @@ function makeMockAttack(overrides: Partial<MevAttack> = {}): MevAttack {
     dex: 'jupiter',
     pool: 'pool_abc123',
     severity: Severity.HIGH,
+    confidenceLevel: null,
+    detectionMethod: null,
+    bundleProvenance: null,
+    lossSource: null,
     ...overrides,
   };
 }

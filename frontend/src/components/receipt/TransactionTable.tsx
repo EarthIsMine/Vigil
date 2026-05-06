@@ -1,6 +1,17 @@
 import type { MevReceipt } from '@/lib/types';
 import { txTypeLabel } from '@/lib/format';
 
+function lossDisplay(r: MevReceipt): { text: string; isUnenriched: boolean } {
+  if (r.mevAnalysis.detected && r.lossSource === 'unenriched') {
+    return { text: 'Loss not estimated', isUnenriched: true };
+  }
+  const lossAmt = r.mevAnalysis.loss.lossAmount;
+  return {
+    text: lossAmt > 0 ? `-${lossAmt.toFixed(3)} SOL` : '0.000 SOL',
+    isUnenriched: false,
+  };
+}
+
 export default function TransactionTable({ receipts }: { receipts: MevReceipt[] }) {
   return (
     <div className="receipt-card p-6 rounded-xl border border-vigil-border-dark fade-up fade-up-d1">
@@ -8,7 +19,7 @@ export default function TransactionTable({ receipts }: { receipts: MevReceipt[] 
       <div className="space-y-3">
         {receipts.map((r) => {
           const { label, cls } = txTypeLabel(r.mevAnalysis.type);
-          const lossAmt = r.mevAnalysis.loss.lossAmount;
+          const loss = lossDisplay(r);
           return (
             <div key={r.receiptId} className="flex items-center gap-4 p-3 bg-vigil-bg/50 rounded-lg border border-vigil-border-dark">
               <div className="flex-1 min-w-0">
@@ -18,8 +29,16 @@ export default function TransactionTable({ receipts }: { receipts: MevReceipt[] 
                 </div>
               </div>
               <div className="text-right">
-                <div className={`font-mono text-sm font-semibold ${cls}`}>
-                  {lossAmt > 0 ? `-${lossAmt.toFixed(3)} SOL` : '0.000'}
+                <div
+                  className={`font-mono text-sm font-semibold ${loss.isUnenriched ? 'text-vigil-muted' : cls}`}
+                  title={loss.isUnenriched ? 'CLOB attack — loss not estimated' : undefined}
+                >
+                  {loss.text}
+                  {loss.isUnenriched && (
+                    <span className="material-symbols-outlined text-sm align-middle ml-1" aria-hidden="true">
+                      info
+                    </span>
+                  )}
                 </div>
                 <div className={`text-xs ${cls}`}>{label}</div>
               </div>

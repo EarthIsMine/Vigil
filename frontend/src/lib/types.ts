@@ -48,7 +48,21 @@ export interface MevAttack {
   dex: string;
   pool: string;
   severity: Severity;
+  confidenceLevel: ConfidenceLevel | null;
+  detectionMethod: DetectionMethod | null;
+  bundleProvenance: BundleProvenance | null;
+  lossSource: LossSource | null;
 }
+
+export type ConfidenceLevel = 'low' | 'medium' | 'high';
+export type DetectionMethod = 'header' | 'cross_slot_window' | 'jito_bundle';
+export type BundleProvenance = 'atomic' | 'spanning' | 'tip_race' | 'organic';
+export type LossSource =
+  | 'amm_replay'
+  | 'whirlpool_replay'
+  | 'dlmm_replay'
+  | 'pool_amount_out'
+  | 'unenriched';
 
 // --- 1. 트랜잭션 분류 ---
 
@@ -236,6 +250,12 @@ export interface MevReceiptBase {
   };
   shareUrl: string;
   shareImageUrl: string;
+  // Surfaced from the parent MevAttack — confidence in the detection itself
+  // (orthogonal to mevAnalysis.loss.confidence which is the loss estimate's precision).
+  confidenceLevel: ConfidenceLevel | null;
+  detectionMethod: DetectionMethod | null;
+  bundleProvenance: BundleProvenance | null;
+  lossSource: LossSource | null;
 }
 
 export interface SandwichAttackDetail {
@@ -243,7 +263,7 @@ export interface SandwichAttackDetail {
   attackerAddress: string;
   frontrunTx: string;
   backrunTx: string;
-  attackerProfit: number;
+  attackerProfit: number | null;
   attackerProfitUsd: number | null;
   pool: string;
   frontrunSlot: number;
@@ -254,7 +274,7 @@ export interface SandwichAttackDetail {
 export interface NonSandwichAttackDetail {
   kind: 'other';
   attackerAddress: string;
-  attackerProfit: number;
+  attackerProfit: number | null;
   attackerProfitUsd: number | null;
   pool: string;
   slot: number;
