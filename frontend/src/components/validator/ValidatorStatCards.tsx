@@ -1,11 +1,17 @@
 import type { ValidatorDetail } from '@/lib/types';
 
+function formatAvgPerSlot(value: number): string {
+  if (!Number.isFinite(value) || value === 0) return '0';
+  if (Math.abs(value) >= 0.001) return value.toFixed(6);
+  return value.toExponential(2);
+}
+
 export default function ValidatorStatCards({ validator }: { validator: ValidatorDetail | null }) {
   const stats = [
     { label: 'Total Extracted (SOL)', value: validator ? `${validator.metricsRaw.totalExtractedSol.toLocaleString()} SOL` : '...' },
     { label: 'Sandwich Involvement', value: validator ? `${(validator.metricsRaw.sandwichInvolvementRate * 100).toFixed(1)}%` : '...' },
     { label: 'Wide Sandwich Rate', value: validator ? `${(validator.metricsRaw.wideSandwichRate * 100).toFixed(1)}%` : '...' },
-    { label: 'Avg Extraction / Slot', value: validator ? `${validator.metricsRaw.avgExtractionPerSlot} SOL` : '...' },
+    { label: 'Avg Extraction / Slot', value: validator ? `${formatAvgPerSlot(validator.metricsRaw.avgExtractionPerSlot)} SOL` : '...' },
   ];
 
   return (
