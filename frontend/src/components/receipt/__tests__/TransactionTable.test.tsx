@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { render, screen } from '@testing-library/react';
+import { describe, it, expect, vi } from 'vitest';
+import { fireEvent, render, screen } from '@testing-library/react';
 import TransactionTable from '../TransactionTable';
 import type { MevReceipt } from '@/lib/types';
 import { MevType, Severity } from '@/lib/types';
@@ -95,5 +95,66 @@ describe('TransactionTable lossDisplay', () => {
   it('formats positive loss as -X.XXX SOL', () => {
     render(<TransactionTable receipts={[makeReceipt()]} />);
     expect(screen.getByText('-0.100 SOL')).toBeInTheDocument();
+  });
+});
+
+describe('TransactionTable selection', () => {
+  it('renders rows as buttons when onSelect is provided', () => {
+    const onSelect = vi.fn();
+    render(
+      <TransactionTable receipts={[makeReceipt({ receiptId: 'r-a' })]} onSelect={onSelect} />,
+    );
+    const button = screen.getByRole('button');
+    expect(button).toBeInTheDocument();
+  });
+
+  it('calls onSelect with the row receiptId when clicked', () => {
+    const onSelect = vi.fn();
+    render(
+      <TransactionTable
+        receipts={[
+          makeReceipt({ receiptId: 'r-a', txSignature: 'tx-a' }),
+          makeReceipt({ receiptId: 'r-b', txSignature: 'tx-b' }),
+        ]}
+        onSelect={onSelect}
+      />,
+    );
+    fireEvent.click(screen.getByText('tx-b').closest('button')!);
+    expect(onSelect).toHaveBeenCalledWith('r-b');
+  });
+
+  it('marks selected row with aria-pressed=true', () => {
+    render(
+      <TransactionTable
+        receipts={[
+          makeReceipt({ receiptId: 'r-a', txSignature: 'tx-a' }),
+          makeReceipt({ receiptId: 'r-b', txSignature: 'tx-b' }),
+        ]}
+        selectedReceiptId="r-b"
+        onSelect={() => {}}
+      />,
+    );
+    const buttonB = screen.getByText('tx-b').closest('button')!;
+    const buttonA = screen.getByText('tx-a').closest('button')!;
+    expect(buttonB).toHaveAttribute('aria-pressed', 'true');
+    expect(buttonA).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  it('renders rows as static divs (no buttons) when onSelect is omitted', () => {
+    render(<TransactionTable receipts={[makeReceipt()]} />);
+    expect(screen.queryByRole('button')).not.toBeInTheDocument();
+  });
+});
+
+describe('TransactionTable confidence dot', () => {
+  it('renders dot when confidenceLevel is set', () => {
+    render(<TransactionTable receipts={[makeReceipt({ confidenceLevel: 'high' })]} />);
+    const dot = screen.getByTestId('confidence-dot');
+    expect(dot).toHaveAttribute('data-confidence', 'high');
+  });
+
+  it('omits dot when confidenceLevel is null', () => {
+    render(<TransactionTable receipts={[makeReceipt({ confidenceLevel: null })]} />);
+    expect(screen.queryByTestId('confidence-dot')).not.toBeInTheDocument();
   });
 });

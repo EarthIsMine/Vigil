@@ -33,7 +33,13 @@ export default function ReceiptPage() {
                   <ErrorBanner message={search.error} onRetry={search.handleAnalyze} />
                 )}
                 {search.result && <ReceiptSummaryCards result={search.result} />}
-                {search.result && <TransactionTable receipts={search.result.receipts} />}
+                {search.result && (
+                  <TransactionTable
+                    receipts={search.result.receipts}
+                    selectedReceiptId={search.selectedReceiptId}
+                    onSelect={search.setSelectedReceiptId}
+                  />
+                )}
                 <ReceiptBottomCta />
               </div>
               <ReceiptDetailCard
