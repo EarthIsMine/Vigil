@@ -49,10 +49,6 @@ export default function Nav() {
               {latestSlot ? `Slot ${latestSlot.toLocaleString('en-US')}` : 'Connecting...'}
             </span>
           </div>
-          <button className="flex items-center gap-2 px-3 py-1.5 bg-surface-300 hover:bg-surface-400 border border-outline/40 rounded-lg text-sm text-on-surf transition">
-            <span className="material-symbols-outlined text-base">account_balance_wallet</span>
-            <span className="hidden sm:inline">0x7a3…f19c</span>
-          </button>
           <button
             className="md:hidden p-1.5 rounded-lg hover:bg-surface-300 transition text-muted"
             onClick={() => setMobileOpen((prev) => !prev)}

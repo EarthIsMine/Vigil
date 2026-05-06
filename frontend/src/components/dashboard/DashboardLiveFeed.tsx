@@ -10,19 +10,16 @@ interface DashboardLiveFeedProps {
 
 const STATUS_LABEL: Record<ConnectionStatus, string> = {
   live: 'Live',
-  mock: 'Mock',
   offline: 'Offline',
 };
 
 const STATUS_DOT_CLASS: Record<ConnectionStatus, string> = {
   live: 'w-2 h-2 rounded-full bg-secondary animate-pulse',
-  mock: 'w-2 h-2 rounded-full bg-muted',
   offline: 'w-2 h-2 rounded-full bg-error',
 };
 
 const STATUS_TEXT_CLASS: Record<ConnectionStatus, string> = {
   live: 'text-xs font-mono text-muted',
-  mock: 'text-xs font-mono text-muted',
   offline: 'text-xs font-mono text-error',
 };
 

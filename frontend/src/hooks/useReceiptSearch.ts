@@ -9,6 +9,7 @@ export interface ReceiptSearchState {
   loading: boolean;
   query: string;
   result: ReceiptSearchResult | null;
+  error: string | null;
   featuredReceipt: MevReceipt | null;
   featuredSandwich: SandwichAttackDetail | null;
   setQuery: (q: string) => void;
@@ -21,13 +22,18 @@ export function useReceiptSearch(): ReceiptSearchState {
   const [loading, setLoading] = useState(false);
   const [query, setQuery] = useState('');
   const [result, setResult] = useState<ReceiptSearchResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleAnalyze = async () => {
     if (!query.trim()) return;
     setLoading(true);
+    setError(null);
     try {
       const data = await searchReceipts(query.trim());
       setResult(data);
+      setShowResults(true);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Couldn't reach the API");
       setShowResults(true);
     } finally {
       setLoading(false);
@@ -47,6 +53,7 @@ export function useReceiptSearch(): ReceiptSearchState {
     loading,
     query,
     result,
+    error,
     featuredReceipt,
     featuredSandwich,
     setQuery,

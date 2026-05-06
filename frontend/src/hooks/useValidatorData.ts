@@ -11,33 +11,58 @@ export interface ValidatorDataState {
   riskColor: string;
   attacks: MevAttack[];
   pools: PoolLeaderboardEntry[];
+  loading: boolean;
+  error: string | null;
 }
 
 export function useValidatorData(): ValidatorDataState {
   const [validator, setValidator] = useState<ValidatorDetail | null>(null);
   const [attacks, setAttacks] = useState<MevAttack[]>([]);
   const [pools, setPools] = useState<PoolLeaderboardEntry[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function load() {
-      const [leaderboard, poolData, attackData] = await Promise.all([
+      const [leaderboardRes, poolsRes, attacksRes] = await Promise.allSettled([
         getValidatorLeaderboard(),
         getPoolLeaderboard(),
         getLiveFeed(50),
       ]);
+      if (cancelled) return;
 
-      setPools(poolData);
-      setAttacks(attackData);
+      const leaderboard = leaderboardRes.status === 'fulfilled' ? leaderboardRes.value : [];
+      setPools(poolsRes.status === 'fulfilled' ? poolsRes.value : []);
+      setAttacks(attacksRes.status === 'fulfilled' ? attacksRes.value : []);
 
       if (leaderboard.length > 0) {
-        const detail = await getValidatorDetail(leaderboard[0].identity);
-        setValidator(detail);
+        try {
+          const detail = await getValidatorDetail(leaderboard[0].identity);
+          if (!cancelled) setValidator(detail);
+        } catch {
+          /* validator detail couldn't load — leave null and surface via error below */
+        }
+      }
+
+      if (!cancelled) {
+        setLoading(false);
+        const allFailed =
+          leaderboardRes.status === 'rejected' &&
+          poolsRes.status === 'rejected' &&
+          attacksRes.status === 'rejected';
+        setError(allFailed ? "Couldn't reach the API" : null);
       }
     }
+
     load();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const riskColor = getRiskColorHex(validator?.riskLevel ?? '');
 
-  return { validator, riskColor, attacks, pools };
+  return { validator, riskColor, attacks, pools, loading, error };
 }

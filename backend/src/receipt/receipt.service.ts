@@ -95,6 +95,13 @@ export class ReceiptService {
           victimLossLamports: attack.victimLossLamports,
         })
       : null;
+    const replayTrace = attack
+      ? this.transform.buildReplayTrace({
+          ammReplay: attack.ammReplay,
+          whirlpoolReplay: attack.whirlpoolReplay,
+          dlmmReplay: attack.dlmmReplay,
+        })
+      : null;
 
     return {
       receiptId: r.victimTxSignature,
@@ -141,6 +148,7 @@ export class ReceiptService {
       detectionMethod,
       bundleProvenance,
       lossSource,
+      replayTrace,
       attackDetail: {
         kind: 'sandwich',
         attackerAddress: attack?.attacker ?? '',

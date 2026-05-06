@@ -1,5 +1,9 @@
 /**
- * Mock data — used as fallback when the backend is unreachable.
+ * Test fixtures — used by component tests in __tests__/ directories.
+ * Do NOT import from runtime application code (services, hooks, components).
+ * Runtime fallback to mock data was removed when the backend stabilised; the
+ * UI now surfaces explicit loading/error/empty states instead.
+ *
  * All values are spec-aligned (test/frontend-logic-mev-filtering.md).
  */
 
@@ -204,6 +208,7 @@ export const MOCK_RECEIPT_RESULT: ReceiptSearchResult = {
     detectionMethod:   'jito_bundle',
     bundleProvenance:  'atomic',
     lossSource:        'whirlpool_replay',
+    replayTrace:       null,
     attackDetail: {
       kind:               'sandwich',
       attackerAddress:    'Atk...xyz',
@@ -263,6 +268,7 @@ export const MOCK_RECEIPT_RESULT: ReceiptSearchResult = {
       detectionMethod:   'jito_bundle',
       bundleProvenance:  'atomic',
       lossSource:        'whirlpool_replay',
+      replayTrace:       null,
       attackDetail: {
         kind:               'sandwich',
         attackerAddress:    'Atk...xyz',
@@ -314,6 +320,7 @@ export const MOCK_RECEIPT_RESULT: ReceiptSearchResult = {
       detectionMethod:   null,
       bundleProvenance:  null,
       lossSource:        null,
+      replayTrace:       null,
       attackDetail: {
         kind:               'other',
         attackerAddress:    '',
@@ -368,6 +375,7 @@ export const MOCK_RECEIPT_RESULT: ReceiptSearchResult = {
       detectionMethod:   'cross_slot_window',
       bundleProvenance:  'tip_race',
       lossSource:        'amm_replay',
+      replayTrace:       null,
       attackDetail: {
         kind:               'sandwich',
         attackerAddress:    'Atk...abc',

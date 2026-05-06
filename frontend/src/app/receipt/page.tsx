@@ -6,6 +6,7 @@ import ReceiptSummaryCards from '@/components/receipt/ReceiptSummaryCards';
 import TransactionTable from '@/components/receipt/TransactionTable';
 import ReceiptDetailCard from '@/components/receipt/ReceiptDetailCard';
 import ReceiptBottomCta from '@/components/receipt/ReceiptBottomCta';
+import ErrorBanner from '@/components/shared/ErrorBanner';
 import { useReceiptSearch } from '@/hooks/useReceiptSearch';
 
 export default function ReceiptPage() {
@@ -26,6 +27,9 @@ export default function ReceiptPage() {
             <ReceiptResultsHeader query={search.query} onBack={search.goBack} />
             <div className="flex flex-col lg:flex-row gap-6 p-4 sm:p-6 max-w-7xl mx-auto">
               <div className="flex-1 min-w-0 space-y-6">
+                {search.error && (
+                  <ErrorBanner message={search.error} onRetry={search.handleAnalyze} />
+                )}
                 {search.result && <ReceiptSummaryCards result={search.result} />}
                 {search.result && <TransactionTable receipts={search.result.receipts} />}
                 <ReceiptBottomCta />

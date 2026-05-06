@@ -11,7 +11,7 @@ import {
 } from 'react';
 import { subscribeConnectionSource, type ConnectionSource } from '@/lib/api';
 
-export type ConnectionStatus = 'live' | 'mock' | 'offline';
+export type ConnectionStatus = 'live' | 'offline';
 
 const LIVE_TTL_MS = 60_000;
 const RECOMPUTE_INTERVAL_MS = 5_000;
@@ -32,26 +32,21 @@ interface ConnectionStatusProviderProps {
 
 export default function ConnectionStatusProvider({ children }: ConnectionStatusProviderProps) {
   const lastLiveTsRef = useRef(0);
-  const lastSourceRef = useRef<ConnectionSource | null>(null);
   const [status, setStatus] = useState<ConnectionStatus>('offline');
 
   const recompute = useCallback(() => {
     const now = Date.now();
     const lastLiveTs = lastLiveTsRef.current;
-    const lastSource = lastSourceRef.current;
 
     if (lastLiveTs > 0 && now - lastLiveTs < LIVE_TTL_MS) {
       setStatus('live');
-    } else if (lastSource !== null) {
-      setStatus('mock');
     } else {
       setStatus('offline');
     }
   }, []);
 
   useEffect(() => {
-    const unsubscribe = subscribeConnectionSource((source) => {
-      lastSourceRef.current = source;
+    const unsubscribe = subscribeConnectionSource((source: ConnectionSource) => {
       if (source === 'live') {
         lastLiveTsRef.current = Date.now();
       }

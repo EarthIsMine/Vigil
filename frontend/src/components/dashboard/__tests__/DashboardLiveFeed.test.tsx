@@ -48,18 +48,11 @@ describe('DashboardLiveFeed', () => {
     expect(container.querySelector('.animate-pulse')).not.toBeNull();
   });
 
-  it('shows non-pulsing Mock badge when status is mock', () => {
-    useConnectionStatusMock.mockReturnValue('mock');
-    const { container } = render(<DashboardLiveFeed attacks={ATTACKS} />);
-    expect(screen.getByText('Mock')).toBeInTheDocument();
-    expect(screen.queryByText('Live')).not.toBeInTheDocument();
-    expect(container.querySelector('.animate-pulse')).toBeNull();
-  });
-
-  it('shows Offline badge when status is offline', () => {
+  it('shows non-pulsing Offline badge when status is offline', () => {
     useConnectionStatusMock.mockReturnValue('offline');
-    render(<DashboardLiveFeed attacks={ATTACKS} />);
+    const { container } = render(<DashboardLiveFeed attacks={ATTACKS} />);
     expect(screen.getByText('Offline')).toBeInTheDocument();
     expect(screen.queryByText('Live')).not.toBeInTheDocument();
+    expect(container.querySelector('.animate-pulse')).toBeNull();
   });
 });
