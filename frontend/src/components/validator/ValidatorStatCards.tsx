@@ -1,9 +1,12 @@
 import type { ValidatorDetail } from '@/lib/types';
 
 function formatAvgPerSlot(value: number): string {
-  if (!Number.isFinite(value) || value === 0) return '0';
-  if (Math.abs(value) >= 0.001) return value.toFixed(6);
-  return value.toExponential(2);
+  if (!Number.isFinite(value)) return '—';
+  if (value === 0) return '0';
+  // Render plain decimal; SOL goes down to lamport precision (1e-9).
+  // Avoid scientific notation — `7.31e-4 SOL` is not user-friendly.
+  const fixed = Math.abs(value) >= 1 ? value.toFixed(4) : value.toFixed(9);
+  return fixed.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
 }
 
 export default function ValidatorStatCards({ validator }: { validator: ValidatorDetail | null }) {
