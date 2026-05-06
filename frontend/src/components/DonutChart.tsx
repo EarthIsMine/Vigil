@@ -1,6 +1,6 @@
 'use client';
 
-import { useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend, Plugin, TooltipItem } from 'chart.js';
 import { Doughnut } from 'react-chartjs-2';
 
@@ -40,8 +40,10 @@ export default function DonutChart({
 
   const centerTextRef = useRef(centerText);
   const centerSubTextRef = useRef(centerSubText);
-  centerTextRef.current = centerText;
-  centerSubTextRef.current = centerSubText;
+  useEffect(() => {
+    centerTextRef.current = centerText;
+    centerSubTextRef.current = centerSubText;
+  }, [centerText, centerSubText]);
 
   const centerTextPlugin: Plugin<'doughnut'> = {
     id: 'centerText',

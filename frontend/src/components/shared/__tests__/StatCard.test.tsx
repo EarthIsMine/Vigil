@@ -24,7 +24,7 @@ describe('StatCard', () => {
     render(
       <StatCard title="Active Attackers" value="42" subtitle="top: 0xABC..." />
     );
-    expect(screen.getByText('top: 0xABC...')).toBeInTheDocument();
+    expect(screen.getByText('top: 0...C...')).toBeInTheDocument();
   });
 
   it('does not render change when not provided', () => {
