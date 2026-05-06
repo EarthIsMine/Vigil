@@ -16,10 +16,21 @@ export default function ProtectionCta() {
               Join thousands of developers protecting their users from sandwich attacks, front-running, and MEV extraction.
             </p>
             <div className="flex flex-wrap gap-4 justify-center">
-              <Link href="/dashboard" className="px-8 py-4 bg-vigil-green hover:bg-vigil-emerald text-white rounded-lg font-medium transition-colors">
+              <a
+                href="https://github.com/EarthIsMine/Vigil-RPC"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-8 py-4 bg-vigil-green hover:bg-vigil-emerald text-white rounded-lg font-medium transition-colors"
+              >
                 Start Protecting Now
-              </Link>
-              <Link href="/docs" className="px-8 py-4 border border-vigil-border hover:border-vigil-green/50 text-white rounded-lg font-medium transition-colors">
+                <span className="material-symbols-outlined text-base" aria-hidden="true">
+                  open_in_new
+                </span>
+              </a>
+              <Link
+                href="/docs"
+                className="px-8 py-4 border border-vigil-border hover:border-vigil-green/50 text-white rounded-lg font-medium transition-colors"
+              >
                 Read Documentation
               </Link>
             </div>

@@ -36,10 +36,21 @@ export default function ProtectionHero() {
             </p>
 
             <div className="flex flex-wrap gap-4">
-              <Link href="/dashboard" className="px-6 py-3 bg-vigil-green hover:bg-vigil-emerald text-white rounded-lg font-medium transition-colors">
+              <a
+                href="https://github.com/EarthIsMine/Vigil-RPC"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-6 py-3 bg-vigil-green hover:bg-vigil-emerald text-white rounded-lg font-medium transition-colors"
+              >
                 Start Protecting
-              </Link>
-              <Link href="/docs" className="px-6 py-3 border border-vigil-border hover:border-vigil-green/50 text-white rounded-lg font-medium transition-colors">
+                <span className="material-symbols-outlined text-sm" aria-hidden="true">
+                  open_in_new
+                </span>
+              </a>
+              <Link
+                href="/docs"
+                className="px-6 py-3 border border-vigil-border hover:border-vigil-green/50 text-white rounded-lg font-medium transition-colors"
+              >
                 Read Docs
               </Link>
             </div>

@@ -13,8 +13,8 @@ export const getDashboardStats = () =>
 export const getTimeSeries = (range: '1h' | '24h' | '7d' = '24h') =>
   apiFetch<TimeSeriesDataPoint[]>(`/dashboard/timeseries?range=${range}`);
 
-export const getValidatorLeaderboard = () =>
-  apiFetch<ValidatorLeaderboardEntry[]>('/validators/leaderboard?limit=5');
+export const getValidatorLeaderboard = (limit = 5) =>
+  apiFetch<ValidatorLeaderboardEntry[]>(`/validators/leaderboard?limit=${limit}`);
 
 export const getPoolLeaderboard = () =>
   apiFetch<PoolLeaderboardEntry[]>('/pools/leaderboard?limit=5');
