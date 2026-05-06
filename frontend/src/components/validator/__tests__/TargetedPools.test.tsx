@@ -26,5 +26,6 @@ describe('TargetedPools', () => {
     render(<TargetedPools pools={MOCK_POOLS} />);
     expect(screen.getByText('1247')).toBeInTheDocument();
     expect(screen.getByText('982')).toBeInTheDocument();
+    expect(screen.getByText('543')).toBeInTheDocument();
   });
 });

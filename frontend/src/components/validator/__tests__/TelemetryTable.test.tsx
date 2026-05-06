@@ -50,7 +50,10 @@ describe('TelemetryTable', () => {
   it('renders telemetry rows', () => {
     render(<TelemetryTable attacks={MOCK_ATTACKS} />);
     expect(screen.getByText('Sandwich')).toBeInTheDocument();
+    expect(screen.getByText('Backrun')).toBeInTheDocument();
     expect(screen.getByText('1.2345')).toBeInTheDocument();
+    expect(screen.getByText('0.0500')).toBeInTheDocument();
     expect(screen.getByText('critical')).toBeInTheDocument();
+    expect(screen.getByText('medium')).toBeInTheDocument();
   });
 });
