@@ -1,257 +1,158 @@
-# Vigil — Solana Execution Quality Observatory
+<p align="center">
+  <h1 align="center">Vigil</h1>
+  <p align="center">
+    A Solana MEV transparency platform — sandwich detection, validator scoring, per-victim receipts.<br/>
+    Real-time live feed, counterfactual replay, and validator risk leaderboards across the Solana DEX surface.
+  </p>
+</p>
 
-Solana MEV를 감지·분석·가시화하는 인프라 플랫폼.
-"모든 스왑에 숨겨진 MEV 세금이 얼마인지 보여주는" 솔라나의 EigenPhi.
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js&logoColor=white" alt="Next.js" />
+  <img src="https://img.shields.io/badge/NestJS-11-E0234E?style=for-the-badge&logo=nestjs&logoColor=white" alt="NestJS" />
+  <img src="https://img.shields.io/badge/TypeScript-5-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/PostgreSQL-16-4169E1?style=for-the-badge&logo=postgresql&logoColor=white" alt="PostgreSQL" />
+  <img src="https://img.shields.io/badge/Solana-9945FF?style=for-the-badge&logo=solana&logoColor=white" alt="Solana" />
+  <img src="https://img.shields.io/badge/License-MIT-blue?style=for-the-badge" alt="MIT License" />
+</p>
 
----
-
-## 핵심 컨셉
-
-BAM에 한정하지 않고 솔라나 트랜잭션 전체 라이프사이클의 **실행 품질**을 측정한다.
-
-| # | 모듈 | 설명 | 구현 가능성 |
-|---|------|------|------------|
-| 1 | **TX Latency Decomposition** | TX 전송 → 블록 포함까지 단계별 지연 분해 | △ (관측 노드 필요) |
-| 2 | **MEV Impact Score** | per-TX MEV 손실 계산 ("당신의 스왑에서 $2.30이 빠져나감") | ✓ 온체인 분석 |
-| 3 | **Validator Execution Scorecard** | 밸리데이터별 MEV 추출 패턴, TX inclusion 공정성, 블록 빌딩 품질 | ✓ 온체인 데이터 |
-| 4 | **Infrastructure Health Dashboard** | Firedancer 채택률, SWQoS 집중도, 투표 TX 비율 | ✓ 퍼블릭 데이터 |
-
-**MVP 핵심**: [2] MEV Impact + [3] Validator Scorecard
-
----
-
-## 왜 콜로세움 스케일인가
-
-1. BAM 하나에 종속 안 됨 → 솔라나 전체를 커버하는 인프라 레이어
-2. "7.2억 달러 MEV = 사용자 숨겨진 세금"을 가시화 → 유저/스테이커 모두에게 직접 가치
-3. 온체인 데이터만으로 대부분 구현 가능 → BAM 오픈소스 안 기다려도 됨
-4. L2Beat + MEV-Explore + validators.app의 솔라나 버전
-5. 나중에 BAM/ACE/MCL 나오면 각각을 커버하는 모듈 추가 가능
+<p align="center">
+  <a href="#quick-start">Quick Start</a> &middot;
+  <a href="#what-vigil-shows">What Vigil Shows</a> &middot;
+  <a href="#architecture">Architecture</a> &middot;
+  <a href="#detector-integration">Detector Integration</a> &middot;
+  <a href="#development">Development</a>
+</p>
 
 ---
 
-## 아키텍처
+Solana MEV — sandwich attacks, frontruns, backruns — extracts hundreds of millions per year from victim swaps. **Vigil** turns that detection stream into something a user can read: a live feed of attacks pushed in real time, per-victim receipts that show the **counterfactual** ("what would your swap have returned if no attacker had been present?"), validator risk leaderboards, and protocol-level breakdowns.
 
-```
-[Helius gRPC] ─── 실시간 TX/블록 스트리밍
-       ↓
-[Nest.js Backend] ─── MEV 감지 엔진 + 데이터 저장 + API
-       ↓ REST + WS
-[Next.js Frontend] ─── 대시보드, MEV 영수증, 밸리데이터 스코어카드
-```
+> Powered by [solana-sandwich-detector](https://github.com/SangHyeonKwon/solana-sandwich-detector). The detector is the upstream stream-in / stream-out primitive (Rust). Vigil is the persistence, scoring, and presentation layer downstream — Nest.js BE, Next.js FE, PostgreSQL.
 
-| 레이어 | 경로 | 스택 |
-|--------|------|------|
-| Frontend | `frontend/` | Next.js 16, React 19, TypeScript, Tailwind CSS 4, Chart.js |
-| Backend | `backend/` | Nest.js, TypeScript, Helius RPC, PostgreSQL, Prisma |
+### What Vigil Shows
+
+| Surface | What you see |
+|---------|--------------|
+| **Dashboard** (`/dashboard`) | Live attack feed pushed via WebSocket, 24h MEV extraction stats, validator + pool leaderboards, 24h timeseries |
+| **MEV Receipt** (`/receipt`) | Per-wallet history of MEV damage. Each attack: confidence badge (`Verified` / `Likely` / `Unverified`), evidence chain (detection method, bundle provenance, loss source), and **counterfactual replay** of the pool state across AMM / Whirlpool / DLMM |
+| **Validator** (`/validator/[identity]`) | Normalised + trend-adjusted risk score, attack heatmap, attack distribution, telemetry table |
+| **Analytics** (`/analytics`) | Protocol-level leaderboards, attack-type breakdown, epoch-by-epoch summaries |
 
 ---
 
-## 데이터 소스
-
-| 소스 | 용도 | 비용 |
-|------|------|------|
-| Helius gRPC | 실시간 TX/블록 스트리밍 | 무료(devnet) / 월 $99~499(mainnet) |
-| Solana RPC | getBlock, getTransaction | 무료(공개) / 유료 RPC 월 $50~200 |
-| Jito Bundle API | 번들 관련 데이터 | 무료 |
-| Validators.app API | 밸리데이터 메타데이터 | 무료 |
-| Solana on-chain votes | 투표 TX 비율 계산 | RPC로 읽기 |
-
----
-
-## 기술 스택
-
-| 레이어 | 기술 | 이유 |
-|--------|------|------|
-| 데이터 수집 | TypeScript / Node.js | Solana web3.js, Helius SDK 호환 |
-| 분석 엔진 | TypeScript (→ Rust 부분 교체 가능) | MEV 감지 로직, 스코어 계산 |
-| DB | TimescaleDB (PostgreSQL 확장) | 시계열 특화, SQL 호환 |
-| API | Nest.js | 모듈화된 백엔드 구조 |
-| 프론트엔드 | Next.js + Tailwind | 대시보드 UI |
-| 차트 | Chart.js + react-chartjs-2 | 시계열/도넛 차트 |
-
----
-
-## 핵심 기술 역량
-
-### 필수
-
-- **Solana TX 구조 이해**: 프로그램 ID로 DEX 스왑 식별 (Jupiter, Raydium, Orca), inner instructions 파싱, 계정 read/write 패턴
-- **MEV 감지 알고리즘**: 샌드위치 공격 (buy → victim swap → sell), 프론트러닝, 백러닝, 슬리피지 초과분 계산
-- **gRPC 스트리밍**: Helius/Yellowstone gRPC 연결, 블록/TX 실시간 수신 + 파싱
-
-### 알면 좋음
-
-- Jito 번들 구조 (bundle tip 계산)
-- 밸리데이터 클라이언트 식별 (Firedancer vs Agave)
-- SWQoS 메커니즘 이해
-
----
-
-## 모듈별 구현 난이도
-
-| 모듈 | 난이도 | 설명 |
-|------|--------|------|
-| [A] 데이터 수집 파이프라인 | ★★★☆ | gRPC → 파싱 → DB 저장 |
-| [B] MEV 감지 엔진 | ★★★★ | 샌드위치/프론트런 탐지, per-TX MEV 손실 계산 |
-| [C] Validator Scorecard | ★★☆☆ | 블록별 MEV 패턴 집계, 밸리데이터별 점수화 |
-| [D] 프론트엔드 대시보드 | ★★☆☆ | Next.js + 차트 |
-| [E] API 레이어 | ★★☆☆ | REST API for 외부 연동 |
-
----
-
-## 인프라 비용
-
-| 항목 | 사양 | 월 비용 |
-|------|------|---------|
-| DB (TimescaleDB / PostgreSQL) | 4GB RAM / 100GB SSD | $20~40 |
-| Backend Server | 2 vCPU / 4GB RAM | $20~30 |
-| Frontend Hosting | Vercel | 무료 |
-| Redis (선택) | 캐싱, 실시간 큐 | $0~10 |
-| **총** | | **$50~80** |
-
-Railway / Fly.io 무료 티어로 시작하면 $0 가능.
-
----
-
-## 외부 라이브러리
-
-| 패키지 | 용도 |
-|--------|------|
-| `@solana/web3.js` | Solana RPC 클라이언트 |
-| `helius-sdk` | Helius API/gRPC |
-| `@jito-labs/jito-ts` | Jito 번들 관련 |
-| `@coral-xyz/anchor` | 프로그램 IDL 디코딩 (선택) |
-| `bs58` | Base58 인코딩 |
-| `pg` / `@timescale/toolkit` | PostgreSQL/TimescaleDB |
-| `bullmq` (선택) | 작업 큐 (데이터 수집 스케줄링) |
-
----
-
-## 가장 어려운 부분
-
-| 순위 | 과제 | 설명 |
-|------|------|------|
-| 1 | **MEV 감지 정확도** | 샌드위치는 패턴이 명확하나 프론트러닝의 의도 판단이 어려움. 80% 정확도면 이미 가치있음 |
-| 2 | **데이터 볼륨** | 솔라나 TPS가 높아 전체 TX 저장 불가. DEX 관련 TX만 필터링 (Jupiter, Raydium, Orca) |
-| 3 | **실시간성** | gRPC 스트리밍 끊김 시 데이터 갭 발생. 재연결 + 갭 백필 로직 필요 |
-
----
-
-## MVP 빌드 순서
-
-```
-Week 1: 데이터 파이프라인
-  → Helius gRPC 연결
-  → DEX TX만 필터링해서 TimescaleDB에 저장
-
-Week 2: MEV 감지
-  → 샌드위치 감지 알고리즘 구현
-  → per-TX MEV 손실 계산
-
-Week 3: 밸리데이터 스코어카드
-  → 블록별 MEV 패턴 집계
-  → 밸리데이터별 점수화
-
-Week 4: 프론트엔드 + 발표 준비
-  → 대시보드 UI
-  → API 문서화
-  → 데모 시나리오
-```
-
----
-
-## 경쟁 환경
-
-| 프로젝트 | 역할 | Vigil과 겹침 |
-|----------|------|-------------|
-| Jito Explorer | 번들/팁 데이터 조회 | 일부 겹침 |
-| MEV Watch (EVM) | 이더리움 MEV 추적 | 솔라나 버전 없음 |
-| EigenPhi (EVM) | EVM MEV 시각화 | 솔라나 버전 없음 |
-| Dune Analytics | SQL 온체인 데이터 쿼리 | 누구나 비슷한 대시보드 생성 가능 |
-| Solscan / SolanaFM | TX 익스플로러 | MEV 분석 미지원 |
-| Validators.app | 밸리데이터 정보 | MEV 관점 스코어 없음 |
-| Flashbots Protect (EVM) | MEV 보호 | 솔라나에 없음 |
-
----
-
-## 강점
-
-| # | 강점 | 강도 |
-|---|------|------|
-| 1 | **솔라나 MEV 전용 분석 도구가 아직 없다** — "솔라나의 EigenPhi" 포지션이 비어있음 | ★★★★ |
-| 2 | **내러티브가 강하다** — "7.2억 달러 MEV = 사용자 숨겨진 세금" | ★★★★ |
-| 3 | **스테이커 의사결정에 실질적 영향** — 밸리데이터 위임 변경 유도 | ★★★☆ |
-
-## 약점
-
-| # | 약점 | 심각도 |
-|---|------|--------|
-| 1 | **기술적 해자 부재** — 온체인 데이터는 누구나 접근 가능, 잘하는 팀이 2주면 복제 | ★★☆☆☆ |
-| 2 | **Dune 대체 가능성** — Dune 대시보드로 비슷한 분석 가능 | ★★☆☆☆ |
-| 3 | **수익 모델 불투명** — 대시보드는 무료 공개해야 의미 있음, API 유료화 수요 불확실 | ★★☆☆☆ |
-| 4 | **감지 정확도 증명 어려움** — false positive 많으면 신뢰도 추락 | ★★★☆☆ |
-| 5 | **사후 분석의 한계** — "내가 $2 뜯겼다는 걸 안다고 뭐가 달라지나?" | ★★★☆☆ |
-
----
-
-## 대시보드 vs 프로덕트
-
-> 현재 스코프대로면 **좋은 대시보드**에 가까움. 콜로세움에서 이기려면 **프로덕트**여야 함.
-
-```
-대시보드: 데이터를 보여준다 → "아 그렇구나" → 끝
-프로덕트: 데이터를 보여주고 → 행동을 유도하거나 → 실제 문제를 해결한다
-```
-
-### 프로덕트 격상 옵션
-
-| 옵션 | 설명 | 난이도 | 임팩트 |
-|------|------|--------|--------|
-| **A. MEV Protection Layer** | 실제 MEV를 막아주는 TX 라우팅 (Flashbots Protect 솔라나 버전) | ★★★★★ | ★★★★★ |
-| **B. Stake Delegation Advisor** | 밸리데이터 스코어 기반 re-delegation TX 생성 | ★★★☆ | ★★★☆ |
-| **C. MEV Alert + SDK** | dApp/월렛 통합 SDK, 스왑 전 위험도 알림 | ★★★☆ | ★★★☆ |
-| **D. Per-TX MEV Receipt** | 모든 스왑에 MEV 영수증 발급, 바이럴 공유 가능 | ★★☆ | ★★★★ |
-
-### 입상 가능성 평가
-
-| 스코프 | 입상 가능성 | 이유 |
-|--------|------------|------|
-| 분석 대시보드만 | 30~40% | 기술적 깊이는 있지만 "So what?"에 대한 답이 약함 |
-| + 옵션 D (MEV 영수증) | 60~70% | 유저 facing 프로덕트 + 바이럴성 + 데이터 인프라 |
-| + 옵션 A (MEV Protection) | 80%+ | 실제 문제 해결. 기간 내 가능성이 관건 |
-
-### 추천 전략
-
-**대시보드 + 옵션 D (MEV 영수증)를 코어로 가고, 가능하면 옵션 C (SDK/API)까지.**
-→ "인프라 + 프로덕트" 둘 다 확보.
-
----
-
-## 빠른 시작
+## Quick Start
 
 ```bash
+# Install workspace deps
+pnpm install
+
+# Backend (needs DATABASE_URL + Solana RPC + a built sandwich-detect binary)
+pnpm --filter backend dev          # listens on :3001
+
 # Frontend
-pnpm --filter vigil-frontend dev     # localhost:3000
-
-# Backend
-pnpm --filter backend dev            # localhost:3001
-
-# Build
-pnpm --filter vigil-frontend build
-pnpm --filter backend build
-
-# Test
-pnpm --filter vigil-frontend test
-pnpm --filter backend test
+pnpm --filter vigil-frontend dev   # opens on :3000
 ```
 
-### 환경변수
+The frontend requires `NEXT_PUBLIC_API_URL` to point at the backend. Without it, every page surfaces an explicit error state — there is no runtime mock fallback.
 
-| 변수 | 설명 |
-|------|------|
-| `HELIUS_API_KEY` | Helius RPC API 키 |
+### Common scripts
+
+```bash
+# Type-check + bundle
+pnpm --filter backend build
+pnpm --filter vigil-frontend build
+
+# Lint + tests
+pnpm --filter vigil-frontend lint
+pnpm --filter vigil-frontend test
+pnpm --filter backend test
+
+# Prisma
+cd backend && npx prisma generate
+cd backend && npx prisma migrate dev
+```
+
+---
+
+## Architecture
+
+```
+[Solana RPC / Helius]
+        ↓
+[solana-sandwich-detector]   ← spawned as a child process; emits JSONL on stdout
+        ↓
+[Nest.js Backend]            ← parse → DB write (Prisma) → broadcast
+        ↓ REST + WebSocket
+[Next.js Frontend]           ← dashboard, receipt, validator, analytics
+```
+
+| Layer | Path | Stack |
+|-------|------|-------|
+| Frontend | `frontend/` | Next.js 16, React 19, TypeScript strict, Tailwind 4, Chart.js, socket.io-client |
+| Backend | `backend/` | NestJS 11, TypeScript strict, Prisma + PostgreSQL, socket.io |
+| Detector | external | Rust — see [solana-sandwich-detector](https://github.com/SangHyeonKwon/solana-sandwich-detector) |
+
+### Real-time path
+
+The backend's `EventsGateway` exposes the `/events` namespace and emits `new_attack` to all subscribed clients on every detection. The frontend's `useLiveAttacks` hook does a REST seed + WS subscription, so the first paint isn't blocked on the WS handshake; subsequent attacks arrive instantly. CORS for both REST and WS is gated by `ALLOWED_ORIGINS`.
+
+### Confidence + counterfactual surface
+
+Each receipt carries the detector's reasoning end-to-end:
+
+- `confidenceLevel` (`high` / `medium` / `low`) — composite score from the detector's signal ensemble
+- `detectionMethod` — `header` (same-block) / `cross_slot_window` / `jito_bundle`
+- `bundleProvenance` — `atomic` / `spanning` / `tip_race` / `organic`
+- `lossSource` — which replay branch produced the loss number (`amm_replay` / `whirlpool_replay` / `dlmm_replay` / `pool_amount_out` / `unenriched`)
+- `replayTrace` — for AMM / Whirlpool / DLMM pools: pre / post-frontrun / post-victim / post-backrun pool snapshots so the receipt UI can render the counterfactual ("if no attack" vs actual)
+
+CLOB venues (Phoenix) emit detections without loss enrichment; the UI surfaces these as `Loss not estimated` instead of synthetic zeros.
+
+---
+
+## Detector Integration
+
+`backend/src/detector/detector.service.ts` consumes the detector's JSONL stream:
+
+1. Spawn `sandwich-detect --follow` as a child process — path via `DETECTOR_BIN`
+2. Read newline-delimited JSON from stdout: `_header`, `_heartbeat`, or attack payloads
+3. `transform.service.ts` normalises detector snake_case → frontend camelCase, derives `lossSource` from which replay branch fired, and builds the FE `replayTrace`
+4. Persist via Prisma (`MevAttack`, `MevReceipt`, `SandwichDetail`, `ValidatorStats`)
+5. `EventsGateway.broadcastAttack` pushes the FE-shaped payload to live clients
+
+The detector schema is pinned at `vigil-v1`. Schema breakage requires an explicit version bump on the detector side; `transform.service.ts`'s normalizers absorb minor key drift defensively.
+
+---
+
+## Development
+
+### Backend env vars
+
+| Var | Purpose |
+|-----|---------|
+| `DATABASE_URL` | PostgreSQL connection string |
+| `HELIUS_API_KEY` | Helius RPC API key |
 | `HELIUS_WS_URL` | Helius WebSocket URL |
-| `DATABASE_URL` | PostgreSQL 연결 문자열 |
-| `NEXT_PUBLIC_API_URL` | 백엔드 API URL (미설정 시 mock 데이터 사용) |
-| `PORT` | 백엔드 서버 포트 (기본 3001) |
+| `PORT` | Backend port (default `3001`) |
+| `ALLOWED_ORIGINS` | Comma-separated CORS allow-list (REST + WS). Unset → `'*'` in dev with a prod warning. |
+| `DETECTOR_BIN` | Path to `sandwich-detect` binary (built from the detector repo) |
+
+### Frontend env vars
+
+| Var | Purpose |
+|-----|---------|
+| `NEXT_PUBLIC_API_URL` | Backend API base, e.g. `http://localhost:3001/api/v1`. **Required at runtime** — there is no mock fallback. |
+
+### Contributor docs
+
+Internal architecture / convention notes live in:
+
+- [`CLAUDE.md`](CLAUDE.md) — root: architecture overview, FE↔BE protocol
+- [`backend/CLAUDE.md`](backend/CLAUDE.md) — module map, env vars, conventions
+- [`frontend/CLAUDE.fe.md`](frontend/CLAUDE.fe.md) — folder structure, page-state guidance
+
+---
+
+## License
+
+MIT
