@@ -46,7 +46,7 @@ function makeMockAttack(overrides: Partial<MevAttack> = {}): MevAttack {
     confidenceLevel: null,
     detectionMethod: null,
     bundleProvenance: null,
-    lossSource: null,
+    lossSource: 'pool_amount_out',
     ...overrides,
   };
 }

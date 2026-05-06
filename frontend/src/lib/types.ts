@@ -51,7 +51,11 @@ export interface MevAttack {
   confidenceLevel: ConfidenceLevel | null;
   detectionMethod: DetectionMethod | null;
   bundleProvenance: BundleProvenance | null;
-  lossSource: LossSource | null;
+  // BE always emits a value (`determineLossSource` falls through to
+  // 'pool_amount_out' or 'unenriched'), so this is non-nullable for the
+  // attack stream. The receipt-level type below is nullable because a
+  // receipt without a parent attack falls back to null.
+  lossSource: LossSource;
 }
 
 export type ConfidenceLevel = 'low' | 'medium' | 'high';
