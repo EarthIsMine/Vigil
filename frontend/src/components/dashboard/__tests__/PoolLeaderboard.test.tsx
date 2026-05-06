@@ -28,8 +28,8 @@ describe('PoolLeaderboard', () => {
 
   it('renders all pools', () => {
     render(<PoolLeaderboard pools={MOCK_POOLS} />);
-    expect(screen.getByText('SOL/USDC')).toBeInTheDocument();
-    expect(screen.getByText('RAY/USDC')).toBeInTheDocument();
+    expect(screen.getByText('SOL/USDC...USDC')).toBeInTheDocument();
+    expect(screen.getByText('RAY/USDC...USDC')).toBeInTheDocument();
   });
 
   it('renders dex names', () => {

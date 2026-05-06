@@ -22,9 +22,9 @@ describe('StatCard', () => {
 
   it('renders subtitle when provided', () => {
     render(
-      <StatCard title="Active Attackers" value="42" subtitle="top: 0xABC..." />
+      <StatCard title="Active Attackers" value="42" subtitle="top: StKH7Qx4p" />
     );
-    expect(screen.getByText('top: 0xABC...')).toBeInTheDocument();
+    expect(screen.getByText('top: S...Qx4p')).toBeInTheDocument();
   });
 
   it('does not render change when not provided', () => {
