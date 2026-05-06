@@ -6,14 +6,12 @@ import {
   getTimeSeries,
   getValidatorLeaderboard,
   getPoolLeaderboard,
-  getLiveFeed,
 } from '@/lib/services/dashboard';
 import type {
   DashboardStats,
   TimeSeriesDataPoint,
   ValidatorLeaderboardEntry,
   PoolLeaderboardEntry,
-  MevAttack,
 } from '@/lib/types';
 
 interface DashboardData {
@@ -21,7 +19,6 @@ interface DashboardData {
   timeseries: TimeSeriesDataPoint[];
   validators: ValidatorLeaderboardEntry[];
   pools: PoolLeaderboardEntry[];
-  liveFeed: MevAttack[];
   loading: boolean;
   error: string | null;
 }
@@ -36,7 +33,6 @@ export function useDashboardData(): DashboardData {
     timeseries: [],
     validators: [],
     pools: [],
-    liveFeed: [],
     loading: true,
     error: null,
   });
@@ -45,17 +41,16 @@ export function useDashboardData(): DashboardData {
     let cancelled = false;
 
     async function load() {
-      const [stats, timeseries, validators, pools, liveFeed] = await Promise.allSettled([
+      const [stats, timeseries, validators, pools] = await Promise.allSettled([
         getDashboardStats(),
         getTimeSeries('24h'),
         getValidatorLeaderboard(),
         getPoolLeaderboard(),
-        getLiveFeed(20),
       ]);
 
       if (cancelled) return;
 
-      const allFailed = [stats, timeseries, validators, pools, liveFeed].every(
+      const allFailed = [stats, timeseries, validators, pools].every(
         (r) => r.status === 'rejected',
       );
 
@@ -64,7 +59,6 @@ export function useDashboardData(): DashboardData {
         timeseries: valueOr(timeseries, []),
         validators: valueOr(validators, []),
         pools: valueOr(pools, []),
-        liveFeed: valueOr(liveFeed, []),
         loading: false,
         error: allFailed ? "Couldn't reach the API" : null,
       });

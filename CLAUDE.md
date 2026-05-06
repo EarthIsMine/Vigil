@@ -42,9 +42,9 @@ Solana MEV 감지·분석 플랫폼. 샌드위치 공격을 실시간 탐지하�
 
 - REST: 조회성 데이터 (대시보드, 리시트, 밸리데이터)
 - WebSocket: 실시간 공격 피드, 대시보드 stats 갱신
-- 응답 포맷: `{ data: T }` (단건), `{ data: T[], cursor?: string }` (목록)
+- 응답 포맷: 엔드포인트가 직접 도메인 객체 반환 (예: `DashboardStats`, `MevReceipt[]`). 별도 wrapper 없음.
 - 에러 포맷: `{ error: { code: string, message: string } }`
-- 페이지네이션: cursor 기반 (offset 사용 금지)
+- 페이지네이션: 현재 미적용 — 향후 list 엔드포인트는 cursor 기반으로 (offset 사용 금지)
 
 ## MVP 우선순위
 

@@ -19,7 +19,9 @@ export default function ReceiptPage() {
           <ReceiptSearchForm
             query={search.query}
             loading={search.loading}
+            range={search.range}
             onQueryChange={search.setQuery}
+            onRangeChange={search.setRange}
             onAnalyze={search.handleAnalyze}
           />
         ) : (

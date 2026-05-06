@@ -29,7 +29,7 @@ export function subscribeConnectionSource(listener: ConnectionListener): () => v
   };
 }
 
-function emitConnectionSource(source: ConnectionSource) {
+export function emitConnectionSource(source: ConnectionSource) {
   connectionListeners.forEach((listener) => {
     listener(source);
   });
