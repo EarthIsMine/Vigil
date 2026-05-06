@@ -52,7 +52,9 @@ export default function TransactionTable({
             <>
               <div className="flex-1 min-w-0">
                 <div className="flex items-center gap-2 mb-1">
-                  <span className="font-mono text-sm text-white truncate">{r.txSignature}</span>
+                  <span className="font-mono text-sm text-white truncate flex-1 min-w-0">
+                    {r.txSignature}
+                  </span>
                   {r.confidenceLevel && (
                     <span
                       data-testid="confidence-dot"
@@ -65,7 +67,7 @@ export default function TransactionTable({
                     />
                   )}
                 </div>
-                <div className="text-xs text-vigil-muted">
+                <div className="text-xs text-vigil-muted truncate">
                   swap · {r.victim.dex}
                 </div>
               </div>
