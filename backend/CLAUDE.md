@@ -105,6 +105,7 @@ Helius WS 구독 (슬롯)
 | `HELIUS_WS_URL` | Helius WebSocket URL |
 | `DATABASE_URL` | PostgreSQL 연결 문자열 |
 | `PORT` | 서버 포트 (기본 3001) |
+| `ALLOWED_ORIGINS` | CORS 허용 origin (콤마 구분, 예: `https://vigil.app,https://staging.vigil.app`). 미설정 시 dev에선 `*`, prod에선 경고. REST + WS 둘 다 적용. |
 
 ## 코딩 컨벤션
 - Nest.js 모듈 패턴 준수 (module → controller → service)
