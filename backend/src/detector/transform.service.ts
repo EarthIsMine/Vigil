@@ -2,6 +2,16 @@ import { Injectable } from '@nestjs/common';
 import { Prisma } from '@prisma/client';
 import { SandwichAttack, AttackType } from './detector.types';
 
+export type FeConfidenceLevel = 'low' | 'medium' | 'high';
+export type FeDetectionMethod = 'header' | 'cross_slot_window' | 'jito_bundle';
+export type FeBundleProvenance = 'atomic' | 'spanning' | 'tip_race' | 'organic';
+export type FeLossSource =
+  | 'amm_replay'
+  | 'whirlpool_replay'
+  | 'dlmm_replay'
+  | 'pool_amount_out'
+  | 'unenriched';
+
 /** Frontend MevAttack shape (matches frontend/src/lib/types.ts) */
 export interface FrontendMevAttack {
   signature: string;
@@ -20,6 +30,10 @@ export interface FrontendMevAttack {
   dex: string;
   pool: string;
   severity: string;
+  confidenceLevel: FeConfidenceLevel | null;
+  detectionMethod: FeDetectionMethod | null;
+  bundleProvenance: FeBundleProvenance | null;
+  lossSource: FeLossSource;
 }
 
 export interface TransformResult {
@@ -134,9 +148,64 @@ export class TransformService {
       dex: attack.dex,
       pool: attack.pool,
       severity: severity ?? 'low',
+      confidenceLevel: this.normalizeConfidenceLevel(attack.confidence_level ?? null),
+      detectionMethod: this.normalizeDetectionMethod(attack.detection_method ?? null),
+      bundleProvenance: this.normalizeBundleProvenance(attack.bundle_provenance ?? null),
+      lossSource: this.determineLossSource({
+        ammReplay: attack.amm_replay ?? null,
+        whirlpoolReplay: attack.whirlpool_replay ?? null,
+        dlmmReplay: attack.dlmm_replay ?? null,
+        victimLossLamports: attack.victim_loss_lamports ?? null,
+      }),
     };
 
     return { dbAttack, dbSandwichDetail, dbReceipts, frontendPayload };
+  }
+
+  normalizeConfidenceLevel(value: unknown): FeConfidenceLevel | null {
+    return value === 'low' || value === 'medium' || value === 'high' ? value : null;
+  }
+
+  normalizeDetectionMethod(value: unknown): FeDetectionMethod | null {
+    if (value == null) return null;
+    if (value === 'same_block') return 'header';
+    if (typeof value === 'object') {
+      if ('cross_slot_window' in (value as object)) return 'cross_slot_window';
+      if ('jito_bundle_confirmed' in (value as object)) return 'jito_bundle';
+    }
+    return null;
+  }
+
+  normalizeBundleProvenance(value: unknown): FeBundleProvenance | null {
+    switch (value) {
+      case 'atomic_bundle':
+        return 'atomic';
+      case 'spanning_bundle':
+        return 'spanning';
+      case 'tip_race':
+        return 'tip_race';
+      case 'organic':
+        return 'organic';
+      default:
+        return null;
+    }
+  }
+
+  /**
+   * Loss source priority — replay traces (precise counterfactual) → pool reserve estimate → unenriched.
+   * `unenriched` is the Phoenix CLOB / unsupported-DEX case where loss can't be quantified.
+   */
+  determineLossSource(input: {
+    ammReplay: unknown;
+    whirlpoolReplay: unknown;
+    dlmmReplay: unknown;
+    victimLossLamports: number | null;
+  }): FeLossSource {
+    if (input.ammReplay) return 'amm_replay';
+    if (input.whirlpoolReplay) return 'whirlpool_replay';
+    if (input.dlmmReplay) return 'dlmm_replay';
+    if (input.victimLossLamports == null) return 'unenriched';
+    return 'pool_amount_out';
   }
 
   /** Map DB attack_type to frontend MevType enum string */
