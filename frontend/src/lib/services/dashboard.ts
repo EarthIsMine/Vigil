@@ -1,11 +1,4 @@
-import { apiFetch, withFallback } from '../api';
-import {
-  MOCK_DASHBOARD_STATS,
-  MOCK_TIMESERIES,
-  MOCK_VALIDATOR_LEADERBOARD,
-  MOCK_POOL_LEADERBOARD,
-  MOCK_LIVE_FEED,
-} from '../mock';
+import { apiFetch } from '../api';
 import type {
   DashboardStats,
   TimeSeriesDataPoint,
@@ -15,36 +8,16 @@ import type {
 } from '../types';
 
 export const getDashboardStats = () =>
-  withFallback(
-    'getDashboardStats',
-    () => apiFetch<DashboardStats>('/dashboard/stats'),
-    MOCK_DASHBOARD_STATS,
-  );
+  apiFetch<DashboardStats>('/dashboard/stats');
 
 export const getTimeSeries = (range: '1h' | '24h' | '7d' = '24h') =>
-  withFallback(
-    'getTimeSeries',
-    () => apiFetch<TimeSeriesDataPoint[]>(`/dashboard/timeseries?range=${range}`),
-    MOCK_TIMESERIES,
-  );
+  apiFetch<TimeSeriesDataPoint[]>(`/dashboard/timeseries?range=${range}`);
 
 export const getValidatorLeaderboard = () =>
-  withFallback(
-    'getValidatorLeaderboard',
-    () => apiFetch<ValidatorLeaderboardEntry[]>('/validators/leaderboard?limit=5'),
-    MOCK_VALIDATOR_LEADERBOARD,
-  );
+  apiFetch<ValidatorLeaderboardEntry[]>('/validators/leaderboard?limit=5');
 
 export const getPoolLeaderboard = () =>
-  withFallback(
-    'getPoolLeaderboard',
-    () => apiFetch<PoolLeaderboardEntry[]>('/pools/leaderboard?limit=5'),
-    MOCK_POOL_LEADERBOARD,
-  );
+  apiFetch<PoolLeaderboardEntry[]>('/pools/leaderboard?limit=5');
 
 export const getLiveFeed = (limit = 20) =>
-  withFallback(
-    'getLiveFeed',
-    () => apiFetch<MevAttack[]>(`/attacks/recent?limit=${limit}`),
-    MOCK_LIVE_FEED,
-  );
+  apiFetch<MevAttack[]>(`/attacks/recent?limit=${limit}`);

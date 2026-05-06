@@ -12,6 +12,62 @@ export type FeLossSource =
   | 'pool_amount_out'
   | 'unenriched';
 
+export interface FeAmmReplayData {
+  reservesPre: [number, number];
+  reservesPostFront: [number, number];
+  reservesPostVictim: [number, number];
+  reservesPostBack: [number, number];
+  spotPricePre: number;
+  spotPricePostFront: number;
+  counterfactualVictimOut: number;
+  actualVictimOut: number;
+  feeNum: number;
+  feeDen: number;
+}
+
+export interface FeWhirlpoolReplayData {
+  sqrtPricePre: string;
+  sqrtPricePostFront: string;
+  sqrtPricePostVictim: string;
+  sqrtPricePostBack: string;
+  liquidityPre: string;
+  liquidityPostFront: string;
+  liquidityPostVictim: string;
+  liquidityPostBack: string;
+  tickCurrentPre: number;
+  tickCurrentPostFront: number;
+  tickCurrentPostVictim: number;
+  tickCurrentPostBack: number;
+  counterfactualVictimOut: number;
+  actualVictimOut: number;
+  feeNum: number;
+  feeDen: number;
+}
+
+export interface FeDlmmReplayData {
+  activeIdPre: number;
+  activeIdPostFront: number;
+  activeIdPostVictim: number;
+  activeIdPostBack: number;
+  binPricePre: string;
+  counterfactualVictimOut: number;
+  actualVictimOut: number;
+  binStep: number;
+  feeNum: number;
+  feeDen: number;
+  volatilityAccumulatorPre: number;
+  volatilityAccumulatorPostFront: number;
+  variableFeeRatePre: number;
+  variableFeeRatePostFront: number;
+  tokenXTransferFeeBps: number | null;
+  tokenYTransferFeeBps: number | null;
+}
+
+export type FeReplayTrace =
+  | { kind: 'amm'; data: FeAmmReplayData }
+  | { kind: 'whirlpool'; data: FeWhirlpoolReplayData }
+  | { kind: 'dlmm'; data: FeDlmmReplayData };
+
 /** Frontend MevAttack shape (matches frontend/src/lib/types.ts) */
 export interface FrontendMevAttack {
   signature: string;
@@ -206,6 +262,86 @@ export class TransformService {
     if (input.dlmmReplay) return 'dlmm_replay';
     if (input.victimLossLamports == null) return 'unenriched';
     return 'pool_amount_out';
+  }
+
+  /**
+   * Build the FE-friendly replay trace from raw detector output.
+   * AMM/Whirlpool/DLMM each have different shapes; we pick whichever the
+   * detector produced and normalise snake_case → camelCase for the FE.
+   * Returns null if no replay was emitted (e.g. CLOB / unenriched).
+   */
+  buildReplayTrace(input: {
+    ammReplay: unknown;
+    whirlpoolReplay: unknown;
+    dlmmReplay: unknown;
+  }): FeReplayTrace | null {
+    if (input.ammReplay) {
+      const r = input.ammReplay as Record<string, unknown>;
+      return {
+        kind: 'amm',
+        data: {
+          reservesPre: r.reserves_pre as [number, number],
+          reservesPostFront: r.reserves_post_front as [number, number],
+          reservesPostVictim: r.reserves_post_victim as [number, number],
+          reservesPostBack: r.reserves_post_back as [number, number],
+          spotPricePre: r.spot_price_pre as number,
+          spotPricePostFront: r.spot_price_post_front as number,
+          counterfactualVictimOut: r.counterfactual_victim_out as number,
+          actualVictimOut: r.actual_victim_out as number,
+          feeNum: r.fee_num as number,
+          feeDen: r.fee_den as number,
+        },
+      };
+    }
+    if (input.whirlpoolReplay) {
+      const r = input.whirlpoolReplay as Record<string, unknown>;
+      return {
+        kind: 'whirlpool',
+        data: {
+          sqrtPricePre: String(r.sqrt_price_pre),
+          sqrtPricePostFront: String(r.sqrt_price_post_front),
+          sqrtPricePostVictim: String(r.sqrt_price_post_victim),
+          sqrtPricePostBack: String(r.sqrt_price_post_back),
+          liquidityPre: String(r.liquidity_pre),
+          liquidityPostFront: String(r.liquidity_post_front),
+          liquidityPostVictim: String(r.liquidity_post_victim),
+          liquidityPostBack: String(r.liquidity_post_back),
+          tickCurrentPre: r.tick_current_pre as number,
+          tickCurrentPostFront: r.tick_current_post_front as number,
+          tickCurrentPostVictim: r.tick_current_post_victim as number,
+          tickCurrentPostBack: r.tick_current_post_back as number,
+          counterfactualVictimOut: r.counterfactual_victim_out as number,
+          actualVictimOut: r.actual_victim_out as number,
+          feeNum: r.fee_num as number,
+          feeDen: r.fee_den as number,
+        },
+      };
+    }
+    if (input.dlmmReplay) {
+      const r = input.dlmmReplay as Record<string, unknown>;
+      return {
+        kind: 'dlmm',
+        data: {
+          activeIdPre: r.active_id_pre as number,
+          activeIdPostFront: r.active_id_post_front as number,
+          activeIdPostVictim: r.active_id_post_victim as number,
+          activeIdPostBack: r.active_id_post_back as number,
+          binPricePre: String(r.bin_price_pre),
+          counterfactualVictimOut: r.counterfactual_victim_out as number,
+          actualVictimOut: r.actual_victim_out as number,
+          binStep: r.bin_step as number,
+          feeNum: r.fee_num as number,
+          feeDen: r.fee_den as number,
+          volatilityAccumulatorPre: r.volatility_accumulator_pre as number,
+          volatilityAccumulatorPostFront: r.volatility_accumulator_post_front as number,
+          variableFeeRatePre: r.variable_fee_rate_pre as number,
+          variableFeeRatePostFront: r.variable_fee_rate_post_front as number,
+          tokenXTransferFeeBps: (r.token_x_transfer_fee_bps as number | null) ?? null,
+          tokenYTransferFeeBps: (r.token_y_transfer_fee_bps as number | null) ?? null,
+        },
+      };
+    }
+    return null;
   }
 
   /** Map DB attack_type to frontend MevType enum string */

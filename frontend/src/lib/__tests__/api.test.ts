@@ -1,44 +1,65 @@
-import { describe, it, expect, vi } from 'vitest';
-import { subscribeConnectionSource, withFallback, type ConnectionSource } from '../api';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { ApiError, apiFetch, subscribeConnectionSource, type ConnectionSource } from '../api';
 
-describe('withFallback', () => {
-  it('emits "live" when fetcher resolves', async () => {
+const ORIG_FETCH = globalThis.fetch;
+
+beforeEach(() => {
+  vi.stubEnv('NEXT_PUBLIC_API_URL', 'https://example.test');
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+  globalThis.fetch = ORIG_FETCH;
+});
+
+describe('apiFetch', () => {
+  it('emits "live" and returns parsed body on 2xx', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ ok: true }), { status: 200 }),
+    );
+
     const sources: ConnectionSource[] = [];
     const unsubscribe = subscribeConnectionSource((s) => sources.push(s));
 
-    const result = await withFallback('test', async () => 'real', 'mock');
+    const result = await apiFetch<{ ok: boolean }>('/x');
 
-    expect(result).toBe('real');
-    expect(sources).toEqual(['live']);
+    expect(result).toEqual({ ok: true });
+    expect(sources).toContain('live');
     unsubscribe();
   });
 
-  it('emits "mock" and returns mock when fetcher rejects', async () => {
+  it('emits "offline" and throws ApiError on non-2xx', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(new Response('', { status: 500 }));
+
     const sources: ConnectionSource[] = [];
     const unsubscribe = subscribeConnectionSource((s) => sources.push(s));
-    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
-    const result = await withFallback(
-      'test',
-      async () => {
-        throw new Error('boom');
-      },
-      'mock',
-    );
-
-    expect(result).toBe('mock');
-    expect(sources).toEqual(['mock']);
+    await expect(apiFetch('/x')).rejects.toBeInstanceOf(ApiError);
+    expect(sources).toContain('offline');
     unsubscribe();
-    warn.mockRestore();
+  });
+
+  it('emits "offline" and throws when API_BASE is empty', async () => {
+    vi.stubEnv('NEXT_PUBLIC_API_URL', '');
+
+    const sources: ConnectionSource[] = [];
+    const unsubscribe = subscribeConnectionSource((s) => sources.push(s));
+
+    await expect(apiFetch('/x')).rejects.toBeInstanceOf(ApiError);
+    expect(sources).toContain('offline');
+    unsubscribe();
   });
 
   it('stops emitting after unsubscribe', async () => {
+    globalThis.fetch = vi.fn().mockResolvedValue(
+      new Response(JSON.stringify({ ok: true }), { status: 200 }),
+    );
+
     const sources: ConnectionSource[] = [];
     const unsubscribe = subscribeConnectionSource((s) => sources.push(s));
     unsubscribe();
 
-    await withFallback('test', async () => 'real', 'mock');
-
+    await apiFetch('/x');
     expect(sources).toEqual([]);
   });
 });

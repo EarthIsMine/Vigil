@@ -7,10 +7,11 @@ import AnalyticsChart from '@/components/analytics/AnalyticsChart';
 import AttackTypeBreakdown from '@/components/analytics/AttackTypeBreakdown';
 import ProtocolLeaderboard from '@/components/analytics/ProtocolLeaderboard';
 import EpochTable from '@/components/analytics/EpochTable';
+import ErrorBanner from '@/components/shared/ErrorBanner';
 import { useAnalyticsData } from '@/hooks/useAnalyticsData';
 
 export default function AnalyticsPage() {
-  const { epochs, protocols, maxAttacks } = useAnalyticsData();
+  const { epochs, protocols, maxAttacks, loading, error } = useAnalyticsData();
 
   return (
     <div className="min-h-screen bg-vigil-bg text-white">
@@ -18,13 +19,22 @@ export default function AnalyticsPage() {
       <main className="md:ml-16 pt-14">
         <div className="p-4 sm:p-6 max-w-7xl mx-auto">
           <AnalyticsHeader />
-          <AnalyticsStatsGrid epochs={epochs} />
-          <AnalyticsChart />
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
-            <AttackTypeBreakdown />
-            <ProtocolLeaderboard protocols={protocols} maxAttacks={maxAttacks} />
-          </div>
-          <EpochTable epochs={epochs} />
+          {error && <ErrorBanner message={error} />}
+          {loading ? (
+            <div className="text-muted font-mono text-sm py-12 text-center">
+              Loading analytics...
+            </div>
+          ) : (
+            <>
+              <AnalyticsStatsGrid epochs={epochs} />
+              <AnalyticsChart />
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+                <AttackTypeBreakdown />
+                <ProtocolLeaderboard protocols={protocols} maxAttacks={maxAttacks} />
+              </div>
+              <EpochTable epochs={epochs} />
+            </>
+          )}
         </div>
       </main>
     </div>

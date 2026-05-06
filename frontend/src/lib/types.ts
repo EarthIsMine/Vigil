@@ -64,6 +64,62 @@ export type LossSource =
   | 'pool_amount_out'
   | 'unenriched';
 
+export interface AmmReplayData {
+  reservesPre: [number, number];
+  reservesPostFront: [number, number];
+  reservesPostVictim: [number, number];
+  reservesPostBack: [number, number];
+  spotPricePre: number;
+  spotPricePostFront: number;
+  counterfactualVictimOut: number;
+  actualVictimOut: number;
+  feeNum: number;
+  feeDen: number;
+}
+
+export interface WhirlpoolReplayData {
+  sqrtPricePre: string;
+  sqrtPricePostFront: string;
+  sqrtPricePostVictim: string;
+  sqrtPricePostBack: string;
+  liquidityPre: string;
+  liquidityPostFront: string;
+  liquidityPostVictim: string;
+  liquidityPostBack: string;
+  tickCurrentPre: number;
+  tickCurrentPostFront: number;
+  tickCurrentPostVictim: number;
+  tickCurrentPostBack: number;
+  counterfactualVictimOut: number;
+  actualVictimOut: number;
+  feeNum: number;
+  feeDen: number;
+}
+
+export interface DlmmReplayData {
+  activeIdPre: number;
+  activeIdPostFront: number;
+  activeIdPostVictim: number;
+  activeIdPostBack: number;
+  binPricePre: string;
+  counterfactualVictimOut: number;
+  actualVictimOut: number;
+  binStep: number;
+  feeNum: number;
+  feeDen: number;
+  volatilityAccumulatorPre: number;
+  volatilityAccumulatorPostFront: number;
+  variableFeeRatePre: number;
+  variableFeeRatePostFront: number;
+  tokenXTransferFeeBps: number | null;
+  tokenYTransferFeeBps: number | null;
+}
+
+export type ReplayTrace =
+  | { kind: 'amm'; data: AmmReplayData }
+  | { kind: 'whirlpool'; data: WhirlpoolReplayData }
+  | { kind: 'dlmm'; data: DlmmReplayData };
+
 // --- 1. 트랜잭션 분류 ---
 
 export enum MevType {
@@ -256,6 +312,7 @@ export interface MevReceiptBase {
   detectionMethod: DetectionMethod | null;
   bundleProvenance: BundleProvenance | null;
   lossSource: LossSource | null;
+  replayTrace: ReplayTrace | null;
 }
 
 export interface SandwichAttackDetail {

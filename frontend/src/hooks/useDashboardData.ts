@@ -23,6 +23,11 @@ interface DashboardData {
   pools: PoolLeaderboardEntry[];
   liveFeed: MevAttack[];
   loading: boolean;
+  error: string | null;
+}
+
+function valueOr<T>(result: PromiseSettledResult<T>, fallback: T): T {
+  return result.status === 'fulfilled' ? result.value : fallback;
 }
 
 export function useDashboardData(): DashboardData {
@@ -33,13 +38,14 @@ export function useDashboardData(): DashboardData {
     pools: [],
     liveFeed: [],
     loading: true,
+    error: null,
   });
 
   useEffect(() => {
     let cancelled = false;
 
     async function load() {
-      const [stats, timeseries, validators, pools, liveFeed] = await Promise.all([
+      const [stats, timeseries, validators, pools, liveFeed] = await Promise.allSettled([
         getDashboardStats(),
         getTimeSeries('24h'),
         getValidatorLeaderboard(),
@@ -47,9 +53,21 @@ export function useDashboardData(): DashboardData {
         getLiveFeed(20),
       ]);
 
-      if (!cancelled) {
-        setData({ stats, timeseries, validators, pools, liveFeed, loading: false });
-      }
+      if (cancelled) return;
+
+      const allFailed = [stats, timeseries, validators, pools, liveFeed].every(
+        (r) => r.status === 'rejected',
+      );
+
+      setData({
+        stats: stats.status === 'fulfilled' ? stats.value : null,
+        timeseries: valueOr(timeseries, []),
+        validators: valueOr(validators, []),
+        pools: valueOr(pools, []),
+        liveFeed: valueOr(liveFeed, []),
+        loading: false,
+        error: allFailed ? "Couldn't reach the API" : null,
+      });
     }
 
     load();

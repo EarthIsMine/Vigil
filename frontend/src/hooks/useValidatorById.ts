@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react';
 import { notFound } from 'next/navigation';
 import { getValidatorDetail } from '@/lib/services/validator';
 import {
-  getValidatorLeaderboard,
   getPoolLeaderboard,
   getLiveFeed,
 } from '@/lib/services/dashboard';
@@ -13,7 +12,7 @@ import type {
   MevAttack,
   PoolLeaderboardEntry,
 } from '@/lib/types';
-import { IS_MOCK, ApiError, apiFetch } from '@/lib/api';
+import { ApiError } from '@/lib/api';
 import { getRiskColorHex } from '@/lib/format';
 
 export interface ValidatorByIdState {
@@ -21,6 +20,8 @@ export interface ValidatorByIdState {
   riskColor: string;
   attacks: MevAttack[];
   pools: PoolLeaderboardEntry[];
+  loading: boolean;
+  error: string | null;
 }
 
 export function useValidatorById(identity: string): ValidatorByIdState {
@@ -28,52 +29,35 @@ export function useValidatorById(identity: string): ValidatorByIdState {
   const [attacks, setAttacks] = useState<MevAttack[]>([]);
   const [pools, setPools] = useState<PoolLeaderboardEntry[]>([]);
   const [shouldNotFound, setShouldNotFound] = useState(false);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     let alive = true;
 
     async function load() {
-      // In mock mode the service always returns the same MOCK_VALIDATOR_DETAIL,
-      // so we validate identity against the leaderboard to surface a real 404.
-      if (IS_MOCK) {
-        const leaderboard = await getValidatorLeaderboard();
+      try {
+        const detail = await getValidatorDetail(identity);
         if (!alive) return;
-        if (!leaderboard.some((v) => v.identity === identity)) {
+        setValidator(detail);
+      } catch (err) {
+        if (!alive) return;
+        if (err instanceof ApiError && err.status === 404) {
           setShouldNotFound(true);
+          setLoading(false);
           return;
         }
+        setError("Couldn't load validator");
       }
 
-      let detail: ValidatorDetail;
-      if (IS_MOCK) {
-        const mock = await getValidatorDetail(identity);
-        detail = { ...mock, identity };
-      } else {
-        try {
-          detail = await apiFetch<ValidatorDetail>(
-            `/validators/${encodeURIComponent(identity)}`,
-          );
-        } catch (err) {
-          if (err instanceof ApiError && err.status === 404) {
-            if (alive) setShouldNotFound(true);
-            return;
-          }
-          // Network/other failure → fall back to mock so the page still renders.
-          const mock = await getValidatorDetail(identity);
-          detail = { ...mock, identity };
-        }
-      }
-
-      if (!alive) return;
-      setValidator(detail);
-
-      const [poolData, attackData] = await Promise.all([
+      const [poolRes, attackRes] = await Promise.allSettled([
         getPoolLeaderboard(),
         getLiveFeed(50),
       ]);
       if (!alive) return;
-      setPools(poolData);
-      setAttacks(attackData);
+      setPools(poolRes.status === 'fulfilled' ? poolRes.value : []);
+      setAttacks(attackRes.status === 'fulfilled' ? attackRes.value : []);
+      setLoading(false);
     }
 
     load();
@@ -85,5 +69,5 @@ export function useValidatorById(identity: string): ValidatorByIdState {
   if (shouldNotFound) notFound();
 
   const riskColor = getRiskColorHex(validator?.riskLevel ?? '');
-  return { validator, riskColor, attacks, pools };
+  return { validator, riskColor, attacks, pools, loading, error };
 }

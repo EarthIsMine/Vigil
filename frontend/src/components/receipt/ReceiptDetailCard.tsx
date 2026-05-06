@@ -3,6 +3,7 @@ import type { ReceiptSearchResult, MevReceipt, SandwichAttackDetail } from '@/li
 import { txTypeLabel, getRiskColorHex } from '@/lib/format';
 import ConfidenceBadge from './ConfidenceBadge';
 import EvidencePanel from './EvidencePanel';
+import CounterfactualPanel from './CounterfactualPanel';
 
 interface ReceiptDetailCardProps {
   result: ReceiptSearchResult | null;
@@ -128,6 +129,11 @@ export default function ReceiptDetailCard({ result, featuredReceipt, featuredSan
           </div>
 
           <div className="receipt-dashed my-6"></div>
+
+          {/* Counterfactual replay — concrete loss derivation */}
+          <div className="mb-4">
+            <CounterfactualPanel trace={featuredReceipt?.replayTrace ?? null} />
+          </div>
 
           {/* Evidence — Why we flagged this */}
           <div className="mb-6">
