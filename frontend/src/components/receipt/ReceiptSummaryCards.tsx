@@ -1,39 +1,52 @@
 import type { ReceiptSearchResult } from '@/lib/types';
 
+function frequencyLabel(attacked: number): { label: string; cls: string } {
+  if (attacked > 10) return { label: 'High frequency', cls: 'text-error' };
+  if (attacked > 3) return { label: 'Medium frequency', cls: 'text-warning' };
+  return { label: 'Low frequency', cls: 'text-vigil-muted' };
+}
+
 export default function ReceiptSummaryCards({ result }: { result: ReceiptSearchResult }) {
+  const freq = frequencyLabel(result.totalAttacked);
+
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 fade-up">
-      <div className="receipt-card p-4 rounded-xl border border-vigil-border-dark">
-        <div className="text-xs text-vigil-muted mb-2">Total MEV Lost</div>
-        <div className="font-display font-bold text-2xl text-white mb-1">
+    <section className="grid grid-cols-2 lg:grid-cols-4 gap-x-8 gap-y-6 border-y border-vigil-border py-8 fade-up">
+      <div className="border-l border-vigil-border pl-4">
+        <p className="text-xs text-vigil-muted mb-2">Total loss</p>
+        <p className="font-display text-2xl font-bold text-white tabular-nums">
           {result.totalLossSol.toFixed(3)} SOL
-        </div>
-        <div className="text-xs text-vigil-muted">{result.totalLossUsd != null ? `$${result.totalLossUsd.toFixed(2)}` : '—'}</div>
+        </p>
+        <p className="text-xs text-vigil-muted mt-1.5">
+          {result.totalLossUsd != null ? `$${result.totalLossUsd.toFixed(2)}` : '—'}
+        </p>
       </div>
-      <div className="receipt-card p-4 rounded-xl border border-vigil-border-dark">
-        <div className="text-xs text-vigil-muted mb-2">Attack Frequency</div>
-        <div className={`font-display font-bold text-2xl mb-1 ${
-          result.totalAttacked > 10 ? 'text-vigil-red' :
-          result.totalAttacked > 3  ? 'text-accent-yellow' : 'text-accent-green'
-        }`}>
-          {result.totalAttacked > 10 ? 'HIGH' : result.totalAttacked > 3 ? 'MED' : 'LOW'}
-        </div>
-        <div className="text-xs text-vigil-muted">{result.totalAttacked}/{result.totalTxScanned} txs</div>
+
+      <div className="border-l border-vigil-border pl-4">
+        <p className="text-xs text-vigil-muted mb-2">Attack frequency</p>
+        <p className="font-display text-2xl font-bold text-white tabular-nums">
+          {result.totalAttacked}
+          <span className="text-base text-vigil-muted font-normal">
+            {' '}/ {result.totalTxScanned}
+          </span>
+        </p>
+        <p className={`text-xs ${freq.cls} mt-1.5`}>{freq.label}</p>
       </div>
-      <div className="receipt-card p-4 rounded-xl border border-vigil-border-dark">
-        <div className="text-xs text-vigil-muted mb-2">Avg Loss / Attack</div>
-        <div className="font-display font-bold text-2xl text-accent-yellow mb-1">
+
+      <div className="border-l border-vigil-border pl-4">
+        <p className="text-xs text-vigil-muted mb-2">Avg loss per attack</p>
+        <p className="font-display text-2xl font-bold text-white tabular-nums">
           {result.avgLossPerTx != null ? `$${result.avgLossPerTx.toFixed(2)}` : '—'}
-        </div>
-        <div className="text-xs text-vigil-muted">per transaction</div>
+        </p>
+        <p className="text-xs text-vigil-muted mt-1.5">per transaction</p>
       </div>
-      <div className="receipt-card p-4 rounded-xl border border-vigil-border-dark">
-        <div className="text-xs text-vigil-muted mb-2">TXs Scanned</div>
-        <div className="font-display font-bold text-2xl text-accent-green mb-1">
+
+      <div className="border-l border-vigil-border pl-4">
+        <p className="text-xs text-vigil-muted mb-2">Transactions scanned</p>
+        <p className="font-display text-2xl font-bold text-white tabular-nums">
           {result.totalTxScanned}
-        </div>
-        <div className="text-xs text-vigil-muted">total transactions</div>
+        </p>
+        <p className="text-xs text-vigil-muted mt-1.5">in selected range</p>
       </div>
-    </div>
+    </section>
   );
 }

@@ -11,17 +11,17 @@ const LEVEL_STYLE: Record<
   high: {
     label: 'Verified',
     icon: 'check_circle',
-    cls: 'bg-accent-green/15 text-accent-green border-accent-green/30',
+    cls: 'text-vigil-green',
   },
   medium: {
     label: 'Likely',
     icon: 'help',
-    cls: 'bg-accent-yellow/15 text-accent-yellow border-accent-yellow/30',
+    cls: 'text-warning',
   },
   low: {
     label: 'Unverified',
     icon: 'visibility_off',
-    cls: 'bg-vigil-muted/15 text-vigil-muted border-vigil-muted/30',
+    cls: 'text-vigil-muted',
   },
 };
 
@@ -32,9 +32,12 @@ export default function ConfidenceBadge({ level }: ConfidenceBadgeProps) {
     <span
       role="status"
       aria-label={`Detection confidence: ${style.label}`}
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full border text-xs font-mono font-semibold ${style.cls}`}
+      className={`inline-flex items-center gap-1 text-xs font-mono ${style.cls}`}
     >
-      <span className="material-symbols-outlined text-sm leading-none" aria-hidden="true">
+      <span
+        className="material-symbols-outlined text-sm leading-none"
+        aria-hidden="true"
+      >
         {style.icon}
       </span>
       {style.label}
