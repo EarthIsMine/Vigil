@@ -39,7 +39,7 @@ export default function ReceiptSearchForm({
         <div className="space-y-3 fade-up fade-up-d2">
           <h1 className="font-display font-bold text-5xl tracking-tight">TRACE YOUR IMPACT</h1>
           <p className="text-lg text-vigil-muted">
-            Enter a wallet address or transaction hash to analyze MEV extraction and generate your receipt
+            Enter a wallet address to analyze MEV extraction against it and generate your receipt
           </p>
         </div>
 
@@ -50,7 +50,7 @@ export default function ReceiptSearchForm({
               value={query}
               onChange={(e) => onQueryChange(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && onAnalyze()}
-              placeholder="7xKp...mN4q or full transaction hash"
+              placeholder="Solana wallet address (e.g., 7xKp…mN4q)"
               className="w-full px-6 py-4 bg-vigil-card-dark border-2 border-vigil-border-dark rounded-xl text-white placeholder:text-vigil-muted focus:outline-none focus:border-vigil-accent glow-blue transition font-mono text-sm"
             />
           </div>
