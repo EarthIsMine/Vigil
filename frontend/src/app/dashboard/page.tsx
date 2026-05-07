@@ -1,5 +1,6 @@
 'use client';
 
+import Sidebar from '@/components/Sidebar';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardStatsGrid from '@/components/dashboard/DashboardStatsGrid';
 import DashboardChart from '@/components/dashboard/DashboardChart';
@@ -14,27 +15,39 @@ export default function DashboardPage() {
   const { stats, timeseries, validators, pools, loading, error } = useDashboardData();
   const liveFeed = useLiveAttacks(20);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-surface flex items-center justify-center">
-        <div className="text-muted font-mono text-sm">Loading dashboard...</div>
-      </div>
-    );
-  }
-
   return (
-    <div className="min-h-screen bg-surface">
-      <main className="pt-16">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <DashboardHeader />
-          {error && <ErrorBanner message={error} />}
-          {stats && <DashboardStatsGrid stats={stats} />}
-          <DashboardChart timeseries={timeseries} />
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
-            <ValidatorLeaderboard validators={validators} />
-            <PoolLeaderboard pools={pools} />
-          </div>
-          <DashboardLiveFeed attacks={liveFeed} />
+    <div className="min-h-screen bg-surface text-white">
+      <Sidebar />
+      <main className="lg:pl-56">
+        <div className="px-6 py-10 max-w-6xl mx-auto">
+          {loading ? (
+            <div className="text-vigil-muted font-mono text-sm py-12">
+              Loading dashboard…
+            </div>
+          ) : (
+            <>
+              <DashboardHeader />
+              {error && <ErrorBanner message={error} />}
+              {stats && <DashboardStatsGrid stats={stats} />}
+
+              <section className="mb-14 fade-up fade-up-d2">
+                <h2 className="font-display text-2xl font-bold text-white mb-1">
+                  Extraction over time
+                </h2>
+                <p className="text-sm text-vigil-muted mb-6">
+                  Hourly buckets, stacked by attack type.
+                </p>
+                <DashboardChart timeseries={timeseries} />
+              </section>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-14">
+                <ValidatorLeaderboard validators={validators} />
+                <PoolLeaderboard pools={pools} />
+              </div>
+
+              <DashboardLiveFeed attacks={liveFeed} />
+            </>
+          )}
         </div>
       </main>
     </div>

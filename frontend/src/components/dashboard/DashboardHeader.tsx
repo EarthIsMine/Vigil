@@ -1,18 +1,33 @@
+import { useConnectionStatus } from '@/components/ConnectionStatusProvider';
+
 export default function DashboardHeader() {
+  const status = useConnectionStatus();
   return (
-    <div className="mb-8 fade-up">
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <header className="mb-10 fade-up">
+      <div className="flex items-end justify-between gap-6">
         <div>
-          <h1 className="font-display text-3xl font-bold text-on-surf mb-2">Dashboard</h1>
-          <p className="text-muted">Real-time MEV monitoring and analytics</p>
+          <h1 className="font-display font-bold text-4xl md:text-5xl tracking-tight text-white mb-2">
+            Dashboard
+          </h1>
+          <p className="text-vigil-muted">
+            Last 24 hours of MEV extraction across Solana DEXs.
+          </p>
         </div>
-        <select className="bg-surface-200 border border-outline rounded-lg px-4 py-2 text-on-surf text-sm font-medium focus:outline-none focus:ring-2 focus:ring-primary">
-          <option>Last 24 hours</option>
-          <option>Last 7 days</option>
-          <option>Last 30 days</option>
-          <option>Last 90 days</option>
-        </select>
+        <div className="flex items-center gap-2 text-sm">
+          <span
+            className={[
+              'w-1.5 h-1.5 rounded-full',
+              status === 'live' ? 'bg-vigil-green animate-pulse' : 'bg-error',
+            ].join(' ')}
+            aria-hidden="true"
+          />
+          <span
+            className={status === 'live' ? 'text-vigil-green' : 'text-error'}
+          >
+            {status === 'live' ? 'Live' : 'Offline'}
+          </span>
+        </div>
       </div>
-    </div>
+    </header>
   );
 }

@@ -1,21 +1,26 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import DashboardHeader from '../DashboardHeader';
 
+vi.mock('@/components/ConnectionStatusProvider', () => ({
+  useConnectionStatus: () => 'live',
+}));
+
 describe('DashboardHeader', () => {
-  it('renders heading', () => {
+  it('renders the heading', () => {
     render(<DashboardHeader />);
     expect(screen.getByText('Dashboard')).toBeInTheDocument();
   });
 
-  it('renders subtitle', () => {
+  it('renders the subtitle', () => {
     render(<DashboardHeader />);
-    expect(screen.getByText('Real-time MEV monitoring and analytics')).toBeInTheDocument();
+    expect(
+      screen.getByText('Last 24 hours of MEV extraction across Solana DEXs.'),
+    ).toBeInTheDocument();
   });
 
-  it('renders time range select', () => {
+  it('renders the connection status indicator', () => {
     render(<DashboardHeader />);
-    expect(screen.getByText('Last 24 hours')).toBeInTheDocument();
-    expect(screen.getByText('Last 7 days')).toBeInTheDocument();
+    expect(screen.getByText('Live')).toBeInTheDocument();
   });
 });
