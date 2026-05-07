@@ -67,10 +67,11 @@ export default function LiveFeed({ attacks }: LiveFeedProps) {
             </span>
             <div className="flex items-center gap-2">
               <span className="font-mono text-xs text-muted">
-                {new Date(attack.timestamp).toLocaleTimeString('en-US', {
+                {new Date(attack.timestamp).toLocaleTimeString('en-GB', {
                   hour: '2-digit',
                   minute: '2-digit',
                   second: '2-digit',
+                  hour12: false,
                 })}
               </span>
               {attack.confidenceLevel && (

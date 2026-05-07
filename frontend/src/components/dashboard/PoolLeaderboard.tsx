@@ -4,7 +4,7 @@ export default function PoolLeaderboard({ pools }: { pools: PoolLeaderboardEntry
   const maxAttacks = pools.length > 0 ? pools[0].attacks : 1;
 
   return (
-    <section className="fade-up fade-up-d3">
+    <section className="fade-up fade-up-d3 bg-surface-100 border border-outline/30 rounded-lg p-6">
       <h2 className="font-display text-xl font-bold text-white mb-5">
         Most targeted pools
       </h2>
@@ -26,9 +26,9 @@ export default function PoolLeaderboard({ pools }: { pools: PoolLeaderboardEntry
                   {p.attacks.toLocaleString()}
                 </span>
               </div>
-              <div className="h-1 bg-white/[0.04] rounded-full overflow-hidden">
+              <div className="h-1 bg-outline/40 rounded-full overflow-hidden">
                 <div
-                  className="h-full rounded-full bg-white/30"
+                  className="h-full rounded-full bg-primary/70"
                   style={{ width: `${(p.attacks / maxAttacks) * 100}%` }}
                 />
               </div>
