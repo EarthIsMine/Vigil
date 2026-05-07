@@ -17,7 +17,7 @@ export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-surface text-white">
       <main className="pt-14">
-        <div className="px-6 py-10 max-w-7xl mx-auto">
+        <div className="px-6 py-10 max-w-6xl mx-auto">
           {loading ? (
             <div className="text-vigil-muted font-mono text-sm py-12">
               Loading dashboard…

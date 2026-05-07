@@ -30,7 +30,7 @@ function generateDefaultLabels(): string[] {
   return Array.from({ length: 24 }, (_, i) => {
     const hour = new Date();
     hour.setHours(hour.getHours() - (23 - i));
-    return hour.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+    return hour.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit', hour12: false });
   });
 }
 
@@ -115,7 +115,7 @@ export default function MevChart({ labels: externalLabels, dataValues: externalD
         border: { display: false },
       },
       y: {
-        grid: { color: '#1a1f33', drawBorder: false },
+        grid: { color: 'rgba(127, 127, 127, 0.12)', drawBorder: false },
         ticks: {
           color: '#8892ab',
           callback: function (value: string | number) {

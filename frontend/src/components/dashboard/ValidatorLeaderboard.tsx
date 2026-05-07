@@ -19,7 +19,7 @@ const RISK_LABEL: Record<string, string> = {
 
 export default function ValidatorLeaderboard({ validators }: { validators: ValidatorLeaderboardEntry[] }) {
   return (
-    <section className="fade-up fade-up-d3">
+    <section className="fade-up fade-up-d3 bg-surface-100 border border-outline/30 rounded-lg p-6">
       <header className="flex items-baseline justify-between mb-5">
         <h2 className="font-display text-xl font-bold text-white">
           Risky validators

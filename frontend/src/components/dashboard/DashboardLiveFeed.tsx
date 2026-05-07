@@ -44,10 +44,11 @@ const CONFIDENCE_HEX: Record<ConfidenceLevel, string> = {
 };
 
 function formatTime(ts: number): string {
-  return new Date(ts).toLocaleTimeString('en-US', {
+  return new Date(ts).toLocaleTimeString('en-GB', {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',
+    hour12: false,
   });
 }
 
@@ -55,7 +56,7 @@ export default function DashboardLiveFeed({ attacks }: DashboardLiveFeedProps) {
   const status = useConnectionStatus();
 
   return (
-    <section className="fade-up fade-up-d3">
+    <section className="fade-up fade-up-d3 bg-surface-100 border border-outline/30 rounded-lg p-6">
       <header className="flex items-baseline justify-between mb-5">
         <h2 className="font-display text-xl font-bold text-white">
           Recent attacks
