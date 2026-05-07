@@ -92,7 +92,7 @@ export default function DashboardLiveFeed({ attacks }: DashboardLiveFeedProps) {
                     ? `${attack.extractedSol.toFixed(3)} ◎`
                     : '—'}
                 </span>
-                <span className="text-right text-xs text-vigil-muted truncate">
+                <span className="text-right text-[10px] text-vigil-muted/60 truncate">
                   {attack.dex}
                 </span>
                 {attack.confidenceLevel ? (

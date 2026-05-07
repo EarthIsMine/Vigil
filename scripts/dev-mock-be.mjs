@@ -130,28 +130,34 @@ const POOLS_LB = [
   { pool: 'JitoSOL/SOL', dex: 'Orca', attacks: 156, volumeLost: '$492K', trend: '+18%' },
 ];
 
-const LIVE_FEED = Array.from({ length: 8 }, (_, i) => ({
-  signature: `mock-sig-${i}-${NOW}`,
-  type: ATTACK_TYPES[i % 4],
-  severity: SEVERITIES[i % 4],
-  slot: 281_493_000 + i * 4,
-  timestamp: NOW - i * 12_000,
-  victim: {
-    signer: rndAddr(),
-    amountIn: +(Math.random() * 5 + 0.1).toFixed(3),
-    amountOut: +(Math.random() * 200 + 10).toFixed(2),
-    expectedAmountOut: +(Math.random() * 220 + 15).toFixed(2),
-  },
-  attacker: rndAddr(),
-  pool: POOLS[i % 3],
-  dex: DEXES[i % 3],
-  extractedUsd: +(Math.random() * 800 + 20).toFixed(2),
-  extractedSol: +(Math.random() * 6 + 0.1).toFixed(3),
-  confidenceLevel: CONFIDENCE_LEVELS[i % 4],
-  detectionMethod: DETECTION_METHODS[i % 4],
-  bundleProvenance: BUNDLE_PROVENANCES[i % 4],
-  lossSource: LOSS_SOURCES[i % 4],
-}));
+// Re-generate on every request so the live feed actually feels live.
+// Otherwise every poll returns the same 8 attacks with the same timestamps.
+function buildLiveFeed(limit = 8) {
+  const now = Date.now();
+  const slotBase = 281_493_000 + Math.floor((now - NOW) / 400); // ~Solana slot time
+  return Array.from({ length: limit }, (_, i) => ({
+    signature: `mock-sig-${now}-${i}`,
+    type: ATTACK_TYPES[i % 4],
+    severity: SEVERITIES[i % 4],
+    slot: slotBase - i * 4,
+    timestamp: now - i * 9_000 - Math.floor(Math.random() * 3_000),
+    victim: {
+      signer: rndAddr(),
+      amountIn: +(Math.random() * 5 + 0.1).toFixed(3),
+      amountOut: +(Math.random() * 200 + 10).toFixed(2),
+      expectedAmountOut: +(Math.random() * 220 + 15).toFixed(2),
+    },
+    attacker: rndAddr(),
+    pool: POOLS[i % 3],
+    dex: DEXES[i % 3],
+    extractedUsd: +(Math.random() * 800 + 20).toFixed(2),
+    extractedSol: +(Math.random() * 6 + 0.1).toFixed(3),
+    confidenceLevel: CONFIDENCE_LEVELS[i % 4],
+    detectionMethod: DETECTION_METHODS[i % 4],
+    bundleProvenance: BUNDLE_PROVENANCES[i % 4],
+    lossSource: LOSS_SOURCES[i % 4],
+  }));
+}
 
 const RECEIPT_AMM_REPLAY = {
   reservesPre: [1_000_000, 200_000],
@@ -345,7 +351,7 @@ const ROUTES = {
   '/api/v1/dashboard/stats': () => STATS,
   '/api/v1/dashboard/timeseries': () => TIMESERIES,
   '/api/v1/pools/leaderboard': () => POOLS_LB,
-  '/api/v1/attacks/recent': () => LIVE_FEED,
+  '/api/v1/attacks/recent': () => buildLiveFeed(20),
   '/api/v1/receipts/search': () => RECEIPT_RESULT,
   '/api/v1/analytics/timeseries': () => TIMESERIES,
   '/api/v1/analytics/protocols': () => POOLS_LB.slice(0, 6),
