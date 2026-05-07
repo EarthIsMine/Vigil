@@ -85,17 +85,6 @@ export default function ReceiptSearchForm({
             </button>
           </div>
         </div>
-
-        <div className="flex items-center justify-center gap-6 pt-8 fade-up fade-up-d4">
-          <div className="flex items-center gap-2 px-3 py-2 bg-vigil-card-dark/50 border border-vigil-border-dark rounded-lg">
-            <span className="w-2 h-2 rounded-full bg-accent-green pulse-dot"></span>
-            <span className="text-xs font-mono text-vigil-muted">Solana Mainnet</span>
-          </div>
-          <div className="flex items-center gap-2 px-3 py-2 bg-vigil-card-dark/50 border border-vigil-border-dark rounded-lg">
-            <span className="w-2 h-2 rounded-full bg-vigil-accent pulse-dot"></span>
-            <span className="text-xs font-mono text-vigil-muted">Devnet</span>
-          </div>
-        </div>
       </div>
     </div>
   );

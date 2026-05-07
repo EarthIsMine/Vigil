@@ -5,6 +5,9 @@ import { io } from 'socket.io-client';
 import type { MevAttack } from '@/lib/types';
 import { emitConnectionSource } from '@/lib/api';
 import { getLiveFeed } from '@/lib/services/dashboard';
+import { MOCK_LIVE_FEED } from '@/lib/mock';
+
+const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === '1';
 
 /**
  * Live feed of recent attacks.
@@ -25,9 +28,12 @@ function getWsBase(): string {
 const POLL_MS = 10_000;
 
 export function useLiveAttacks(maxItems = 20): MevAttack[] {
-  const [attacks, setAttacks] = useState<MevAttack[]>([]);
+  const [attacks, setAttacks] = useState<MevAttack[]>(
+    USE_MOCK ? MOCK_LIVE_FEED.slice(0, maxItems) : []
+  );
 
   useEffect(() => {
+    if (USE_MOCK) return;
     let alive = true;
 
     const fetchFresh = () => {
