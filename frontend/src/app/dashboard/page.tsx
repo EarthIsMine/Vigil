@@ -1,6 +1,5 @@
 'use client';
 
-import Sidebar from '@/components/Sidebar';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
 import DashboardStatsGrid from '@/components/dashboard/DashboardStatsGrid';
 import DashboardChart from '@/components/dashboard/DashboardChart';
@@ -17,8 +16,7 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-surface text-white">
-      <Sidebar />
-      <main className="lg:pl-56">
+      <main className="pt-14">
         <div className="px-6 py-10 max-w-6xl mx-auto">
           {loading ? (
             <div className="text-vigil-muted font-mono text-sm py-12">
