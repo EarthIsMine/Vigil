@@ -1,47 +1,122 @@
 'use client';
 
-import LiveFeed from '@/components/LiveFeed';
-import { useConnectionStatus, type ConnectionStatus } from '@/components/ConnectionStatusProvider';
-import type { MevAttack } from '@/lib/types';
+import {
+  useConnectionStatus,
+  type ConnectionStatus,
+} from '@/components/ConnectionStatusProvider';
+import type { ConfidenceLevel, MevAttack } from '@/lib/types';
 
 interface DashboardLiveFeedProps {
   attacks: MevAttack[];
 }
+
+const TYPE_LABEL: Record<string, string> = {
+  sandwich_single: 'Sandwich',
+  sandwich_wide: 'Wide sandwich',
+  sandwich_auth_hop: 'Auth hop',
+  backrun: 'Backrun',
+  liquidation: 'Liquidation',
+  jit_liquidity: 'JIT',
+};
+
+const TYPE_COLOR: Record<string, string> = {
+  sandwich_single: 'text-error',
+  sandwich_wide: 'text-warning',
+  sandwich_auth_hop: 'text-warning',
+  backrun: 'text-primary',
+};
 
 const STATUS_LABEL: Record<ConnectionStatus, string> = {
   live: 'Live',
   offline: 'Offline',
 };
 
-const DOT_CLASS: Record<ConnectionStatus, string> = {
+const STATUS_DOT: Record<ConnectionStatus, string> = {
   live: 'bg-vigil-green animate-pulse',
   offline: 'bg-error',
 };
 
-const TEXT_CLASS: Record<ConnectionStatus, string> = {
+const STATUS_TEXT: Record<ConnectionStatus, string> = {
   live: 'text-vigil-green',
   offline: 'text-error',
 };
+
+const CONFIDENCE_HEX: Record<ConfidenceLevel, string> = {
+  high: '#22c55e',
+  medium: '#eab308',
+  low: '#8892ab',
+};
+
+function formatTime(ts: number): string {
+  return new Date(ts).toLocaleTimeString('en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+  });
+}
 
 export default function DashboardLiveFeed({ attacks }: DashboardLiveFeedProps) {
   const status = useConnectionStatus();
 
   return (
-    <section className="fade-up fade-up-d4">
+    <section className="fade-up fade-up-d3">
       <header className="flex items-baseline justify-between mb-5">
-        <h2 className="font-display text-2xl font-bold text-white">
-          Live attack feed
+        <h2 className="font-display text-xl font-bold text-white">
+          Recent attacks
         </h2>
         <div
           className="flex items-center gap-2 text-xs"
           role="status"
-          aria-label={`Connection status: ${STATUS_LABEL[status]}`}
+          aria-label={`Connection: ${STATUS_LABEL[status]}`}
         >
-          <span className={`w-1.5 h-1.5 rounded-full ${DOT_CLASS[status]}`} />
-          <span className={TEXT_CLASS[status]}>{STATUS_LABEL[status]}</span>
+          <span className={`w-1.5 h-1.5 rounded-full ${STATUS_DOT[status]}`} />
+          <span className={STATUS_TEXT[status]}>{STATUS_LABEL[status]}</span>
         </div>
       </header>
-      <LiveFeed attacks={attacks} />
+
+      {attacks.length === 0 ? (
+        <p className="text-sm text-vigil-muted py-6">
+          No attacks detected yet. Waiting for data…
+        </p>
+      ) : (
+        <ul className="divide-y divide-vigil-border/60">
+          {attacks.slice(0, 8).map((attack) => {
+            const typeLabel = TYPE_LABEL[attack.type] ?? attack.type;
+            const typeColor = TYPE_COLOR[attack.type] ?? 'text-vigil-muted';
+            return (
+              <li
+                key={attack.signature}
+                className="grid grid-cols-[60px_minmax(0,1fr)_72px_60px_12px] items-center gap-3 py-2.5 text-sm"
+              >
+                <span className="font-mono tabular-nums text-xs text-vigil-muted">
+                  {formatTime(attack.timestamp)}
+                </span>
+                <span className={`truncate ${typeColor}`}>{typeLabel}</span>
+                <span className="text-right font-mono tabular-nums text-white">
+                  {attack.extractedSol != null
+                    ? `${attack.extractedSol.toFixed(3)} ◎`
+                    : '—'}
+                </span>
+                <span className="text-right text-xs text-vigil-muted truncate">
+                  {attack.dex}
+                </span>
+                {attack.confidenceLevel ? (
+                  <span
+                    className="inline-block w-2 h-2 rounded-full justify-self-end"
+                    style={{
+                      backgroundColor: CONFIDENCE_HEX[attack.confidenceLevel],
+                    }}
+                    aria-label={`Confidence: ${attack.confidenceLevel}`}
+                    title={`Confidence: ${attack.confidenceLevel}`}
+                  />
+                ) : (
+                  <span aria-hidden="true" />
+                )}
+              </li>
+            );
+          })}
+        </ul>
+      )}
     </section>
   );
 }

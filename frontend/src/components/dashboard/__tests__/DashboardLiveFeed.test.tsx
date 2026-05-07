@@ -38,7 +38,7 @@ describe('DashboardLiveFeed', () => {
   it('renders the heading', () => {
     useConnectionStatusMock.mockReturnValue('live');
     render(<DashboardLiveFeed attacks={ATTACKS} />);
-    expect(screen.getByText('Live attack feed')).toBeInTheDocument();
+    expect(screen.getByText('Recent attacks')).toBeInTheDocument();
   });
 
   it('shows pulsing Live badge when status is live', () => {
