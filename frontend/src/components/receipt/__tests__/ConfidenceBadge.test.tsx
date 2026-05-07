@@ -6,13 +6,13 @@ describe('ConfidenceBadge', () => {
   it('renders Verified label with green tone for high confidence', () => {
     const { container } = render(<ConfidenceBadge level="high" />);
     expect(screen.getByText('Verified')).toBeInTheDocument();
-    expect(container.querySelector('[role="status"]')?.className).toContain('text-accent-green');
+    expect(container.querySelector('[role="status"]')?.className).toContain('text-vigil-green');
   });
 
-  it('renders Likely label with yellow tone for medium confidence', () => {
+  it('renders Likely label with warning tone for medium confidence', () => {
     const { container } = render(<ConfidenceBadge level="medium" />);
     expect(screen.getByText('Likely')).toBeInTheDocument();
-    expect(container.querySelector('[role="status"]')?.className).toContain('text-accent-yellow');
+    expect(container.querySelector('[role="status"]')?.className).toContain('text-warning');
   });
 
   it('renders Unverified label with muted tone for low confidence', () => {

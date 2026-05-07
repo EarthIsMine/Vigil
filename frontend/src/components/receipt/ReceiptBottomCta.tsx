@@ -1,16 +1,26 @@
 export default function ReceiptBottomCta() {
   return (
-    <div className="relative receipt-card p-8 rounded-xl border border-vigil-red/30 overflow-hidden fade-up fade-up-d2">
-      <div className="absolute inset-0 scan-line pointer-events-none"></div>
-      <div className="relative z-10 text-center space-y-4">
-        <h3 className="font-display font-bold text-2xl text-white">STOP LEAKING VALUE</h3>
-        <p className="text-vigil-muted max-w-md mx-auto">
-          You&apos;re losing money to MEV attacks. Activate protection to shield your transactions.
+    <section className="border-t border-vigil-border pt-8 fade-up fade-up-d2">
+      <div className="max-w-md">
+        <h3 className="font-display font-bold text-xl text-white mb-2">
+          Stop leaking value
+        </h3>
+        <p className="text-sm text-vigil-muted mb-5">
+          Vigil RPC routes your transactions through a protected path so MEV
+          can&apos;t extract from your swaps. Free tier available.
         </p>
-        <button className="px-8 py-3 bg-accent-green hover:bg-accent-green/90 rounded-xl font-display font-semibold text-white transition">
-          ACTIVATE SHIELD
-        </button>
+        <a
+          href="https://github.com/EarthIsMine/Vigil-RPC"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-2 px-5 py-2.5 bg-vigil-green hover:bg-vigil-emerald text-white rounded-lg text-sm font-medium transition-colors"
+        >
+          Activate shield
+          <span className="material-symbols-outlined text-sm" aria-hidden="true">
+            open_in_new
+          </span>
+        </a>
       </div>
-    </div>
+    </section>
   );
 }
