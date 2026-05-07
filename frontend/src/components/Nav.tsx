@@ -13,24 +13,16 @@ const navLinks = [
   { href: "/api-docs", label: "API Docs" },
 ];
 
-// Routes that have their own sidebar — global top nav stays out of the way.
-const SIDEBAR_ROUTES = ['/dashboard'];
-
 export default function Nav() {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
   const latestSlot = useLatestSlot();
 
-  if (SIDEBAR_ROUTES.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
-    return null;
-  }
-
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-surface-100/80 backdrop-blur-xl border-b border-outline/30">
       <div className="flex items-center justify-between h-14 px-5">
         <div className="flex items-center gap-6">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="material-symbols-outlined text-secondary text-2xl">shield</span>
+          <Link href="/" className="flex items-center">
             <span className="font-display font-bold text-lg tracking-tight text-white">VIGIL</span>
           </Link>
           <div className="hidden md:flex items-center gap-1 ml-4">
