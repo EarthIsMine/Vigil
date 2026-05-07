@@ -1,27 +1,65 @@
-export const NAV_SECTIONS = [
+export type EndpointMethod = 'GET' | 'POST' | 'DELETE';
+
+export interface NavItem {
+  id: string;
+  method?: EndpointMethod;
+}
+
+export interface NavGroup {
+  group: string;
+  items: NavItem[];
+}
+
+export const NAV_SECTIONS: readonly NavGroup[] = [
   {
     group: 'Getting Started',
     items: [
-      { id: 'introduction', label: 'Introduction' },
-      { id: 'authentication', label: 'Authentication' },
+      { id: 'introduction' },
+      { id: 'authentication' },
     ],
   },
   {
     group: 'Core API',
     items: [
-      { id: 'send-transaction', label: 'Send Transaction' },
-      { id: 'mev-receipt', label: 'MEV Receipt' },
-      { id: 'protection-status', label: 'Protection Status' },
+      { id: 'send-transaction', method: 'POST' },
+      { id: 'mev-receipt', method: 'GET' },
+      { id: 'protection-status', method: 'GET' },
     ],
   },
   {
     group: 'System',
     items: [
-      { id: 'rate-limits', label: 'Rate Limits' },
-      { id: 'settings', label: 'Settings' },
+      { id: 'rate-limits' },
+      { id: 'settings' },
     ],
   },
 ] as const;
+
+// Markdown-backed groups (auto-derived from content/index.ts > DOCS).
+export const MARKDOWN_GROUPS = ['detectorReadme', 'detectorDesign', 'rpcReadme'] as const;
+export type MarkdownGroupKey = (typeof MARKDOWN_GROUPS)[number];
+
+// Curated (hand-built JSX) pages under the Getting Started group.
+export const GETTING_STARTED_PAGES = ['overview', 'quickstart'] as const;
+export type GettingStartedPageId = (typeof GETTING_STARTED_PAGES)[number];
+
+// All groups, in sidebar order. Getting Started first, then markdown groups.
+export const DOC_GROUPS = ['gettingStarted', ...MARKDOWN_GROUPS] as const;
+export type DocGroupKey = (typeof DOC_GROUPS)[number];
+
+// Encoded as `${docGroupKey}:${sectionId}`.
+export const DEFAULT_DOC_PAGE = 'gettingStarted:overview';
+
+export function parseDocPageId(id: string): { group: DocGroupKey; section: string } | null {
+  const [group, section] = id.split(':');
+  if (!group || !section) return null;
+  if (!(DOC_GROUPS as readonly string[]).includes(group)) return null;
+  return { group: group as DocGroupKey, section };
+}
+
+export function isMarkdownGroup(key: DocGroupKey): key is MarkdownGroupKey {
+  return (MARKDOWN_GROUPS as readonly string[]).includes(key);
+}
 
 export const TS_EXAMPLE = `<span class="text-primary">import</span> { <span class="text-secondary">VigilClient</span> } <span class="text-primary">from</span> <span class="text-secondary">'@vigil/sdk'</span>;
 
