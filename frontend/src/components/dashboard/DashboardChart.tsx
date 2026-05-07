@@ -13,9 +13,16 @@ export default function DashboardChart({ timeseries }: DashboardChartProps) {
   const dataValues = timeseries.map((dp) => dp.totalUsd);
 
   return (
-    <div className="bg-surface-100 border border-outline rounded-lg p-6 mb-8 fade-up fade-up-d2">
-      <h2 className="font-display text-xl font-bold text-on-surf mb-6">MEV Extraction Over Time</h2>
+    <section className="fade-up fade-up-d2">
+      <header className="mb-5">
+        <h2 className="font-display text-2xl font-bold text-white mb-1">
+          Extraction over time
+        </h2>
+        <p className="text-sm text-vigil-muted">
+          Hourly buckets for the last 24 hours.
+        </p>
+      </header>
       <MevChart labels={labels} dataValues={dataValues} />
-    </div>
+    </section>
   );
 }
