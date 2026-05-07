@@ -63,20 +63,12 @@ const SEED_VALIDATORS = [
   { identity: 'Ev3Rs7take5', name: 'Everstake',           client: 'Jito-Agave', riskScore: 35 },
 ];
 
-const FILLER_NAMES = [
-  'Figment',          'P2P Validator',     'Kiln',             'Triton One',
-  'Helius Stake',     'Allnodes',          'Coinbase Cloud',   'Binance Staking',
-  'Solana Beach',     'Step Finance',      'BlazeStake',       'Ledger by Figment',
-  'Lido on Solana',   'Solflare',          'Phantom Cloud',    'Mango Markets',
-  'Drift Foundation', 'Marinade DAO',      'Sanctum',          'JitoSOL',
-  'Solfare',          'StakeWiz',          'Validators DAO',   'Cogent Crypto',
-  'pumpkin\'s pool',  'Edgevana',          'Helius',           'Block Daemon',
-  'Hashquark',        'Kraken Stake',      'Anchor Stake',     'Jupiter Stake',
-  'Solend',           'Tensor Stake',      'Drip Stake',       'Marginfi',
-  'Lifinity',         'Backpack Stake',    'Bonfida',          'Magic Eden Stake',
-  'OKX Earn',         'Bitcoin Suisse',    'CoinList Stake',   'Brave Validators',
-  'NodeFleet',
-];
+// Fictional names — keeps real validator brands off this demo data.
+// Prefixed `Validator-` so screenshots can't be mistaken for real metrics
+// against any actual public validator.
+const FILLER_NAMES = Array.from({ length: 45 }, (_, i) =>
+  `Validator-${String(i + 1).padStart(3, '0')}`,
+);
 
 const CLIENTS = ['Jito-Agave', 'Agave', 'Frankendancer', 'Firedancer'];
 
