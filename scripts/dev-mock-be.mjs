@@ -47,13 +47,80 @@ const TIMESERIES = Array.from({ length: 24 }, (_, i) => {
   };
 });
 
-const VALIDATOR_LB = [
-  { rank: 1, identity: 'StKHse7Qx4p', name: 'Stake House Capital', client: 'Jito-Agave', riskScore: 96, riskLevel: 'critical', extractedUsd: '$892K' },
-  { rank: 2, identity: 'mariN4vALi9', name: 'Marinade Finance', client: 'Jito-Agave', riskScore: 81, riskLevel: 'high', extractedUsd: '$743K' },
-  { rank: 3, identity: 'J1to1abund1', name: 'Jito Labs', client: 'Jito-Agave', riskScore: 74, riskLevel: 'high', extractedUsd: '$621K' },
-  { rank: 4, identity: 'C1oRu5s1one', name: 'Chorus One', client: 'Agave', riskScore: 48, riskLevel: 'medium', extractedUsd: '$558K' },
-  { rank: 5, identity: 'Ev3Rs7take5', name: 'Everstake', client: 'Jito-Agave', riskScore: 35, riskLevel: 'medium', extractedUsd: '$492K' },
+const SEED_VALIDATORS = [
+  { identity: 'StKHse7Qx4p', name: 'Stake House Capital', client: 'Jito-Agave', riskScore: 96 },
+  { identity: 'mariN4vALi9', name: 'Marinade Finance',    client: 'Jito-Agave', riskScore: 81 },
+  { identity: 'J1to1abund1', name: 'Jito Labs',           client: 'Jito-Agave', riskScore: 74 },
+  { identity: 'C1oRu5s1one', name: 'Chorus One',          client: 'Agave',      riskScore: 48 },
+  { identity: 'Ev3Rs7take5', name: 'Everstake',           client: 'Jito-Agave', riskScore: 35 },
 ];
+
+const FILLER_NAMES = [
+  'Figment',          'P2P Validator',     'Kiln',             'Triton One',
+  'Helius Stake',     'Allnodes',          'Coinbase Cloud',   'Binance Staking',
+  'Solana Beach',     'Step Finance',      'BlazeStake',       'Ledger by Figment',
+  'Lido on Solana',   'Solflare',          'Phantom Cloud',    'Mango Markets',
+  'Drift Foundation', 'Marinade DAO',      'Sanctum',          'JitoSOL',
+  'Solfare',          'StakeWiz',          'Validators DAO',   'Cogent Crypto',
+  'pumpkin\'s pool',  'Edgevana',          'Helius',           'Block Daemon',
+  'Hashquark',        'Kraken Stake',      'Anchor Stake',     'Jupiter Stake',
+  'Solend',           'Tensor Stake',      'Drip Stake',       'Marginfi',
+  'Lifinity',         'Backpack Stake',    'Bonfida',          'Magic Eden Stake',
+  'OKX Earn',         'Bitcoin Suisse',    'CoinList Stake',   'Brave Validators',
+  'NodeFleet',
+];
+
+const CLIENTS = ['Jito-Agave', 'Agave', 'Frankendancer', 'Firedancer'];
+
+const B58_ID = 'abcdefghijkmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ123456789';
+const detIdent = (name) => {
+  // deterministic-ish per name so the list stays stable across requests
+  let h = 0;
+  for (const ch of name) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  let id = '';
+  for (let i = 0; i < 11; i++) {
+    h = (h * 1103515245 + 12345) >>> 0;
+    id += B58_ID[h % B58_ID.length];
+  }
+  return id;
+};
+
+const riskLevelFor = (score) =>
+  score >= 75 ? 'critical' :
+  score >= 50 ? 'high' :
+  score >= 25 ? 'medium' :
+  score > 0   ? 'low' : 'unrated';
+
+const formatExtracted = (n) =>
+  n >= 1_000_000 ? `$${(n / 1_000_000).toFixed(1)}M` :
+  n >= 1_000     ? `$${Math.round(n / 1_000)}K` :
+                   `$${n}`;
+
+const filler = FILLER_NAMES.map((name, i) => {
+  // taper score 30 → 4 across the filler so distribution is realistic
+  const score = Math.max(4, Math.round(30 - (i / FILLER_NAMES.length) * 26 + (Math.sin(i) * 4)));
+  return {
+    identity: detIdent(name),
+    name,
+    client: CLIENTS[i % CLIENTS.length],
+    riskScore: score,
+  };
+});
+
+const ALL_VALIDATORS = [...SEED_VALIDATORS, ...filler];
+
+const VALIDATOR_LB = ALL_VALIDATORS.map((v, i) => ({
+  rank: i + 1,
+  identity: v.identity,
+  name: v.name,
+  client: v.client,
+  riskScore: v.riskScore,
+  riskLevel: riskLevelFor(v.riskScore),
+  // taper extracted with a noisy decay; high-rank gets more
+  extractedUsd: formatExtracted(
+    Math.round(900_000 / Math.pow(i + 1, 0.55) + Math.sin(i * 1.7) * 30_000),
+  ),
+}));
 
 const POOLS_LB = [
   { pool: 'SOL/USDC', dex: 'Orca', attacks: 342, volumeLost: '$1.2M', trend: '+15%' },
@@ -277,7 +344,6 @@ const EPOCHS = [
 const ROUTES = {
   '/api/v1/dashboard/stats': () => STATS,
   '/api/v1/dashboard/timeseries': () => TIMESERIES,
-  '/api/v1/validators/leaderboard': () => VALIDATOR_LB,
   '/api/v1/pools/leaderboard': () => POOLS_LB,
   '/api/v1/attacks/recent': () => LIVE_FEED,
   '/api/v1/receipts/search': () => RECEIPT_RESULT,
@@ -310,6 +376,11 @@ const server = http.createServer((req, res) => {
 
   if (ROUTES[pathname]) {
     return send(res, 200, ROUTES[pathname]());
+  }
+
+  if (pathname === '/api/v1/validators/leaderboard') {
+    const limit = Math.min(Number(url.searchParams.get('limit') ?? 50), VALIDATOR_LB.length);
+    return send(res, 200, VALIDATOR_LB.slice(0, limit));
   }
 
   const validatorMatch = pathname.match(/^\/api\/v1\/validators\/([^/]+)$/);

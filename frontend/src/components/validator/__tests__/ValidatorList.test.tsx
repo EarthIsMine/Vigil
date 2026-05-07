@@ -44,10 +44,10 @@ describe('ValidatorList', () => {
     expect(links[1]).toHaveAttribute('href', '/validator/mariN4vALi9');
   });
 
-  it('shows risk level badge text in upper case', () => {
+  it('shows risk level label in sentence case', () => {
     render(<ValidatorList validators={ROWS} />);
-    expect(screen.getByText('CRITICAL')).toBeInTheDocument();
-    expect(screen.getByText('HIGH')).toBeInTheDocument();
+    expect(screen.getByText('Critical')).toBeInTheDocument();
+    expect(screen.getByText('High')).toBeInTheDocument();
   });
 
   it('falls back to em-dash when extractedUsd is null', () => {
