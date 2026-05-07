@@ -5,6 +5,14 @@
 //   node scripts/dev-mock-be.mjs
 //   NEXT_PUBLIC_API_URL=http://localhost:3001/api/v1 pnpm --filter vigil-frontend dev
 //
+// ⚠️  DEMO DATA — DO NOT PUBLISH OR SCREENSHOT FOR EXTERNAL DISTRIBUTION.
+//    • Validator names are real Solana brands (publicly known). Their
+//      pubkeys, stake, commission, risk scores, and extraction figures
+//      here are *all synthetic* — fabricated for layout testing only.
+//    • The real product computes these metrics from the detector's
+//      replay output against on-chain state. Do not compare these
+//      synthetic scores to any real validator's behavior.
+//
 // Production uses the real Nest.js BE; this file is purely for local UI work.
 
 import http from 'node:http';
