@@ -5,7 +5,6 @@ import ReceiptResultsHeader from '@/components/receipt/ReceiptResultsHeader';
 import ReceiptSummaryCards from '@/components/receipt/ReceiptSummaryCards';
 import TransactionTable from '@/components/receipt/TransactionTable';
 import ReceiptDetailCard from '@/components/receipt/ReceiptDetailCard';
-import ReceiptBottomCta from '@/components/receipt/ReceiptBottomCta';
 import ErrorBanner from '@/components/shared/ErrorBanner';
 import { useReceiptSearch } from '@/hooks/useReceiptSearch';
 
@@ -40,7 +39,6 @@ export default function ReceiptPage() {
                     onSelect={search.setSelectedReceiptId}
                   />
                 )}
-                <ReceiptBottomCta />
               </div>
               <ReceiptDetailCard
                 result={search.result}
