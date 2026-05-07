@@ -11,17 +11,29 @@ const MOCK_STATS: DashboardStats = {
 };
 
 describe('DashboardStatsGrid', () => {
-  it('renders all stat titles', () => {
+  it('renders all stat labels in sentence case', () => {
     render(<DashboardStatsGrid stats={MOCK_STATS} />);
-    expect(screen.getByText('MEV Extracted')).toBeInTheDocument();
-    expect(screen.getByText('Total Attacks')).toBeInTheDocument();
-    expect(screen.getByText('Active Attackers')).toBeInTheDocument();
-    expect(screen.getByText('Avg Victim Loss')).toBeInTheDocument();
+    expect(screen.getByText('MEV extracted (24h)')).toBeInTheDocument();
+    expect(screen.getByText('Attacks detected')).toBeInTheDocument();
+    expect(screen.getByText('Avg loss per victim')).toBeInTheDocument();
+    expect(screen.getByText('Active attackers')).toBeInTheDocument();
   });
 
   it('renders formatted values', () => {
     render(<DashboardStatsGrid stats={MOCK_STATS} />);
     expect(screen.getByText('120')).toBeInTheDocument();
     expect(screen.getByText('18')).toBeInTheDocument();
+    expect(screen.getByText('$42.50')).toBeInTheDocument();
+  });
+
+  it('renders top attacker hint when available', () => {
+    render(<DashboardStatsGrid stats={MOCK_STATS} />);
+    expect(screen.getByText(/top: abc\.\.\.xyz/)).toBeInTheDocument();
+  });
+
+  it('renders change indicator for non-null changePercent', () => {
+    render(<DashboardStatsGrid stats={MOCK_STATS} />);
+    expect(screen.getByText(/\+5\.2%/)).toBeInTheDocument();
+    expect(screen.getByText(/-3\.1%/)).toBeInTheDocument();
   });
 });

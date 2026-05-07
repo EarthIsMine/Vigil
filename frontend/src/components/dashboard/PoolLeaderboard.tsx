@@ -1,34 +1,46 @@
 import type { PoolLeaderboardEntry } from '@/lib/types';
 
+const POOL_COLORS = ['#ef4444', '#f97316', '#eab308', '#22c55e', '#22d3ee', '#3b82f6', '#a855f7'];
+
 export default function PoolLeaderboard({ pools }: { pools: PoolLeaderboardEntry[] }) {
+  const maxAttacks = pools.length > 0 ? pools[0].attacks : 1;
+
   return (
-    <div className="bg-surface-100 border border-outline rounded-lg p-6 fade-up fade-up-d3">
-      <h2 className="font-display text-xl font-bold text-on-surf mb-6">Most Targeted Pools</h2>
-      <div className="space-y-4">
-        {pools.map((p) => (
-          <div key={p.pool} className="p-4 bg-surface-200 border border-outline rounded-lg hover:bg-surface-300 transition-colors">
-            <div className="flex items-center justify-between mb-2">
-              <div className="min-w-0 flex-1 mr-3">
-                <h3 className="font-mono font-semibold text-on-surf truncate" title={p.pool}>
-                  {p.pool.slice(0, 8)}...{p.pool.slice(-4)}
-                </h3>
-                <p className="text-xs text-muted">{p.dex}</p>
+    <section className="fade-up fade-up-d3">
+      <h2 className="font-display text-xl font-bold text-white mb-5">
+        Most targeted pools
+      </h2>
+
+      {pools.length === 0 ? (
+        <p className="text-sm text-vigil-muted py-4">No data yet.</p>
+      ) : (
+        <ul className="space-y-4">
+          {pools.map((p, i) => (
+            <li key={p.pool}>
+              <div className="flex items-baseline justify-between text-sm mb-1.5">
+                <span className="text-white truncate mr-3">
+                  <span className="text-vigil-muted">{p.dex}</span>{' '}
+                  <span className="font-mono text-xs">
+                    {p.pool.length > 16 ? `${p.pool.slice(0, 8)}…${p.pool.slice(-4)}` : p.pool}
+                  </span>
+                </span>
+                <span className="font-mono tabular-nums text-vigil-muted shrink-0">
+                  {p.attacks.toLocaleString()}
+                </span>
               </div>
-              <span className="text-xs font-mono text-secondary">{p.trend}</span>
-            </div>
-            <div className="flex items-center gap-6 mt-3">
-              <div>
-                <p className="text-xs text-muted mb-1">Attacks</p>
-                <p className="font-mono text-sm font-semibold text-error">{p.attacks}</p>
+              <div className="h-1 bg-white/[0.04] rounded-full overflow-hidden">
+                <div
+                  className="h-full rounded-full"
+                  style={{
+                    width: `${(p.attacks / maxAttacks) * 100}%`,
+                    backgroundColor: POOL_COLORS[i % POOL_COLORS.length],
+                  }}
+                />
               </div>
-              <div>
-                <p className="text-xs text-muted mb-1">Volume Lost</p>
-                <p className="font-mono text-sm font-semibold text-on-surf">{p.volumeLost}</p>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    </div>
+            </li>
+          ))}
+        </ul>
+      )}
+    </section>
   );
 }

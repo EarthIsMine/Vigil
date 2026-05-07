@@ -1,52 +1,74 @@
 import Link from 'next/link';
 import type { ValidatorLeaderboardEntry } from '@/lib/types';
 
+const RISK_TEXT: Record<string, string> = {
+  critical: 'text-error',
+  high: 'text-warning',
+  medium: 'text-yellow-500',
+  low: 'text-vigil-muted',
+  unrated: 'text-vigil-muted',
+};
+
+const RISK_LABEL: Record<string, string> = {
+  critical: 'Critical',
+  high: 'High',
+  medium: 'Medium',
+  low: 'Low',
+  unrated: 'Unrated',
+};
+
 export default function ValidatorLeaderboard({ validators }: { validators: ValidatorLeaderboardEntry[] }) {
   return (
-    <div className="bg-surface-100 border border-outline rounded-lg p-6 fade-up fade-up-d3">
-      <h2 className="font-display text-xl font-bold text-on-surf mb-6">Risky Validators Leaderboard</h2>
-      <div className="space-y-4">
-        {validators.map((v) => (
-          <Link
-            key={v.rank}
-            href={`/validator/${encodeURIComponent(v.identity)}`}
-            className="flex items-center gap-4 p-4 bg-surface-200 border border-outline rounded-lg hover:bg-surface-300 transition-colors"
-          >
-            <div className="flex-shrink-0 w-8 h-8 flex items-center justify-center bg-primary-dim rounded-full">
-              <span className="font-mono text-sm font-bold text-primary">{v.rank}</span>
-            </div>
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1 truncate">
-                <code className="font-mono text-sm text-on-surf truncate" title={v.identity}>
-                  {v.identity.slice(0, 8)}...{v.identity.slice(-4)}
-                </code>
-                {v.name && v.name !== `${v.identity.slice(0, 8)}...` && (
-                  <>
-                    <span className="text-xs text-muted flex-shrink-0">•</span>
-                    <span className="text-xs text-muted truncate">{v.name}</span>
-                  </>
-                )}
-              </div>
-              <div className="flex items-center gap-3">
-                <span className="font-mono text-xs px-1.5 py-0.5 rounded text-secondary bg-sec-dim">
-                  {v.client}
-                </span>
-                <span className={`font-mono text-xs px-1.5 py-0.5 rounded ${
-                  v.riskLevel === 'critical' ? 'text-error bg-error/10' :
-                  v.riskLevel === 'high' ? 'text-error/70 bg-error/10' :
-                  'text-muted bg-surface-400'
-                }`}>
-                  {v.riskLevel.toUpperCase()}
-                </span>
-              </div>
-            </div>
-            <div className="flex-shrink-0 text-right">
-              <p className="font-mono font-semibold text-error">{v.extractedUsd ?? '—'}</p>
-              <p className="font-mono text-xs text-muted">Risk: {v.riskScore}</p>
-            </div>
-          </Link>
-        ))}
-      </div>
-    </div>
+    <section className="fade-up fade-up-d3">
+      <header className="flex items-baseline justify-between mb-5">
+        <h2 className="font-display text-xl font-bold text-white">
+          Risky validators
+        </h2>
+        <Link
+          href="/validator"
+          className="text-xs text-vigil-muted hover:text-white transition-colors"
+        >
+          View all →
+        </Link>
+      </header>
+
+      {validators.length === 0 ? (
+        <p className="text-sm text-vigil-muted py-4">No data yet.</p>
+      ) : (
+        <ul className="divide-y divide-vigil-border/60">
+          {validators.map((v) => {
+            const riskCls = RISK_TEXT[v.riskLevel] ?? RISK_TEXT.unrated;
+            return (
+              <li key={v.identity}>
+                <Link
+                  href={`/validator/${encodeURIComponent(v.identity)}`}
+                  className="grid grid-cols-[24px_minmax(0,1fr)_60px_80px] items-center gap-3 py-3 group hover:bg-white/[0.02] -mx-2 px-2 transition-colors"
+                >
+                  <span className="font-mono text-xs text-vigil-muted tabular-nums">
+                    {v.rank}
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-sm text-white truncate group-hover:text-primary transition-colors">
+                      {v.name}
+                    </p>
+                    <p className="text-xs text-vigil-muted truncate font-mono">
+                      {v.identity.length > 14
+                        ? `${v.identity.slice(0, 6)}…${v.identity.slice(-4)}`
+                        : v.identity}
+                    </p>
+                  </div>
+                  <span className={`text-xs ${riskCls} text-right`}>
+                    {RISK_LABEL[v.riskLevel] ?? v.riskLevel}
+                  </span>
+                  <span className="text-right font-mono tabular-nums text-sm text-white">
+                    {v.extractedUsd ?? '—'}
+                  </span>
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </section>
   );
 }

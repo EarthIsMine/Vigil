@@ -21,26 +21,25 @@ const MOCK_POOLS: PoolLeaderboardEntry[] = [
 ];
 
 describe('PoolLeaderboard', () => {
-  it('renders the heading', () => {
+  it('renders the heading in sentence case', () => {
     render(<PoolLeaderboard pools={MOCK_POOLS} />);
-    expect(screen.getByText('Most Targeted Pools')).toBeInTheDocument();
+    expect(screen.getByText('Most targeted pools')).toBeInTheDocument();
   });
 
-  it('renders all pools', () => {
-    render(<PoolLeaderboard pools={MOCK_POOLS} />);
-    expect(screen.getByText('SOL/USDC...USDC')).toBeInTheDocument();
-    expect(screen.getByText('RAY/USDC...USDC')).toBeInTheDocument();
-  });
-
-  it('renders dex names', () => {
+  it('renders dex names per row', () => {
     render(<PoolLeaderboard pools={MOCK_POOLS} />);
     expect(screen.getByText('Raydium')).toBeInTheDocument();
     expect(screen.getByText('Orca')).toBeInTheDocument();
   });
 
-  it('renders attack counts and volume', () => {
+  it('renders attack counts with thousands separator', () => {
     render(<PoolLeaderboard pools={MOCK_POOLS} />);
-    expect(screen.getByText('1234')).toBeInTheDocument();
-    expect(screen.getByText('$45,678')).toBeInTheDocument();
+    expect(screen.getByText('1,234')).toBeInTheDocument();
+    expect(screen.getByText('567')).toBeInTheDocument();
+  });
+
+  it('renders empty-state when no pools', () => {
+    render(<PoolLeaderboard pools={[]} />);
+    expect(screen.getByText(/No data yet/)).toBeInTheDocument();
   });
 });

@@ -13,33 +13,35 @@ const STATUS_LABEL: Record<ConnectionStatus, string> = {
   offline: 'Offline',
 };
 
-const STATUS_DOT_CLASS: Record<ConnectionStatus, string> = {
-  live: 'w-2 h-2 rounded-full bg-secondary animate-pulse',
-  offline: 'w-2 h-2 rounded-full bg-error',
+const DOT_CLASS: Record<ConnectionStatus, string> = {
+  live: 'bg-vigil-green animate-pulse',
+  offline: 'bg-error',
 };
 
-const STATUS_TEXT_CLASS: Record<ConnectionStatus, string> = {
-  live: 'text-xs font-mono text-muted',
-  offline: 'text-xs font-mono text-error',
+const TEXT_CLASS: Record<ConnectionStatus, string> = {
+  live: 'text-vigil-green',
+  offline: 'text-error',
 };
 
 export default function DashboardLiveFeed({ attacks }: DashboardLiveFeedProps) {
   const status = useConnectionStatus();
 
   return (
-    <div className="bg-surface-100 border border-outline rounded-lg p-6 fade-up fade-up-d4">
-      <div className="flex items-center justify-between mb-6">
-        <h2 className="font-display text-xl font-bold text-on-surf">Recent Attacks Live Feed</h2>
+    <section className="fade-up fade-up-d4">
+      <header className="flex items-baseline justify-between mb-5">
+        <h2 className="font-display text-2xl font-bold text-white">
+          Live attack feed
+        </h2>
         <div
-          className="flex items-center gap-2"
+          className="flex items-center gap-2 text-xs"
           role="status"
           aria-label={`Connection status: ${STATUS_LABEL[status]}`}
         >
-          <div className={STATUS_DOT_CLASS[status]}></div>
-          <span className={STATUS_TEXT_CLASS[status]}>{STATUS_LABEL[status]}</span>
+          <span className={`w-1.5 h-1.5 rounded-full ${DOT_CLASS[status]}`} />
+          <span className={TEXT_CLASS[status]}>{STATUS_LABEL[status]}</span>
         </div>
-      </div>
+      </header>
       <LiveFeed attacks={attacks} />
-    </div>
+    </section>
   );
 }
