@@ -19,12 +19,8 @@ const TYPE_LABEL: Record<string, string> = {
   jit_liquidity: 'JIT',
 };
 
-const TYPE_COLOR: Record<string, string> = {
-  sandwich_single: 'text-error',
-  sandwich_wide: 'text-warning',
-  sandwich_auth_hop: 'text-warning',
-  backrun: 'text-primary',
-};
+// Single neutral color for type — confidence dot carries the only color signal.
+const TYPE_TEXT = 'text-white';
 
 const STATUS_LABEL: Record<ConnectionStatus, string> = {
   live: 'Live',
@@ -82,7 +78,6 @@ export default function DashboardLiveFeed({ attacks }: DashboardLiveFeedProps) {
         <ul className="divide-y divide-vigil-border/60">
           {attacks.slice(0, 8).map((attack) => {
             const typeLabel = TYPE_LABEL[attack.type] ?? attack.type;
-            const typeColor = TYPE_COLOR[attack.type] ?? 'text-vigil-muted';
             return (
               <li
                 key={attack.signature}
@@ -91,7 +86,7 @@ export default function DashboardLiveFeed({ attacks }: DashboardLiveFeedProps) {
                 <span className="font-mono tabular-nums text-xs text-vigil-muted">
                   {formatTime(attack.timestamp)}
                 </span>
-                <span className={`truncate ${typeColor}`}>{typeLabel}</span>
+                <span className={`truncate ${TYPE_TEXT}`}>{typeLabel}</span>
                 <span className="text-right font-mono tabular-nums text-white">
                   {attack.extractedSol != null
                     ? `${attack.extractedSol.toFixed(3)} ◎`
