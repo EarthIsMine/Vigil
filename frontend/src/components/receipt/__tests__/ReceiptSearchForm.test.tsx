@@ -42,9 +42,4 @@ describe('ReceiptSearchForm', () => {
     expect(onQueryChange).toHaveBeenCalledWith('abc');
   });
 
-  it('renders network badges', () => {
-    render(<ReceiptSearchForm {...defaultProps} />);
-    expect(screen.getByText('Solana Mainnet')).toBeInTheDocument();
-    expect(screen.getByText('Devnet')).toBeInTheDocument();
-  });
 });

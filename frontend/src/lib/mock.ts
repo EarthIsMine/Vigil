@@ -11,6 +11,10 @@ import {
   MevType,
   Severity,
 } from './types';
+
+// Fixed reference timestamp so SSR and CSR produce identical mock data
+// (otherwise Date.now() would diverge between server and client renders).
+const REF_TIME = Date.UTC(2026, 4, 7, 12, 0, 0); // 2026-05-07T12:00:00Z
 import type {
   DashboardStats,
   TimeSeriesDataPoint,
@@ -35,7 +39,7 @@ export const MOCK_DASHBOARD_STATS: DashboardStats = {
 };
 
 export const MOCK_TIMESERIES: TimeSeriesDataPoint[] = Array.from({ length: 24 }, (_, i) => {
-  const ts = Date.now() - (23 - i) * 3_600_000;
+  const ts = REF_TIME - (23 - i) * 3_600_000;
   const base = 150_000 + Math.sin(i / 3) * 60_000;
   return {
     timestamp: ts,
@@ -101,11 +105,11 @@ const LOSS_SOURCES: LossSource[] = [
 ];
 
 export const MOCK_LIVE_FEED: MevAttack[] = Array.from({ length: 8 }, (_, i) => ({
-  signature: `mock-sig-${i}-${Date.now()}`,
+  signature: `mock-sig-${i}-${REF_TIME}`,
   type: ATTACK_TYPES[i % 4],
   severity: SEVERITIES[i % 4],
   slot: 281_493_000 + i * 4,
-  timestamp: Date.now() - i * 12_000,
+  timestamp: REF_TIME - i * 12_000,
   victim: {
     signer: rndAddr(),
     amountIn: parseFloat((Math.random() * 5 + 0.1).toFixed(3)),
@@ -152,7 +156,7 @@ export const MOCK_VALIDATOR_DETAIL: ValidatorDetail = {
     avgExtractionPerSlot: 84,
     recentTrend: 'increasing',
   },
-  lastUpdated: Date.now(),
+  lastUpdated: REF_TIME,
 };
 
 // ─── Receipt ──────────────────────────────────────────────────────────────
@@ -166,7 +170,7 @@ export const MOCK_RECEIPT_RESULT: ReceiptSearchResult = {
   worstAttack: {
     receiptId:   'VGL-2026-04-07-0001',
     txSignature: '4nR8xK2j...',
-    timestamp:   Date.now() - 3_600_000,
+    timestamp:   REF_TIME - 3_600_000,
     victim: {
       wallet:            '7xKp...mN4q',
       action:            'swap',
@@ -226,7 +230,7 @@ export const MOCK_RECEIPT_RESULT: ReceiptSearchResult = {
     {
       receiptId:   'VGL-2026-04-07-0001',
       txSignature: '4nR8xK2j...',
-      timestamp:   Date.now() - 3_600_000,
+      timestamp:   REF_TIME - 3_600_000,
       victim: {
         wallet:            '7xKp...mN4q',
         action:            'swap',
@@ -285,7 +289,7 @@ export const MOCK_RECEIPT_RESULT: ReceiptSearchResult = {
     {
       receiptId:   'VGL-2026-04-07-0002',
       txSignature: '9mWz...pL5v',
-      timestamp:   Date.now() - 7_200_000,
+      timestamp:   REF_TIME - 7_200_000,
       victim: {
         wallet:            '7xKp...mN4q',
         action:            'swap',
@@ -333,7 +337,7 @@ export const MOCK_RECEIPT_RESULT: ReceiptSearchResult = {
     {
       receiptId:   'VGL-2026-04-07-0003',
       txSignature: '2bTf...hQ8n',
-      timestamp:   Date.now() - 10_800_000,
+      timestamp:   REF_TIME - 10_800_000,
       victim: {
         wallet:            '7xKp...mN4q',
         action:            'swap',
