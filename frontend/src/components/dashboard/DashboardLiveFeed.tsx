@@ -79,34 +79,38 @@ export default function DashboardLiveFeed({ attacks }: DashboardLiveFeedProps) {
           {attacks.slice(0, 8).map((attack) => {
             const typeLabel = TYPE_LABEL[attack.type] ?? attack.type;
             return (
-              <li
-                key={attack.signature}
-                className="grid grid-cols-[60px_minmax(0,1fr)_72px_60px_12px] items-center gap-3 py-2.5 text-sm"
-              >
-                <span className="font-mono tabular-nums text-xs text-vigil-muted">
-                  {formatTime(attack.timestamp)}
-                </span>
-                <span className={`truncate ${TYPE_TEXT}`}>{typeLabel}</span>
-                <span className="text-right font-mono tabular-nums text-white">
-                  {attack.extractedSol != null
-                    ? `${attack.extractedSol.toFixed(3)} ◎`
-                    : '—'}
-                </span>
-                <span className="text-right text-[10px] text-vigil-muted/60 truncate">
-                  {attack.dex}
-                </span>
-                {attack.confidenceLevel ? (
-                  <span
-                    className="inline-block w-2 h-2 rounded-full justify-self-end"
-                    style={{
-                      backgroundColor: CONFIDENCE_HEX[attack.confidenceLevel],
-                    }}
-                    aria-label={`Confidence: ${attack.confidenceLevel}`}
-                    title={`Confidence: ${attack.confidenceLevel}`}
-                  />
-                ) : (
-                  <span aria-hidden="true" />
-                )}
+              <li key={attack.signature}>
+                <a
+                  href={`https://solscan.io/tx/${attack.signature}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  title={`View ${attack.signature.slice(0, 10)}… on Solscan`}
+                  className="grid grid-cols-[60px_minmax(0,1fr)_72px_60px_12px] items-center gap-3 py-2.5 px-2 -mx-2 text-sm hover:bg-white/[0.02] transition-colors"
+                >
+                  <span className="font-mono tabular-nums text-xs text-vigil-muted">
+                    {formatTime(attack.timestamp)}
+                  </span>
+                  <span className={`truncate ${TYPE_TEXT}`}>{typeLabel}</span>
+                  <span className="text-right font-mono tabular-nums text-white">
+                    {attack.extractedSol != null
+                      ? `${attack.extractedSol.toFixed(3)} ◎`
+                      : '—'}
+                  </span>
+                  <span className="text-right text-[10px] text-vigil-muted/60 truncate">
+                    {attack.dex}
+                  </span>
+                  {attack.confidenceLevel ? (
+                    <span
+                      className="inline-block w-2 h-2 rounded-full justify-self-end"
+                      style={{
+                        backgroundColor: CONFIDENCE_HEX[attack.confidenceLevel],
+                      }}
+                      aria-label={`Confidence: ${attack.confidenceLevel}`}
+                    />
+                  ) : (
+                    <span aria-hidden="true" />
+                  )}
+                </a>
               </li>
             );
           })}
