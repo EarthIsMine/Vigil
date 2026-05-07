@@ -16,6 +16,10 @@ const MOCK_ATTACKS: MevAttack[] = [
     dex: 'Orca',
     pool: 'PoolAddr12345',
     severity: Severity.CRITICAL,
+    confidenceLevel: null,
+    detectionMethod: null,
+    bundleProvenance: null,
+    lossSource: 'pool_amount_out',
   },
   {
     signature: 'sigRayBackrun9876543210',
@@ -23,37 +27,50 @@ const MOCK_ATTACKS: MevAttack[] = [
     timestamp: 1700000050000,
     slot: 250000010,
     extractedUsd: 500,
-    extractedSol: 0.0500,
+    extractedSol: 0.05,
     victim: { signer: 'victim2', amountIn: 200, amountOut: 195, expectedAmountOut: 200 },
     attacker: 'attacker2',
     dex: 'Raydium',
     pool: 'PoolAddr67890',
     severity: Severity.MEDIUM,
+    confidenceLevel: null,
+    detectionMethod: null,
+    bundleProvenance: null,
+    lossSource: 'pool_amount_out',
   },
 ];
 
 describe('TelemetryTable', () => {
   it('renders the heading', () => {
     render(<TelemetryTable attacks={MOCK_ATTACKS} />);
-    expect(screen.getByText('Telemetry')).toBeInTheDocument();
+    expect(screen.getByText('Recent attacks')).toBeInTheDocument();
   });
 
-  it('renders table headers', () => {
+  it('renders sentence-case column headers', () => {
     render(<TelemetryTable attacks={MOCK_ATTACKS} />);
-    expect(screen.getByText('Timestamp')).toBeInTheDocument();
+    expect(screen.getByText('Time')).toBeInTheDocument();
     expect(screen.getByText('Type')).toBeInTheDocument();
-    expect(screen.getByText('DEX / Pool')).toBeInTheDocument();
+    expect(screen.getByText('Pool')).toBeInTheDocument();
     expect(screen.getByText('Loss (SOL)')).toBeInTheDocument();
     expect(screen.getByText('Severity')).toBeInTheDocument();
   });
 
-  it('renders telemetry rows', () => {
+  it('renders attack type labels and loss values', () => {
     render(<TelemetryTable attacks={MOCK_ATTACKS} />);
     expect(screen.getByText('Sandwich')).toBeInTheDocument();
     expect(screen.getByText('Backrun')).toBeInTheDocument();
     expect(screen.getByText('1.2345')).toBeInTheDocument();
     expect(screen.getByText('0.0500')).toBeInTheDocument();
+  });
+
+  it('shows severity capitalized via CSS class', () => {
+    render(<TelemetryTable attacks={MOCK_ATTACKS} />);
     expect(screen.getByText('critical')).toBeInTheDocument();
     expect(screen.getByText('medium')).toBeInTheDocument();
+  });
+
+  it('renders an empty-state message when there are no attacks', () => {
+    render(<TelemetryTable attacks={[]} />);
+    expect(screen.getByText(/No attacks detected yet/)).toBeInTheDocument();
   });
 });

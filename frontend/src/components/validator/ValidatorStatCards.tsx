@@ -3,28 +3,51 @@ import type { ValidatorDetail } from '@/lib/types';
 function formatAvgPerSlot(value: number): string {
   if (!Number.isFinite(value)) return '—';
   if (value === 0) return '0';
-  // SOL down to lamport precision (1e-9). Avoid scientific notation
-  // (`7.31e-4 SOL` is unfriendly) — render plain decimal, trim trailing zeros.
+  // SOL down to lamport precision (1e-9). Avoid scientific notation.
   const fixed = Math.abs(value) >= 1 ? value.toFixed(4) : value.toFixed(9);
   return fixed.replace(/(\.\d*?)0+$/, '$1').replace(/\.$/, '');
 }
 
+function formatPercent(rate: number): string {
+  return `${(rate * 100).toFixed(1)}%`;
+}
+
+interface Stat {
+  label: string;
+  value: string;
+  unit?: string;
+}
+
 export default function ValidatorStatCards({ validator }: { validator: ValidatorDetail | null }) {
-  const stats = [
-    { label: 'Total Extracted (SOL)', value: validator ? `${validator.metricsRaw.totalExtractedSol.toLocaleString()} SOL` : '...' },
-    { label: 'Sandwich Involvement', value: validator ? `${(validator.metricsRaw.sandwichInvolvementRate * 100).toFixed(1)}%` : '...' },
-    { label: 'Wide Sandwich Rate', value: validator ? `${(validator.metricsRaw.wideSandwichRate * 100).toFixed(1)}%` : '...' },
-    { label: 'Avg Extraction / Slot', value: validator ? `${formatAvgPerSlot(validator.metricsRaw.avgExtractionPerSlot)} SOL` : '...' },
-  ];
+  const stats: Stat[] = validator
+    ? [
+        { label: 'Total extracted', value: validator.metricsRaw.totalExtractedSol.toLocaleString(), unit: 'SOL' },
+        { label: 'Sandwich involvement', value: formatPercent(validator.metricsRaw.sandwichInvolvementRate) },
+        { label: 'Wide sandwich rate', value: formatPercent(validator.metricsRaw.wideSandwichRate) },
+        { label: 'Avg per slot', value: formatAvgPerSlot(validator.metricsRaw.avgExtractionPerSlot), unit: 'SOL' },
+      ]
+    : [
+        { label: 'Total extracted', value: '—' },
+        { label: 'Sandwich involvement', value: '—' },
+        { label: 'Wide sandwich rate', value: '—' },
+        { label: 'Avg per slot', value: '—' },
+      ];
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6 fade-up fade-up-d2">
-      {stats.map((s) => (
-        <div key={s.label} className="bg-[#111827] border border-white/[0.06] rounded-lg p-5">
-          <div className="text-[#8892ab] text-xs font-mono uppercase tracking-wider mb-3">{s.label}</div>
-          <div className="text-2xl font-bold text-white">{s.value}</div>
-        </div>
-      ))}
-    </div>
+    <section className="mb-14 fade-up fade-up-d2">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-x-8 gap-y-6">
+        {stats.map((s) => (
+          <div key={s.label} className="border-l border-vigil-border pl-4">
+            <p className="text-xs text-vigil-muted mb-2">{s.label}</p>
+            <p className="font-display text-3xl font-bold text-white tabular-nums">
+              {s.value}
+              {s.unit && (
+                <span className="text-base text-vigil-muted font-normal ml-1.5">{s.unit}</span>
+              )}
+            </p>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
