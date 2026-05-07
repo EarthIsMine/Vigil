@@ -1,6 +1,6 @@
 @import "tailwindcss";
 
-@theme inline {
+@theme {
   /* ── Fonts ── */
   --font-display: var(--font-space-grotesk);
   --font-body: var(--font-inter);
@@ -69,11 +69,14 @@
 html {
   scroll-behavior: smooth;
   scroll-padding-top: 4.5rem;
+  color-scheme: dark;
+  scrollbar-gutter: stable;
 }
 
 body {
   @apply bg-surface text-on-surf;
 }
+
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { @apply w-1.5 h-1.5; }
@@ -170,6 +173,45 @@ body {
 
 /* ── API Docs ── */
 pre code { @apply text-[13px] leading-7; }
+
+/* Light theme override — applied on <html> by the global theme toggle. */
+.theme-light {
+  color-scheme: light;
+  --color-surface: #f4f5f7;
+  --color-surface-100: #ffffff;
+  --color-surface-200: #f9fafb;
+  --color-surface-300: #f3f4f6;
+  --color-on-surf: #18181b;
+  --color-muted: #6b7280;
+  --color-outline: #e5e7eb;
+  --color-primary: #2563eb;
+  --color-primary-dim: #dbeafe;
+  --color-secondary: #16a34a;
+  --color-warning: #d97706;
+  --color-error: #dc2626;
+}
+.theme-light ::-webkit-scrollbar-track { background: #f3f4f6; }
+.theme-light ::-webkit-scrollbar-thumb { background: #d1d5db; }
+
+/* Safety-net for components that hardcode dark colors. Maps the most common
+   "dark-only" Tailwind tokens to light values so legacy components don't appear
+   white-on-white when the global theme is light. */
+.theme-light .text-white { color: var(--color-on-surf); }
+.theme-light .bg-vigil-black,
+.theme-light .bg-vigil-dark,
+.theme-light .bg-vigil-bg { background-color: var(--color-surface-100); }
+.theme-light .bg-vigil-card,
+.theme-light .bg-vigil-card-dark { background-color: var(--color-surface-200); }
+.theme-light .border-vigil-border,
+.theme-light .border-vigil-border-dark { border-color: var(--color-outline); }
+.theme-light .text-vigil-muted { color: var(--color-muted); }
+.theme-light .text-vigil-text { color: var(--color-on-surf); }
+.theme-light .bg-vigil-code,
+.theme-light .bg-vigil-code-header,
+.theme-light .bg-vigil-surface { background-color: var(--color-surface-200); }
+.theme-light .bg-\[\#0a0e1a\] { background-color: var(--color-surface-100); }
+.theme-light .bg-\[\#0f1424\] { background-color: var(--color-surface-100); }
+.theme-light .bg-\[\#0f131f\] { background-color: var(--color-surface-100); }
 
 /* ── Material Symbols ── */
 .material-symbols-outlined {

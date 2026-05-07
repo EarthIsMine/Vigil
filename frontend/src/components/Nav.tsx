@@ -1,26 +1,23 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useLatestSlot } from "@/hooks/useLatestSlot";
+import NavMoreMenu from "./NavMoreMenu";
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
   { href: "/validator", label: "Validators" },
   { href: "/receipt", label: "MEV Receipt" },
-  { href: "/protection", label: "Protection" },
-  { href: "/api-docs", label: "API Docs" },
 ];
 
 export default function Nav() {
   const pathname = usePathname();
-  const [mobileOpen, setMobileOpen] = useState(false);
-  const latestSlot = useLatestSlot();
+
+  if (pathname?.startsWith("/api-docs") || pathname?.startsWith("/protection")) return null;
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-surface-100/80 backdrop-blur-xl border-b border-outline/30">
-      <div className="flex items-center justify-between h-14 px-5">
+      <div className="max-w-6xl mx-auto flex items-center justify-between h-14 px-6">
         <div className="flex items-center gap-6">
           <Link href="/" className="flex items-center">
             <span className="font-display font-bold text-lg tracking-tight text-white">VIGIL</span>
@@ -31,9 +28,7 @@ export default function Nav() {
                 key={link.href}
                 href={link.href}
                 className={`nav-link px-3 py-1.5 text-sm font-medium rounded-md ${
-                  pathname === link.href
-                    ? "active text-primary"
-                    : "text-muted hover:text-on-surf"
+                  pathname === link.href ? "active text-primary" : "text-muted hover:text-on-surf"
                 }`}
               >
                 {link.label}
@@ -42,45 +37,9 @@ export default function Nav() {
           </div>
         </div>
         <div className="flex items-center gap-3">
-          <div className="hidden sm:flex items-center gap-1.5 px-2.5 py-1 bg-sec-dim/40 border border-secondary/20 rounded-full">
-            <span className="w-2 h-2 rounded-full bg-secondary pulse-dot"></span>
-            <span className="text-xs font-mono text-secondary">
-              {latestSlot ? `Slot ${latestSlot.toLocaleString('en-US')}` : 'Connecting...'}
-            </span>
-          </div>
-          <button
-            className="md:hidden p-1.5 rounded-lg hover:bg-surface-300 transition text-muted"
-            onClick={() => setMobileOpen((prev) => !prev)}
-            aria-label="Toggle menu"
-          >
-            <span className="material-symbols-outlined text-xl">
-              {mobileOpen ? "close" : "menu"}
-            </span>
-          </button>
+          <NavMoreMenu />
         </div>
       </div>
-
-      {/* Mobile menu */}
-      {mobileOpen && (
-        <div className="md:hidden border-t border-outline/20 bg-surface-100/95 backdrop-blur-xl">
-          <div className="flex flex-col py-2 px-4">
-            {navLinks.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setMobileOpen(false)}
-                className={`px-3 py-2.5 text-sm font-medium rounded-lg transition ${
-                  pathname === link.href
-                    ? "text-primary bg-primary/10"
-                    : "text-muted hover:text-on-surf hover:bg-surface-300"
-                }`}
-              >
-                {link.label}
-              </Link>
-            ))}
-          </div>
-        </div>
-      )}
     </nav>
   );
 }
