@@ -88,7 +88,10 @@ export default function DashboardLiveFeed({ attacks }: DashboardLiveFeedProps) {
                   title={`View ${attack.signature.slice(0, 10)}… on Solscan`}
                   className="grid grid-cols-[60px_minmax(0,1fr)_72px_60px_12px] items-center gap-3 py-2.5 px-2 -mx-2 text-sm hover:bg-white/[0.02] transition-colors"
                 >
-                  <span className="font-mono tabular-nums text-xs text-vigil-muted">
+                  <span
+                    className="font-mono tabular-nums text-xs text-vigil-muted"
+                    suppressHydrationWarning
+                  >
                     {formatTime(attack.timestamp)}
                   </span>
                   <span className={`truncate ${TYPE_TEXT}`}>{typeLabel}</span>
