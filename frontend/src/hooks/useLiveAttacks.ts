@@ -90,7 +90,15 @@ export function useLiveAttacks(
     return () => {
       alive = false;
       window.clearInterval(pollId);
-      socket.disconnect();
+      socket.removeAllListeners();
+      // Avoid the "WebSocket is closed before the connection is established"
+      // browser warning by waiting for the handshake to finish before tearing
+      // it down. If already connected, disconnect immediately.
+      if (socket.connected) {
+        socket.disconnect();
+      } else {
+        socket.once('connect', () => socket.disconnect());
+      }
     };
   }, [maxItems]);
 

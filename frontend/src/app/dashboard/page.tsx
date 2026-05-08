@@ -1,56 +1,50 @@
+import { Suspense } from 'react';
 import DashboardHeader from '@/components/dashboard/DashboardHeader';
-import DashboardStatsGrid from '@/components/dashboard/DashboardStatsGrid';
-import DashboardChart from '@/components/dashboard/DashboardChart';
-import ValidatorLeaderboard from '@/components/dashboard/ValidatorLeaderboard';
-import PoolLeaderboard from '@/components/dashboard/PoolLeaderboard';
-import DashboardLiveFeedSection from '@/components/dashboard/DashboardLiveFeedSection';
-import ErrorBanner from '@/components/shared/ErrorBanner';
+
+// Render the page dynamically so the static shell streams immediately while
+// the slow leaderboard data arrives via Suspense; the underlying fetches keep
+// their per-request revalidate cache.
+export const dynamic = 'force-dynamic';
+
+import StatsSection from '@/components/dashboard/sections/StatsSection';
+import ChartSection from '@/components/dashboard/sections/ChartSection';
+import ValidatorLeaderboardSection from '@/components/dashboard/sections/ValidatorLeaderboardSection';
+import PoolLeaderboardSection from '@/components/dashboard/sections/PoolLeaderboardSection';
+import LiveFeedFetcher from '@/components/dashboard/sections/LiveFeedFetcher';
 import {
-  getDashboardStats,
-  getTimeSeries,
-  getValidatorLeaderboard,
-  getPoolLeaderboard,
-  getLiveFeed,
-} from '@/lib/services/dashboard';
+  StatsGridSkeleton,
+  ChartSkeleton,
+  LeaderboardSkeleton,
+  LiveFeedSkeleton,
+} from '@/components/dashboard/sections/skeletons';
 
-const REVALIDATE_S = 30;
-
-export default async function DashboardPage() {
-  const [statsR, timeseriesR, validatorsR, poolsR, attacksR] =
-    await Promise.allSettled([
-      getDashboardStats({ revalidate: REVALIDATE_S }),
-      getTimeSeries('24h', { revalidate: REVALIDATE_S }),
-      getValidatorLeaderboard(5, { revalidate: REVALIDATE_S }),
-      getPoolLeaderboard({ revalidate: REVALIDATE_S }),
-      getLiveFeed(20, { revalidate: 0 }),
-    ]);
-
-  const stats = statsR.status === 'fulfilled' ? statsR.value : null;
-  const timeseries = timeseriesR.status === 'fulfilled' ? timeseriesR.value : [];
-  const validators = validatorsR.status === 'fulfilled' ? validatorsR.value : [];
-  const pools = poolsR.status === 'fulfilled' ? poolsR.value : [];
-  const initialAttacks = attacksR.status === 'fulfilled' ? attacksR.value : [];
-
-  const allFailed = [statsR, timeseriesR, validatorsR, poolsR].every(
-    (r) => r.status === 'rejected',
-  );
-
+export default function DashboardPage() {
   return (
     <div className="min-h-screen bg-surface text-white">
       <main className="pt-14">
         <div className="px-6 py-10 max-w-6xl mx-auto">
           <DashboardHeader />
-          {allFailed && <ErrorBanner message="Couldn't reach the API" />}
-          {stats && <DashboardStatsGrid stats={stats} />}
+
+          <Suspense fallback={<StatsGridSkeleton />}>
+            <StatsSection />
+          </Suspense>
 
           <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-12 mb-14">
-            <DashboardChart timeseries={timeseries} />
-            <ValidatorLeaderboard validators={validators} />
+            <Suspense fallback={<ChartSkeleton />}>
+              <ChartSection />
+            </Suspense>
+            <Suspense fallback={<LeaderboardSkeleton />}>
+              <ValidatorLeaderboardSection />
+            </Suspense>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <PoolLeaderboard pools={pools} />
-            <DashboardLiveFeedSection initialAttacks={initialAttacks} />
+            <Suspense fallback={<LeaderboardSkeleton />}>
+              <PoolLeaderboardSection />
+            </Suspense>
+            <Suspense fallback={<LiveFeedSkeleton />}>
+              <LiveFeedFetcher />
+            </Suspense>
           </div>
         </div>
       </main>
