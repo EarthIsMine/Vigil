@@ -1,3 +1,5 @@
+'use client';
+
 import MevChart from '@/components/MevChart';
 import type { TimeSeriesDataPoint } from '@/lib/types';
 

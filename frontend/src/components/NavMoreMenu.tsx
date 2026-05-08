@@ -2,48 +2,12 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { THEME_KEY, applyThemeClass, readStoredTheme, type Theme } from "@/lib/theme";
 
 interface MoreItem {
   href: string;
   label: string;
   icon: string;
   external?: boolean;
-}
-
-function ThemeToggleRow({ theme, onToggle }: { theme: Theme; onToggle: () => void }) {
-  const isDark = theme === "dark";
-  return (
-    <button
-      type="button"
-      onClick={onToggle}
-      suppressHydrationWarning
-      aria-pressed={isDark}
-      className="w-full flex items-center gap-2 px-3 py-2 text-sm text-on-surf hover:bg-surface-300 transition"
-    >
-      <span
-        suppressHydrationWarning
-        className="material-symbols-outlined text-base text-primary leading-none"
-      >
-        {isDark ? "dark_mode" : "light_mode"}
-      </span>
-      <span suppressHydrationWarning className="flex-1 text-left">
-        {isDark ? "Dark mode" : "Light mode"}
-      </span>
-      <span
-        suppressHydrationWarning
-        className={`relative inline-flex w-9 h-5 rounded-full transition ${
-          isDark ? "bg-primary" : "bg-surface-300"
-        }`}
-      >
-        <span
-          className={`absolute top-0.5 left-0.5 block w-4 h-4 rounded-full bg-white transition-transform ${
-            isDark ? "translate-x-4" : "translate-x-0"
-          }`}
-        />
-      </span>
-    </button>
-  );
 }
 
 // Shown at all breakpoints — secondary destinations
@@ -61,12 +25,7 @@ const MOBILE_NAV: MoreItem[] = [
 
 export default function NavMoreMenu() {
   const [open, setOpen] = useState(false);
-  const [theme, setTheme] = useState<Theme>(readStoredTheme);
   const ref = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    applyThemeClass(theme);
-  }, [theme]);
 
   useEffect(() => {
     if (!open) return;
@@ -85,14 +44,6 @@ export default function NavMoreMenu() {
   }, [open]);
 
   const close = () => setOpen(false);
-
-  const toggleTheme = () => {
-    setTheme((prev) => {
-      const next: Theme = prev === "dark" ? "light" : "dark";
-      window.localStorage.setItem(THEME_KEY, next);
-      return next;
-    });
-  };
 
   return (
     <div ref={ref} className="relative">
@@ -161,11 +112,6 @@ export default function NavMoreMenu() {
                 </li>
               )
             )}
-
-            <li className="border-t border-outline/15 my-1" aria-hidden="true" />
-            <li>
-              <ThemeToggleRow theme={theme} onToggle={toggleTheme} />
-            </li>
           </ul>
         </div>
       )}

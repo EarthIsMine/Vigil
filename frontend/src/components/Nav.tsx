@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import NavMoreMenu from "./NavMoreMenu";
+import ThemeToggleButton from "./ThemeToggleButton";
 
 const navLinks = [
   { href: "/dashboard", label: "Dashboard" },
@@ -36,7 +37,8 @@ export default function Nav() {
             ))}
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-1">
+          <ThemeToggleButton />
           <NavMoreMenu />
         </div>
       </div>
