@@ -9,7 +9,19 @@
       "Bash(pnpm test:*)",
       "Bash(pnpm build:*)",
       "Bash(pnpm --filter vigil-frontend test:*)",
-      "Bash(pnpm --filter vigil-frontend lint:*)"
+      "Bash(pnpm --filter vigil-frontend lint:*)",
+      "Bash(top -l 1 -n 0)",
+      "Bash(awk '{printf \"%-40s RSS: %s MB\\\\n\", $11, $6/1024}')",
+      "Bash(sort -t: -k2 -n -r)",
+      "Bash(awk '{printf \"%-60s RSS: %.1f MB\\\\n\", $11, $6/1024}')",
+      "Bash(awk '{printf \"%.1f\\\\t%s\\\\n\", $6/1024, $11}')",
+      "Bash(gawk '{ *)",
+      "Bash(awk '{ *)",
+      "Bash(osascript *)",
+      "Bash(python3 *)",
+      "Bash(memory_pressure)",
+      "Bash(sysctl vm.swapusage)",
+      "Bash(docker system *)"
     ]
   }
 }

@@ -1,3 +1,5 @@
+'use client';
+
 import { useConnectionStatus } from '@/components/ConnectionStatusProvider';
 
 export default function DashboardHeader() {

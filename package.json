@@ -2,6 +2,7 @@
   "name": "vigil",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.15.1",
   "scripts": {
     "dev": "pnpm --filter vigil-frontend dev",
     "dev:backend": "pnpm --filter backend dev",
@@ -11,5 +12,15 @@
     "start": "pnpm --filter vigil-frontend start",
     "lint": "pnpm --filter vigil-frontend lint",
     "lint:backend": "pnpm --filter backend lint"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@nestjs/core",
+      "@prisma/client",
+      "@prisma/engines",
+      "prisma",
+      "sharp",
+      "unrs-resolver"
+    ]
   }
 }

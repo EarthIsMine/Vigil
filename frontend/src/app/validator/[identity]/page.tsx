@@ -1,6 +1,4 @@
-'use client';
-
-import { useParams } from 'next/navigation';
+import { notFound } from 'next/navigation';
 import ValidatorBreadcrumb from '@/components/validator/ValidatorBreadcrumb';
 import ValidatorHeader from '@/components/validator/ValidatorHeader';
 import ValidatorStatCards from '@/components/validator/ValidatorStatCards';
@@ -8,33 +6,55 @@ import ValidatorHeatmapSection from '@/components/validator/ValidatorHeatmapSect
 import ValidatorAttackDistribution from '@/components/validator/ValidatorAttackDistribution';
 import TelemetryTable from '@/components/validator/TelemetryTable';
 import ErrorBanner from '@/components/shared/ErrorBanner';
-import { useValidatorById } from '@/hooks/useValidatorById';
+import { getValidatorDetail } from '@/lib/services/validator';
+import { getPoolLeaderboard, getLiveFeed } from '@/lib/services/dashboard';
+import { ApiError } from '@/lib/api';
+import { getRiskColorHex } from '@/lib/format';
+import type { MevAttack, PoolLeaderboardEntry, ValidatorDetail } from '@/lib/types';
 
-export default function ValidatorIdentityPage() {
-  const params = useParams<{ identity: string }>();
-  const raw = params?.identity ?? '';
-  const identity = decodeURIComponent(Array.isArray(raw) ? raw[0] : raw);
-  const { validator, riskColor, attacks, pools, loading, error } = useValidatorById(identity);
+const REVALIDATE_S = 30;
+
+export default async function ValidatorIdentityPage({
+  params,
+}: {
+  params: Promise<{ identity: string }>;
+}) {
+  const { identity: rawIdentity } = await params;
+  const identity = decodeURIComponent(rawIdentity);
+
+  let validator: ValidatorDetail | null = null;
+  let detailError = false;
+  try {
+    validator = await getValidatorDetail(identity, { revalidate: REVALIDATE_S });
+  } catch (err) {
+    if (err instanceof ApiError && err.status === 404) {
+      notFound();
+    }
+    detailError = true;
+  }
+
+  const [poolsR, attacksR] = await Promise.allSettled([
+    getPoolLeaderboard({ revalidate: REVALIDATE_S }),
+    getLiveFeed(50, { revalidate: REVALIDATE_S }),
+  ]);
+  const pools: PoolLeaderboardEntry[] =
+    poolsR.status === 'fulfilled' ? poolsR.value : [];
+  const attacks: MevAttack[] =
+    attacksR.status === 'fulfilled' ? attacksR.value : [];
+
+  const riskColor = getRiskColorHex(validator?.riskLevel ?? '');
 
   return (
     <div className="min-h-screen bg-[#0a0e1a] text-white">
       <main className="pt-14">
         <div className="px-6 py-10 max-w-6xl mx-auto">
           <ValidatorBreadcrumb name={validator?.name ?? '...'} />
-          {error && <ErrorBanner message={error} />}
-          {loading && !validator ? (
-            <div className="text-vigil-muted font-mono text-sm py-12">
-              Loading validator…
-            </div>
-          ) : (
-            <>
-              <ValidatorHeader validator={validator} riskColor={riskColor} />
-              <ValidatorStatCards validator={validator} />
-              <ValidatorHeatmapSection attacks={attacks} />
-              <ValidatorAttackDistribution attacks={attacks} pools={pools} />
-              <TelemetryTable attacks={attacks} />
-            </>
-          )}
+          {detailError && <ErrorBanner message="Couldn't load validator" />}
+          <ValidatorHeader validator={validator} riskColor={riskColor} />
+          <ValidatorStatCards validator={validator} />
+          <ValidatorHeatmapSection attacks={attacks} />
+          <ValidatorAttackDistribution attacks={attacks} pools={pools} />
+          <TelemetryTable attacks={attacks} />
         </div>
       </main>
     </div>

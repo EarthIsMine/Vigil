@@ -1,0 +1,63 @@
+# Vigil — full stack (Postgres + Nest backend with detector + Next frontend)
+# Run from this directory:
+#   docker compose --env-file .env.docker up -d --build
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: vigil-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-vigil}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-vigil}
+      POSTGRES_DB: ${POSTGRES_DB:-vigil}
+    ports:
+      - "${DB_PORT:-5433}:5432"
+    volumes:
+      - vigil-pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-vigil} -d ${POSTGRES_DB:-vigil}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build:
+      context: ..
+      dockerfile: Vigil/backend/Dockerfile
+    image: vigil-backend:latest
+    container_name: vigil-backend
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://${POSTGRES_USER:-vigil}:${POSTGRES_PASSWORD:-vigil}@db:5432/${POSTGRES_DB:-vigil}
+      RPC_URL: ${RPC_URL}
+      POOL_STATE_RPC: ${POOL_STATE_RPC}
+      DETECTOR_BIN: /usr/local/bin/sandwich-detect
+      DETECTOR_CONCURRENCY: ${DETECTOR_CONCURRENCY:-32}
+      DETECTOR_WINDOW: ${DETECTOR_WINDOW:-5}
+      RUST_LOG: ${RUST_LOG:-info}
+      PORT: 3001
+    ports:
+      - "${BACKEND_PORT:-3001}:3001"
+
+  frontend:
+    build:
+      context: ..
+      dockerfile: Vigil/frontend/Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:3001/api/v1}
+    image: vigil-frontend:latest
+    container_name: vigil-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    environment:
+      INTERNAL_API_URL: http://backend:3001/api/v1
+    ports:
+      - "${FRONTEND_PORT:-3000}:3000"
+
+volumes:
+  vigil-pgdata:

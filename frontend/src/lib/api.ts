@@ -8,6 +8,16 @@
 const TIMEOUT_MS = 4000;
 
 function getApiBase(): string {
+  // Server fetches prefer INTERNAL_API_URL (e.g. http://backend:3001/api/v1) to
+  // skip the public Cloudflare → nginx → backend round-trip. Client falls back
+  // to NEXT_PUBLIC_API_URL because the browser can't resolve docker hostnames.
+  if (typeof window === 'undefined') {
+    return (
+      process.env.INTERNAL_API_URL ??
+      process.env.NEXT_PUBLIC_API_URL ??
+      ''
+    );
+  }
   return process.env.NEXT_PUBLIC_API_URL ?? '';
 }
 
@@ -35,13 +45,22 @@ export function emitConnectionSource(source: ConnectionSource) {
   });
 }
 
+export interface ApiFetchOpts {
+  /** Server-side ISR window in seconds. Omit on the client. */
+  revalidate?: number;
+}
+
 /**
  * apiFetch — wraps fetch with timeout + error normalisation.
  * Throws ApiError on non-2xx, timeout, or missing config.
  * Emits 'live' on success and 'offline' on failure so the UI can surface
- * connection state.
+ * connection state. Pass `opts.revalidate` from RSC to enable Next fetch cache.
  */
-export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> {
+export async function apiFetch<T>(
+  path: string,
+  init?: RequestInit,
+  opts?: ApiFetchOpts,
+): Promise<T> {
   const apiBase = getApiBase();
   if (!apiBase) {
     emitConnectionSource('offline');
@@ -51,12 +70,17 @@ export async function apiFetch<T>(path: string, init?: RequestInit): Promise<T> 
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS);
 
+  const fetchInit: RequestInit = { ...init, signal: controller.signal };
+  if (opts?.revalidate !== undefined) {
+    (fetchInit as RequestInit & { next: { revalidate: number } }).next = {
+      revalidate: opts.revalidate,
+    };
+  } else if (!init?.cache) {
+    fetchInit.cache = 'no-store';
+  }
+
   try {
-    const res = await fetch(`${apiBase}${path}`, {
-      cache: 'no-store',
-      ...init,
-      signal: controller.signal,
-    });
+    const res = await fetch(`${apiBase}${path}`, fetchInit);
 
     if (!res.ok) {
       emitConnectionSource('offline');

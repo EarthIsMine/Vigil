@@ -12,10 +12,11 @@ const USE_MOCK = process.env.NEXT_PUBLIC_USE_MOCK === '1';
 /**
  * Live feed of recent attacks.
  *
- * Initial render loads the last `maxItems` via REST so the page has data even
- * before the WS handshake completes. The WS subscription to the `/events`
- * namespace then prepends any newly-detected attack the BE broadcasts via
- * `EventsGateway.broadcastAttack`.
+ * `initialAttacks` (optional) seeds state so RSC-prefetched data shows on the
+ * first paint without a flash of empty list. The WS subscription to the
+ * `/events` namespace then prepends any newly-detected attack the BE
+ * broadcasts via `EventsGateway.broadcastAttack`. A 10s REST poll runs as a
+ * backup in case the WS drops without firing `disconnect`.
  *
  * Connection state side-effects flow through `emitConnectionSource` so the
  * shared `ConnectionStatusProvider` reflects WS up/down without needing
@@ -27,9 +28,12 @@ function getWsBase(): string {
 
 const POLL_MS = 10_000;
 
-export function useLiveAttacks(maxItems = 20): MevAttack[] {
+export function useLiveAttacks(
+  maxItems = 20,
+  initialAttacks: MevAttack[] = [],
+): MevAttack[] {
   const [attacks, setAttacks] = useState<MevAttack[]>(
-    USE_MOCK ? MOCK_LIVE_FEED.slice(0, maxItems) : []
+    USE_MOCK ? MOCK_LIVE_FEED.slice(0, maxItems) : initialAttacks.slice(0, maxItems),
   );
 
   useEffect(() => {
