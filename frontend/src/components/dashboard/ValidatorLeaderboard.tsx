@@ -58,7 +58,7 @@ export default function ValidatorLeaderboard({ validators }: { validators: Valid
                           ? `${v.identity.slice(0, 6)}…${v.identity.slice(-4)}`
                           : v.identity}
                       </p>
-                      <CopyAddressButton address={v.identity} iconClassName="text-xs" />
+                      <CopyAddressButton address={v.identity} />
                     </div>
                   </div>
                   <span className={`text-xs ${riskCls} text-right`}>

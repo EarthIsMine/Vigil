@@ -37,7 +37,7 @@ export default function ValidatorHeader({ validator, riskColor }: ValidatorHeade
             <span>
               {validator.identity.slice(0, 8)}…{validator.identity.slice(-4)}
             </span>
-            <CopyAddressButton address={validator.identity} iconClassName="text-xs" />
+            <CopyAddressButton address={validator.identity} />
           </p>
           <h1 className="font-display font-bold text-4xl md:text-5xl tracking-tight text-white truncate">
             {validator.name}
@@ -75,7 +75,7 @@ export default function ValidatorHeader({ validator, riskColor }: ValidatorHeade
               <span>
                 {validator.voteAccount.slice(0, 8)}…{validator.voteAccount.slice(-4)}
               </span>
-              <CopyAddressButton address={validator.voteAccount} iconClassName="text-xs" />
+              <CopyAddressButton address={validator.voteAccount} />
             </dd>
           </div>
         )}
