@@ -53,7 +53,11 @@ export default async function ValidatorIdentityPage({
           <ValidatorHeader validator={validator} riskColor={riskColor} />
           <ValidatorStatCards validator={validator} />
           <ValidatorHeatmapSection attacks={attacks} />
-          <ValidatorAttackDistribution attacks={attacks} pools={pools} />
+          <ValidatorAttackDistribution
+            attacksByType={validator?.attacksByType ?? {}}
+            attacksTotal={validator?.attacksTotal ?? 0}
+            pools={pools}
+          />
           <TelemetryTable attacks={attacks} />
         </div>
       </main>

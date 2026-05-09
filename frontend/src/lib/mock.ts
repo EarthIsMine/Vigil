@@ -156,6 +156,13 @@ export const MOCK_VALIDATOR_DETAIL: ValidatorDetail = {
     avgExtractionPerSlot: 84,
     recentTrend: 'increasing',
   },
+  attacksByType: {
+    sandwich_wide: 142,
+    sandwich_single: 87,
+    sandwich_auth_hop: 23,
+    backrun: 15,
+  },
+  attacksTotal: 267,
   lastUpdated: REF_TIME,
 };
 

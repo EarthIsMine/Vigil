@@ -106,6 +106,7 @@ export class ValidatorService {
     if (!me) return null;
 
     const { score, level, normalized } = this.calculateRiskScore(me.raw, bounds);
+    const { attacksByType, attacksTotal } = await this.getAttackTypeBreakdown(identity);
 
     return {
       identity: v.identity,
@@ -120,8 +121,40 @@ export class ValidatorService {
       metricsNormalized: normalized,
       riskScore: score,
       riskLevel: level,
+      attacksByType,
+      attacksTotal,
       lastUpdated: v.lastUpdated.getTime(),
     };
+  }
+
+  private async getAttackTypeBreakdown(
+    identity: string,
+  ): Promise<{ attacksByType: Record<string, number>; attacksTotal: number }> {
+    const grouped = await this.prisma.mevAttack.groupBy({
+      by: ['type'],
+      where: { leaderIdentity: identity },
+      _count: { _all: true },
+    });
+
+    const attacksByType: Record<string, number> = {};
+    let attacksTotal = 0;
+    for (const g of grouped) {
+      const feType = this.toFrontendAttackType(g.type);
+      const count = g._count._all;
+      attacksByType[feType] = (attacksByType[feType] ?? 0) + count;
+      attacksTotal += count;
+    }
+    return { attacksByType, attacksTotal };
+  }
+
+  private toFrontendAttackType(dbType: string): string {
+    switch (dbType) {
+      case 'sandwich': return 'sandwich_single';
+      case 'wide_sandwich': return 'sandwich_wide';
+      case 'authority_hop': return 'sandwich_auth_hop';
+      case 'backrun': return 'backrun';
+      default: return dbType;
+    }
   }
 
   private async enrichAll(validators: ValidatorStats[]): Promise<EnrichedValidator[]> {

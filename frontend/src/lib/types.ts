@@ -447,6 +447,8 @@ export interface ValidatorDetail extends ValidatorRiskScore {
   stake: string;
   commission: number;
   activeSinceEpoch: number;
+  attacksByType: Record<string, number>;
+  attacksTotal: number;
 }
 
 export interface ReceiptSearchResult {
