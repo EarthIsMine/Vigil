@@ -47,10 +47,14 @@ function FencedCodeBlock({ lang, children }: { lang: string; children: string })
   const label = LANG_LABELS[lang.toLowerCase()] ?? (lang ? lang.toUpperCase() : 'Code');
   const dotColor = lang === 'json' || lang === 'jsonc' ? 'bg-primary' : 'bg-secondary';
 
-  const handleCopy = () => {
-    navigator.clipboard.writeText(children);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1500);
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(children);
+      setCopied(true);
+      window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setCopied(false);
+    }
   };
 
   return (
@@ -127,7 +131,7 @@ export const MARKDOWN_COMPONENTS: Components = {
       {...props}
       className="font-display font-semibold text-on-surf text-lg mt-8 mb-3 scroll-mt-32 flex items-center gap-2.5"
     >
-      <span className="inline-block w-1.5 h-1.5 bg-primary rotate-45 flex-shrink-0" aria-hidden />
+      <span className="inline-block w-1.5 h-1.5 bg-primary rotate-45 shrink-0" aria-hidden />
       <span>{children}</span>
     </h3>
   ),
@@ -178,7 +182,7 @@ export const MARKDOWN_COMPONENTS: Components = {
         {...props}
         className={`my-5 flex gap-3 ${style.bg} border-l-2 ${style.border} pl-4 pr-4 py-3 rounded-r-md`}
       >
-        <span className={`material-symbols-outlined ${style.iconColor} text-lg leading-none mt-0.5 flex-shrink-0`}>
+        <span className={`material-symbols-outlined ${style.iconColor} text-lg leading-none mt-0.5 shrink-0`}>
           {style.icon}
         </span>
         <div className="flex-1 text-on-surf/85 text-[0.9rem] leading-relaxed [&>p]:my-1 [&>p]:leading-relaxed">
