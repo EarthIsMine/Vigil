@@ -1,10 +1,8 @@
 import { notFound } from 'next/navigation';
-import ValidatorBreadcrumb from '@/components/validator/ValidatorBreadcrumb';
 import ValidatorHeader from '@/components/validator/ValidatorHeader';
 import ValidatorStatCards from '@/components/validator/ValidatorStatCards';
 import EngineEvidence from '@/components/validator/EngineEvidence';
-import ValidatorHeatmapSection from '@/components/validator/ValidatorHeatmapSection';
-import ValidatorAttackDistribution from '@/components/validator/ValidatorAttackDistribution';
+import TargetedPools from '@/components/validator/TargetedPools';
 import TelemetryTable from '@/components/validator/TelemetryTable';
 import ErrorBanner from '@/components/shared/ErrorBanner';
 import { getValidatorDetail } from '@/lib/services/validator';
@@ -49,17 +47,13 @@ export default async function ValidatorIdentityPage({
     <div className="min-h-screen bg-[#0a0e1a] text-white">
       <main className="pt-14">
         <div className="px-6 py-10 max-w-6xl mx-auto">
-          <ValidatorBreadcrumb name={validator?.name ?? '...'} />
           {detailError && <ErrorBanner message="Couldn't load validator" />}
           <ValidatorHeader validator={validator} riskColor={riskColor} />
           <ValidatorStatCards validator={validator} />
           <EngineEvidence attacks={attacks} />
-          <ValidatorHeatmapSection attacks={attacks} />
-          <ValidatorAttackDistribution
-            attacksByType={validator?.attacksByType ?? {}}
-            attacksTotal={validator?.attacksTotal ?? 0}
-            pools={pools}
-          />
+          <section className="mb-14 fade-up fade-up-d4">
+            <TargetedPools pools={pools} />
+          </section>
           <TelemetryTable attacks={attacks} />
         </div>
       </main>
