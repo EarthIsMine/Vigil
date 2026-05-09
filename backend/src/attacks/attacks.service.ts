@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { TransformService } from '../detector/transform.service';
 
@@ -9,8 +10,12 @@ export class AttacksService {
     private readonly transform: TransformService,
   ) {}
 
-  async getRecent(limit: number) {
+  async getRecent(limit: number, leader?: string) {
+    const where: Prisma.MevAttackWhereInput = {};
+    if (leader) where.leaderIdentity = leader;
+
     const attacks = await this.prisma.mevAttack.findMany({
+      where,
       orderBy: { timestampMs: 'desc' },
       take: limit,
     });

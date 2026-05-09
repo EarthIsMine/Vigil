@@ -1,4 +1,5 @@
 import { Injectable } from '@nestjs/common';
+import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 
 export type PoolLeaderboardRange = '1h' | '24h' | '7d' | 'all';
@@ -18,8 +19,14 @@ const fmtUsd = (n: number) =>
 export class PoolsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  async getLeaderboard(limit: number, range: PoolLeaderboardRange = '24h') {
-    if (range === 'all') {
+  async getLeaderboard(
+    limit: number,
+    range: PoolLeaderboardRange = '24h',
+    leader?: string,
+  ) {
+    // Fast path: global all-time leaderboard uses the pre-aggregated PoolStats.
+    // Any validator-scoped or time-windowed query must aggregate from MevAttack.
+    if (range === 'all' && !leader) {
       const pools = await this.prisma.poolStats.findMany({
         orderBy: { attackCount: 'desc' },
         take: limit,
@@ -37,10 +44,17 @@ export class PoolsService {
       }));
     }
 
-    const sinceMs = BigInt(Date.now() - WINDOW_MS[range]);
+    const where: Prisma.MevAttackWhereInput = {};
+    if (range !== 'all') {
+      where.timestampMs = { gte: BigInt(Date.now() - WINDOW_MS[range]) };
+    }
+    if (leader) {
+      where.leaderIdentity = leader;
+    }
+
     const grouped = await this.prisma.mevAttack.groupBy({
       by: ['pool', 'dex'],
-      where: { timestampMs: { gte: sinceMs } },
+      where,
       _count: true,
       _sum: { extractedUsd: true },
       _max: { timestampMs: true },

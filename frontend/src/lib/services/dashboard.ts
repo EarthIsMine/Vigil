@@ -32,16 +32,37 @@ export type PoolLeaderboardRange = '1h' | '24h' | '7d' | 'all';
 export interface PoolLeaderboardOpts extends ApiFetchOpts {
   range?: PoolLeaderboardRange;
   limit?: number;
+  /** When set, scopes to attacks where this validator was the slot leader. */
+  leader?: string;
 }
 
 export const getPoolLeaderboard = (opts: PoolLeaderboardOpts = {}) => {
-  const { range = '24h', limit = 5, revalidate } = opts;
+  const { range = '24h', limit = 5, leader, revalidate } = opts;
+  const params = new URLSearchParams({
+    limit: String(limit),
+    range,
+  });
+  if (leader) params.set('leader', leader);
   return apiFetch<PoolLeaderboardEntry[]>(
-    `/pools/leaderboard?limit=${limit}&range=${range}`,
+    `/pools/leaderboard?${params.toString()}`,
     undefined,
     revalidate !== undefined ? { revalidate } : undefined,
   );
 };
 
-export const getLiveFeed = (limit = 20, opts?: ApiFetchOpts) =>
-  apiFetch<MevAttack[]>(`/attacks/recent?limit=${limit}`, undefined, opts);
+export interface LiveFeedOpts extends ApiFetchOpts {
+  /** When set, scopes to attacks where this validator was the slot leader. */
+  leader?: string;
+}
+
+export const getLiveFeed = (limit = 20, opts?: LiveFeedOpts) => {
+  const params = new URLSearchParams({ limit: String(limit) });
+  if (opts?.leader) params.set('leader', opts.leader);
+  const fetchOpts =
+    opts?.revalidate !== undefined ? { revalidate: opts.revalidate } : undefined;
+  return apiFetch<MevAttack[]>(
+    `/attacks/recent?${params.toString()}`,
+    undefined,
+    fetchOpts,
+  );
+};

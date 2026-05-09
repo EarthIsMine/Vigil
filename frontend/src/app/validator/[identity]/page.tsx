@@ -34,8 +34,8 @@ export default async function ValidatorIdentityPage({
   }
 
   const [poolsR, attacksR] = await Promise.allSettled([
-    getPoolLeaderboard({ revalidate: REVALIDATE_S }),
-    getLiveFeed(50, { revalidate: REVALIDATE_S }),
+    getPoolLeaderboard({ leader: identity, range: 'all', revalidate: REVALIDATE_S }),
+    getLiveFeed(50, { leader: identity, revalidate: REVALIDATE_S }),
   ]);
   const pools: PoolLeaderboardEntry[] =
     poolsR.status === 'fulfilled' ? poolsR.value : [];
