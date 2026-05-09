@@ -56,6 +56,27 @@ export interface MevAttack {
   // attack stream. The receipt-level type below is nullable because a
   // receipt without a parent attack falls back to null.
   lossSource: LossSource;
+  // AMM-replay confidence interval — null when replay didn't enrich
+  // (e.g., Phoenix CLOB, multi-hop Jupiter routes).
+  victimLossSolLower?: number | null;
+  victimLossSolUpper?: number | null;
+  // Structured evidence categories from the detector. Pass-through jsonb;
+  // narrow with type guards when consuming.
+  evidence?: DetectionEvidence | null;
+}
+
+// Detector emits a 5-category evidence taxonomy (Structural / Temporal /
+// Provenance / Economic / Plausibility). Schema is jsonb pass-through; we
+// keep the shape permissive so detector evolution doesn't break the FE.
+export interface DetectionEvidence {
+  ensembleAgreement?: number;
+  signals?: Array<{
+    category?: 'structural' | 'temporal' | 'provenance' | 'economic' | 'plausibility' | string;
+    type?: string;
+    verdict?: 'pass' | 'fail' | 'informational';
+    [key: string]: unknown;
+  }>;
+  [key: string]: unknown;
 }
 
 export type ConfidenceLevel = 'low' | 'medium' | 'high';
@@ -317,6 +338,11 @@ export interface MevReceiptBase {
   bundleProvenance: BundleProvenance | null;
   lossSource: LossSource | null;
   replayTrace: ReplayTrace | null;
+  // AMM-replay confidence interval (SOL). Null when replay didn't enrich.
+  victimLossSolLower?: number | null;
+  victimLossSolUpper?: number | null;
+  // Structured evidence from detector (5-category taxonomy).
+  evidence?: DetectionEvidence | null;
 }
 
 export interface SandwichAttackDetail {
