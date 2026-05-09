@@ -1,5 +1,5 @@
 import { getPoolLeaderboard } from '@/lib/services/dashboard';
-import PoolLeaderboard from '@/components/dashboard/PoolLeaderboard';
+import PoolLeaderboardLive from '@/components/dashboard/PoolLeaderboardLive';
 
 const REVALIDATE_S = 30;
 
@@ -8,7 +8,7 @@ export default async function PoolLeaderboardSection() {
   try {
     pools = await getPoolLeaderboard({ revalidate: REVALIDATE_S });
   } catch {
-    /* empty state */
+    /* empty state — client poller will retry */
   }
-  return <PoolLeaderboard pools={pools} />;
+  return <PoolLeaderboardLive initialPools={pools} />;
 }

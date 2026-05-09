@@ -27,12 +27,21 @@ export const getValidatorLeaderboard = (limit = 5, opts?: ApiFetchOpts) =>
     opts,
   );
 
-export const getPoolLeaderboard = (opts?: ApiFetchOpts) =>
-  apiFetch<PoolLeaderboardEntry[]>(
-    '/pools/leaderboard?limit=5',
+export type PoolLeaderboardRange = '1h' | '24h' | '7d' | 'all';
+
+export interface PoolLeaderboardOpts extends ApiFetchOpts {
+  range?: PoolLeaderboardRange;
+  limit?: number;
+}
+
+export const getPoolLeaderboard = (opts: PoolLeaderboardOpts = {}) => {
+  const { range = '24h', limit = 5, revalidate } = opts;
+  return apiFetch<PoolLeaderboardEntry[]>(
+    `/pools/leaderboard?limit=${limit}&range=${range}`,
     undefined,
-    opts,
+    revalidate !== undefined ? { revalidate } : undefined,
   );
+};
 
 export const getLiveFeed = (limit = 20, opts?: ApiFetchOpts) =>
   apiFetch<MevAttack[]>(`/attacks/recent?limit=${limit}`, undefined, opts);
