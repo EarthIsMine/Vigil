@@ -2,6 +2,7 @@ import { notFound } from 'next/navigation';
 import ValidatorBreadcrumb from '@/components/validator/ValidatorBreadcrumb';
 import ValidatorHeader from '@/components/validator/ValidatorHeader';
 import ValidatorStatCards from '@/components/validator/ValidatorStatCards';
+import EngineEvidence from '@/components/validator/EngineEvidence';
 import ValidatorHeatmapSection from '@/components/validator/ValidatorHeatmapSection';
 import ValidatorAttackDistribution from '@/components/validator/ValidatorAttackDistribution';
 import TelemetryTable from '@/components/validator/TelemetryTable';
@@ -52,6 +53,7 @@ export default async function ValidatorIdentityPage({
           {detailError && <ErrorBanner message="Couldn't load validator" />}
           <ValidatorHeader validator={validator} riskColor={riskColor} />
           <ValidatorStatCards validator={validator} />
+          <EngineEvidence attacks={attacks} />
           <ValidatorHeatmapSection attacks={attacks} />
           <ValidatorAttackDistribution
             attacksByType={validator?.attacksByType ?? {}}

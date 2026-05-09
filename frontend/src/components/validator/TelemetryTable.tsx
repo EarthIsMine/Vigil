@@ -26,6 +26,27 @@ const SEVERITY_DOT: Record<string, string> = {
   info: 'bg-vigil-muted',
 };
 
+const BUNDLE_PILL: Record<string, { label: string; cls: string }> = {
+  atomic:    { label: 'Atomic',    cls: 'bg-error/15 text-error' },
+  spanning:  { label: 'Spanning',  cls: 'bg-warning/15 text-warning' },
+  tip_race:  { label: 'Tip race',  cls: 'bg-yellow-500/15 text-yellow-500' },
+  organic:   { label: 'Organic',   cls: 'bg-vigil-muted/20 text-vigil-muted' },
+};
+
+const DETECTION_LABEL: Record<string, string> = {
+  header: 'Same-block',
+  cross_slot_window: 'Cross-slot',
+  jito_bundle: 'Bundle',
+};
+
+const LOSS_SOURCE_LABEL: Record<string, string> = {
+  amm_replay: 'AMM',
+  whirlpool_replay: 'Whirlpool',
+  dlmm_replay: 'DLMM',
+  pool_amount_out: 'amount_out',
+  unenriched: 'unenriched',
+};
+
 interface Props {
   attacks: MevAttack[];
 }
@@ -51,6 +72,9 @@ export default function TelemetryTable({ attacks }: Props) {
                 <th className="font-normal py-3 pr-6">Type</th>
                 <th className="font-normal py-3 pr-6">Pool</th>
                 <th className="font-normal py-3 pr-6">Victim TX</th>
+                <th className="font-normal py-3 pr-6">Bundle</th>
+                <th className="font-normal py-3 pr-6">Detection</th>
+                <th className="font-normal py-3 pr-6">Replay</th>
                 <th className="font-normal py-3 pr-6 text-right">Loss (SOL)</th>
                 <th className="font-normal py-3 pr-6 text-right">Slot</th>
                 <th className="font-normal py-3 text-center">Severity</th>
@@ -76,6 +100,25 @@ export default function TelemetryTable({ attacks }: Props) {
                   </td>
                   <td className="py-3 pr-6 font-mono text-xs text-primary whitespace-nowrap">
                     {atk.signature.slice(0, 10)}…
+                  </td>
+                  <td className="py-3 pr-6 whitespace-nowrap">
+                    {atk.bundleProvenance ? (
+                      <span
+                        className={`inline-block px-2 py-0.5 rounded text-[10px] font-mono uppercase tracking-wider ${
+                          BUNDLE_PILL[atk.bundleProvenance]?.cls ?? 'bg-vigil-muted/20 text-vigil-muted'
+                        }`}
+                      >
+                        {BUNDLE_PILL[atk.bundleProvenance]?.label ?? atk.bundleProvenance}
+                      </span>
+                    ) : (
+                      <span className="text-vigil-muted text-xs">—</span>
+                    )}
+                  </td>
+                  <td className="py-3 pr-6 whitespace-nowrap text-xs text-vigil-muted">
+                    {atk.detectionMethod ? DETECTION_LABEL[atk.detectionMethod] ?? atk.detectionMethod : '—'}
+                  </td>
+                  <td className="py-3 pr-6 whitespace-nowrap text-xs font-mono text-vigil-muted">
+                    {LOSS_SOURCE_LABEL[atk.lossSource] ?? atk.lossSource}
                   </td>
                   <td className="py-3 pr-6 text-right tabular-nums text-white whitespace-nowrap">
                     {atk.extractedSol != null ? atk.extractedSol.toFixed(4) : '—'}
