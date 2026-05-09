@@ -68,7 +68,9 @@ function categoryBreakdown(evidence: DetectionEvidence | null | undefined) {
   const signals = evidence?.signals;
   if (!Array.isArray(signals) || signals.length === 0) return null;
   const counts = new Map<string, { pass: number; fail: number; info: number }>();
-  for (const s of signals) {
+  for (const raw of signals) {
+    if (!raw || typeof raw !== 'object') continue;
+    const s = raw as { category?: unknown; verdict?: unknown };
     const cat = typeof s.category === 'string' ? s.category : 'other';
     const verdict = s.verdict;
     const bucket = counts.get(cat) ?? { pass: 0, fail: 0, info: 0 };
