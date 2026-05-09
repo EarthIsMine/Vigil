@@ -14,6 +14,13 @@ interface ClusterNode {
   version: string | null;
 }
 
+interface StakewizValidator {
+  identity: string;
+  name: string | null;
+}
+
+const STAKEWIZ_VALIDATORS_URL = 'https://api.stakewiz.com/validators';
+
 interface EpochInfo {
   epoch: number;
   slotIndex: number;     // 0-based offset within current epoch
@@ -59,11 +66,12 @@ export class ValidatorMetaService implements OnModuleInit, OnModuleDestroy {
     const identitySet = new Set(knownValidators.map((v) => v.identity));
 
     try {
-      const [voteAccounts, clusterNodes] = await Promise.all([
+      const [voteAccounts, clusterNodes, nameMap] = await Promise.all([
         this.rpcCall<{ current: VoteAccountInfo[]; delinquent: VoteAccountInfo[] }>(
           rpcUrl, 'getVoteAccounts',
         ),
         this.rpcCall<ClusterNode[]>(rpcUrl, 'getClusterNodes'),
+        this.fetchValidatorNames(identitySet),
       ]);
 
       // identity → vote account info 매핑
@@ -91,8 +99,9 @@ export class ValidatorMetaService implements OnModuleInit, OnModuleDestroy {
       for (const identity of identitySet) {
         const va = voteMap.get(identity);
         const client = clientMap.get(identity);
+        const name = nameMap.get(identity);
 
-        if (!va && !client) continue;
+        if (!va && !client && !name) continue;
 
         const earliestEpoch = va?.epochCredits?.length
           ? va.epochCredits[0][0]
@@ -108,17 +117,43 @@ export class ValidatorMetaService implements OnModuleInit, OnModuleDestroy {
               ...(earliestEpoch !== undefined && { activeSinceEpoch: earliestEpoch }),
             }),
             ...(client && { client }),
+            ...(name && { name }),
           },
         });
         updated++;
       }
 
-      this.logger.log(`Updated ${updated} validator metadata from RPC`);
+      this.logger.log(
+        `Updated ${updated} validator metadata from RPC + Stakewiz (named: ${nameMap.size})`,
+      );
 
       await this.refreshLeaderSlots(rpcUrl, identitySet);
     } catch (err) {
       this.logger.warn(`Validator metadata refresh failed: ${(err as Error).message}`);
     }
+  }
+
+  /**
+   * Fetch validator display names from Stakewiz. The endpoint returns the full
+   * mainnet validator set; we filter to identities we already track. Failure
+   * is non-fatal — names just stay as whatever's in the DB.
+   */
+  private async fetchValidatorNames(identitySet: Set<string>): Promise<Map<string, string>> {
+    const map = new Map<string, string>();
+    try {
+      const res = await fetch(STAKEWIZ_VALIDATORS_URL);
+      if (!res.ok) return map;
+      const list = (await res.json()) as StakewizValidator[];
+      for (const v of list) {
+        if (identitySet.has(v.identity) && v.name) {
+          const trimmed = v.name.trim();
+          if (trimmed) map.set(v.identity, trimmed);
+        }
+      }
+    } catch (err) {
+      this.logger.warn(`Stakewiz name fetch failed: ${(err as Error).message}`);
+    }
+    return map;
   }
 
   /**
