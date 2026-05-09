@@ -53,6 +53,28 @@ export default function EngineEvidence({ attacks }: Props) {
   }
   const sourceEntries = Object.entries(sourceCounts).sort((a, b) => b[1] - a[1]);
 
+  // Aggregate AMM-replay confidence interval. Each enriched attack carries
+  // lower/upper bounds; sum them to get a band around the point estimate.
+  // Attacks without bounds (CLOB, multi-hop) are excluded — surfaced
+  // separately as the coverage ratio.
+  let pointSum = 0;
+  let lowerSum = 0;
+  let upperSum = 0;
+  let withBounds = 0;
+  for (const a of attacks) {
+    if (
+      typeof a.victimLossSolLower === 'number' &&
+      typeof a.victimLossSolUpper === 'number' &&
+      a.extractedSol != null
+    ) {
+      pointSum += a.extractedSol;
+      lowerSum += a.victimLossSolLower;
+      upperSum += a.victimLossSolUpper;
+      withBounds += 1;
+    }
+  }
+  const hasBoundedLoss = withBounds > 0;
+
   return (
     <section className="mb-14 fade-up fade-up-d3">
       <div className="mb-6">
@@ -91,6 +113,26 @@ export default function EngineEvidence({ attacks }: Props) {
           tone={counterfactualFlips > 0 ? 'warning' : 'muted'}
         />
       </div>
+
+      {hasBoundedLoss && (
+        <div className="mb-6 p-4 rounded-lg border border-outline/20 bg-surface">
+          <p className="text-xs uppercase tracking-widest text-muted font-mono mb-2">
+            Replay-derived loss
+          </p>
+          <p className="font-display text-2xl font-bold text-on-surf tabular-nums mb-1">
+            {pointSum.toFixed(3)}
+            <span className="text-sm text-muted font-normal ml-1.5">SOL</span>
+          </p>
+          <p className="text-xs text-muted font-mono mb-2 tabular-nums">
+            interval [{lowerSum.toFixed(3)} – {upperSum.toFixed(3)}] SOL
+          </p>
+          <p className="text-[11px] text-muted leading-relaxed">
+            Sum across {withBounds} of {total} attacks where AMM replay returned
+            per-step parser/model residual bounds. The remaining{' '}
+            {total - withBounds} fell back to point estimates.
+          </p>
+        </div>
+      )}
 
       <div>
         <p className="text-xs uppercase tracking-widest text-muted font-mono mb-3">
