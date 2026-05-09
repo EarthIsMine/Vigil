@@ -2,26 +2,39 @@
 
 import { useState, useEffect } from 'react';
 
-export function useActiveSection(sectionIds: readonly string[], rootMargin = '-20% 0px -75%'): string {
+export function useActiveSection(sectionIds: readonly string[]): string {
   const [activeSection, setActiveSection] = useState(sectionIds[0] ?? '');
 
   useEffect(() => {
-    const els = sectionIds
-      .map((id) => document.getElementById(id))
-      .filter(Boolean) as HTMLElement[];
+    if (sectionIds.length === 0) return;
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) setActiveSection(entry.target.id);
-        });
-      },
-      { rootMargin }
-    );
+    const compute = () => {
+      const doc = document.documentElement;
+      const atBottom = window.innerHeight + window.scrollY >= doc.scrollHeight - 4;
+      if (atBottom) {
+        setActiveSection(sectionIds[sectionIds.length - 1] ?? '');
+        return;
+      }
+      const activationY = window.innerHeight * 0.25;
+      let current = sectionIds[0] ?? '';
+      for (const id of sectionIds) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        const top = el.getBoundingClientRect().top;
+        if (top <= activationY) current = id;
+        else break;
+      }
+      setActiveSection(current);
+    };
 
-    els.forEach((el) => observer.observe(el));
-    return () => els.forEach((el) => observer.unobserve(el));
-  }, [sectionIds, rootMargin]);
+    compute();
+    window.addEventListener('scroll', compute, { passive: true });
+    window.addEventListener('resize', compute);
+    return () => {
+      window.removeEventListener('scroll', compute);
+      window.removeEventListener('resize', compute);
+    };
+  }, [sectionIds]);
 
   return activeSection;
 }
