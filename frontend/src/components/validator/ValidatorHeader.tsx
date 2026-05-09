@@ -1,4 +1,5 @@
 import type { ValidatorDetail } from '@/lib/types';
+import CopyAddressButton from '@/components/shared/CopyAddressButton';
 
 interface ValidatorHeaderProps {
   validator: ValidatorDetail | null;
@@ -29,8 +30,14 @@ export default function ValidatorHeader({ validator, riskColor }: ValidatorHeade
     <header className="mb-12 fade-up fade-up-d1">
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-6 mb-6">
         <div className="min-w-0">
-          <p className="text-sm text-vigil-muted mb-2 font-mono" title={validator.identity}>
-            {validator.identity.slice(0, 8)}…{validator.identity.slice(-4)}
+          <p
+            className="text-sm text-vigil-muted mb-2 font-mono inline-flex items-center gap-1.5"
+            title={validator.identity}
+          >
+            <span>
+              {validator.identity.slice(0, 8)}…{validator.identity.slice(-4)}
+            </span>
+            <CopyAddressButton address={validator.identity} iconClassName="text-xs" />
           </p>
           <h1 className="font-display font-bold text-4xl md:text-5xl tracking-tight text-white truncate">
             {validator.name}
@@ -62,12 +69,15 @@ export default function ValidatorHeader({ validator, riskColor }: ValidatorHeade
         <Datum label="Commission" value={`${validator.commission}%`} />
         <Datum label="Active since" value={`Epoch ${validator.activeSinceEpoch}`} />
         {validator.voteAccount && (
-          <Datum
-            label="Vote account"
-            value={`${validator.voteAccount.slice(0, 8)}…${validator.voteAccount.slice(-4)}`}
-            mono
-            title={validator.voteAccount}
-          />
+          <div className="flex items-baseline gap-2">
+            <dt>Vote account</dt>
+            <dd className="text-white font-mono inline-flex items-center gap-1.5" title={validator.voteAccount}>
+              <span>
+                {validator.voteAccount.slice(0, 8)}…{validator.voteAccount.slice(-4)}
+              </span>
+              <CopyAddressButton address={validator.voteAccount} iconClassName="text-xs" />
+            </dd>
+          </div>
         )}
       </dl>
     </header>

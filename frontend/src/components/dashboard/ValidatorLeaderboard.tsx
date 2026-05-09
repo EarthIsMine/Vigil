@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import type { ValidatorLeaderboardEntry } from '@/lib/types';
+import CopyAddressButton from '@/components/shared/CopyAddressButton';
 
 const RISK_TEXT: Record<string, string> = {
   critical: 'text-error',
@@ -51,11 +52,14 @@ export default function ValidatorLeaderboard({ validators }: { validators: Valid
                     <p className="text-sm text-white truncate group-hover:text-primary transition-colors">
                       {v.name}
                     </p>
-                    <p className="text-xs text-vigil-muted truncate font-mono">
-                      {v.identity.length > 14
-                        ? `${v.identity.slice(0, 6)}…${v.identity.slice(-4)}`
-                        : v.identity}
-                    </p>
+                    <div className="flex items-center gap-1.5 min-w-0">
+                      <p className="text-xs text-vigil-muted truncate font-mono" title={v.identity}>
+                        {v.identity.length > 14
+                          ? `${v.identity.slice(0, 6)}…${v.identity.slice(-4)}`
+                          : v.identity}
+                      </p>
+                      <CopyAddressButton address={v.identity} iconClassName="text-xs" />
+                    </div>
                   </div>
                   <span className={`text-xs ${riskCls} text-right`}>
                     {RISK_LABEL[v.riskLevel] ?? v.riskLevel}
