@@ -134,6 +134,9 @@ export default function ReceiptDetailCard({ result, featuredReceipt, featuredSan
               detectionMethod={featuredReceipt?.detectionMethod ?? null}
               bundleProvenance={featuredReceipt?.bundleProvenance ?? null}
               lossSource={featuredReceipt?.lossSource ?? null}
+              victimLossSolLower={featuredReceipt?.victimLossSolLower ?? null}
+              victimLossSolUpper={featuredReceipt?.victimLossSolUpper ?? null}
+              evidence={featuredReceipt?.evidence ?? null}
             />
           </div>
 
