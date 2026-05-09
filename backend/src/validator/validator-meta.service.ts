@@ -140,8 +140,10 @@ export class ValidatorMetaService implements OnModuleInit, OnModuleDestroy {
    */
   private async fetchValidatorNames(identitySet: Set<string>): Promise<Map<string, string>> {
     const map = new Map<string, string>();
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10_000);
     try {
-      const res = await fetch(STAKEWIZ_VALIDATORS_URL);
+      const res = await fetch(STAKEWIZ_VALIDATORS_URL, { signal: controller.signal });
       if (!res.ok) return map;
       const list = (await res.json()) as StakewizValidator[];
       for (const v of list) {
@@ -151,7 +153,10 @@ export class ValidatorMetaService implements OnModuleInit, OnModuleDestroy {
         }
       }
     } catch (err) {
-      this.logger.warn(`Stakewiz name fetch failed: ${(err as Error).message}`);
+      const message = err instanceof Error ? err.message : String(err);
+      this.logger.warn(`Stakewiz name fetch failed: ${message}`);
+    } finally {
+      clearTimeout(timeoutId);
     }
     return map;
   }
