@@ -10,6 +10,12 @@ import {
 } from '@/app/api-docs/constants';
 import { DOCS } from '@/app/api-docs/content';
 import { useDocs } from '@/app/api-docs/DocsContext';
+import { docsAnchorId } from './DocumentationContent';
+
+function scrollToAnchor(id: string) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
 
 const METHOD_PILL_COLORS: Record<EndpointMethod, string> = {
   GET: 'bg-secondary/15 text-secondary',
@@ -40,9 +46,7 @@ export default function DocsSidebar() {
     lang,
     activeTab,
     activeDocPage,
-    setActiveDocPage,
     activeApiPage,
-    setActiveApiPage,
   } = useDocs();
   const q = searchQuery.trim().toLowerCase();
 
@@ -90,8 +94,9 @@ export default function DocsSidebar() {
                       key={pageId}
                       type="button"
                       onClick={() => {
-                        setActiveDocPage(pageId);
-                        window.scrollTo({ top: 0 });
+                        // All doc-tab content is stacked in one page — every
+                        // sidebar item is a scroll target. Spy updates the URL.
+                        scrollToAnchor(docsAnchorId(group.groupKey, item.id));
                       }}
                       className={`w-full text-left flex items-center gap-2 text-sm px-3 py-2 rounded transition-colors ${
                         isActive
@@ -148,8 +153,9 @@ export default function DocsSidebar() {
                     key={item.id}
                     type="button"
                     onClick={() => {
-                      setActiveApiPage(item.id);
-                      window.scrollTo({ top: 0 });
+                      // All API sections are stacked — scroll to the anchor.
+                      // Spy updates the URL once it lands.
+                      scrollToAnchor(item.id);
                     }}
                     className={`w-full text-left flex items-center gap-2.5 text-sm px-3 py-2 rounded-md transition-colors ${
                       isActive

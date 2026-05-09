@@ -1,18 +1,15 @@
 'use client';
 
-import { use, useEffect, useState, useCallback } from 'react';
-import { useRouter } from 'next/navigation';
-import { parseDocPageId, isMarkdownGroup } from '../constants';
+import { use, useEffect, useMemo, useState, useCallback } from 'react';
 import { DocsProvider, type Theme, type DocsTab } from '../DocsContext';
 import type { Lang } from '../i18n';
-import { parseUrl, buildUrl } from '../urlMapping';
+import { parseUrl, buildUrl, type DocsRoute } from '../urlMapping';
 import DocsHeader from '@/components/api-docs/DocsHeader';
 import DocsTabs from '@/components/api-docs/DocsTabs';
 import DocsSidebar from '@/components/api-docs/DocsSidebar';
 import DocsRightToc from '@/components/api-docs/DocsRightToc';
 import DocsContent from '@/components/api-docs/DocsContent';
-import DocSectionView from '@/components/api-docs/DocSectionView';
-import GettingStartedView from '@/components/api-docs/GettingStartedView';
+import DocumentationContent from '@/components/api-docs/DocumentationContent';
 import { THEME_KEY, applyThemeClass, readStoredTheme } from '@/lib/theme';
 
 const LANG_KEY = 'vigil-docs-lang';
@@ -25,8 +22,18 @@ function readStored<T extends string>(key: string, allowed: readonly T[], fallba
 
 export default function ApiDocsPage({ params }: { params: Promise<{ slug?: string[] }> }) {
   const { slug } = use(params);
-  const route = parseUrl(slug);
-  const router = useRouter();
+  // The route is parsed from URL on mount; in-page navigation (sidebar click,
+  // scroll-spy URL sync) updates `route` via local state and writes the URL
+  // through history.replaceState — bypassing Next's router avoids the implicit
+  // scroll-to-top some App Router transitions trigger on catch-all segments.
+  const initialRoute = useMemo(() => parseUrl(slug), [slug]);
+  const [route, setRoute] = useState<DocsRoute>(initialRoute);
+
+  // External URL changes (browser back/forward) drop a new params Promise → new
+  // slug. Re-derive and overwrite local state so the UI reflects the URL.
+  useEffect(() => {
+    setRoute(parseUrl(slug));
+  }, [slug]);
 
   const [theme, setTheme] = useState<Theme>(readStoredTheme);
   const [lang, setLangState] = useState<Lang>(() => readStored(LANG_KEY, ['en', 'ko'] as const, 'en'));
@@ -50,15 +57,27 @@ export default function ApiDocsPage({ params }: { params: Promise<{ slug?: strin
   };
 
   const navigate = useCallback(
-    (next: Partial<{ activeTab: DocsTab; activeApiPage: string; activeDocPage: string }>) => {
-      const url = buildUrl({ ...route, ...next });
-      router.replace(url, { scroll: false });
-      window.scrollTo({ top: 0 });
+    (
+      next: Partial<DocsRoute>,
+      opts?: { scrollTop?: boolean },
+    ) => {
+      setRoute((prev) => {
+        const merged = { ...prev, ...next };
+        if (typeof window !== 'undefined') {
+          window.history.replaceState(null, '', buildUrl(merged));
+        }
+        return merged;
+      });
+      if (opts?.scrollTop) window.scrollTo({ top: 0 });
     },
-    [route, router]
+    [],
   );
 
-  const setActiveTab = useCallback((tab: DocsTab) => navigate({ activeTab: tab }), [navigate]);
+  // Tab change resets to top — sections within a tab handle their own anchoring.
+  const setActiveTab = useCallback(
+    (tab: DocsTab) => navigate({ activeTab: tab }, { scrollTop: true }),
+    [navigate],
+  );
   const setActiveApiPage = useCallback(
     (id: string) => navigate({ activeTab: 'api-reference', activeApiPage: id }),
     [navigate]
@@ -95,13 +114,9 @@ export default function ApiDocsPage({ params }: { params: Promise<{ slug?: strin
               <div className="max-w-3xl mx-auto px-6 py-12 lg:px-10">
                 {route.activeTab === 'api-reference' ? (
                   <DocsContent />
-                ) : (() => {
-                  const parsed = parseDocPageId(route.activeDocPage);
-                  if (parsed && isMarkdownGroup(parsed.group)) {
-                    return <DocSectionView pageId={route.activeDocPage} />;
-                  }
-                  return <GettingStartedView pageId={route.activeDocPage} />;
-                })()}
+                ) : (
+                  <DocumentationContent />
+                )}
               </div>
             </main>
             <DocsRightToc />

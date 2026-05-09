@@ -7,18 +7,22 @@ import { useDocs } from '@/app/api-docs/DocsContext';
 import { extractHeadings } from '@/lib/extractHeadings';
 import { useActiveSection } from '@/hooks/useActiveSection';
 
-// API Reference: hardcoded sub-anchors per section.
-// Empty arrays mean the section has no useful sub-headings — TOC will hide.
+// API Reference: hardcoded sub-anchors per section. IDs are namespaced per
+// section because all sections share one stacked layout — bare ids like
+// "response-fields" would collide between mev-receipt and protection-status.
+// Format: `${sectionId}--${sub}` (matches apiSubId in DocsContent).
 const API_SECTION_SUBHEADINGS: Record<string, { id: string; label: { en: string; ko: string } }[]> = {
   introduction: [],
   authentication: [],
-  'send-transaction': [{ id: 'parameters', label: { en: 'Parameters', ko: '파라미터' } }],
+  'send-transaction': [
+    { id: 'send-transaction--parameters', label: { en: 'Parameters', ko: '파라미터' } },
+  ],
   'mev-receipt': [
-    { id: 'path-parameters', label: { en: 'Path Parameters', ko: '경로 파라미터' } },
-    { id: 'response-fields', label: { en: 'Response Fields', ko: '응답 필드' } },
+    { id: 'mev-receipt--path-parameters', label: { en: 'Path Parameters', ko: '경로 파라미터' } },
+    { id: 'mev-receipt--response-fields', label: { en: 'Response Fields', ko: '응답 필드' } },
   ],
   'protection-status': [
-    { id: 'response-fields', label: { en: 'Response Fields', ko: '응답 필드' } },
+    { id: 'protection-status--response-fields', label: { en: 'Response Fields', ko: '응답 필드' } },
   ],
   'rate-limits': [],
   settings: [],

@@ -1,16 +1,31 @@
 'use client';
 
 import Link from 'next/link';
+import { useEffect, useMemo, useRef } from 'react';
 import ParamRow from './ParamRow';
 import MethodBadge from './MethodBadge';
 import CodeBlock from './CodeBlock';
-import { TS_EXAMPLE, SEND_RESPONSE, RECEIPT_RESPONSE, RATE_LIMITS } from '@/app/api-docs/constants';
+import {
+  TS_EXAMPLE,
+  SEND_RESPONSE,
+  RECEIPT_RESPONSE,
+  RATE_LIMITS,
+  NAV_SECTIONS,
+} from '@/app/api-docs/constants';
 import { useDocs } from '@/app/api-docs/DocsContext';
+import { useDocsScrollSpy } from '@/hooks/useDocsScrollSpy';
+
+const SECTION_ORDER: readonly string[] = NAV_SECTIONS.flatMap((g) =>
+  g.items.map((i) => i.id),
+);
+
+// Per-section sub-anchor IDs are prefixed to avoid collisions in stacked layout.
+export const apiSubId = (sectionId: string, sub: string) => `${sectionId}--${sub}`;
 
 function IntroductionSection() {
   const { t } = useDocs();
   return (
-    <section className="fade-up">
+    <>
       <p className="text-xs uppercase tracking-widest text-muted font-mono mb-3">
         {t.content.breadcrumb}
       </p>
@@ -57,14 +72,14 @@ function IntroductionSection() {
           {t.content.baseUrl}: <code className="font-mono text-primary">https://api.vigil.sh/v1</code>
         </span>
       </div>
-    </section>
+    </>
   );
 }
 
 function AuthenticationSection() {
   const { t } = useDocs();
   return (
-    <section className="fade-up">
+    <>
       <div className="flex items-center gap-2 mb-4">
         <span className="material-symbols-outlined text-primary">lock</span>
         <h1 className="font-display font-bold text-3xl text-on-surf">
@@ -98,14 +113,14 @@ function AuthenticationSection() {
         <span className="material-symbols-outlined text-base mt-0.5">warning</span>
         <span>{t.content.authentication.warning}</span>
       </div>
-    </section>
+    </>
   );
 }
 
 function SendTransactionSection() {
   const { t } = useDocs();
   return (
-    <section className="fade-up">
+    <>
       <div className="flex items-center gap-3 mb-4">
         <MethodBadge method="POST" />
         <h1 className="font-display font-bold text-3xl text-on-surf">
@@ -117,7 +132,10 @@ function SendTransactionSection() {
         POST /v1/tx/send
       </div>
 
-      <h3 id="parameters" className="font-display font-semibold text-on-surf text-base mb-3 scroll-mt-32">
+      <h3
+        id={apiSubId('send-transaction', 'parameters')}
+        className="font-display font-semibold text-on-surf text-base mb-3 scroll-mt-32"
+      >
         {t.content.parameters}
       </h3>
       <div className="bg-surface mb-6 divide-y divide-outline/10">
@@ -142,14 +160,14 @@ function SendTransactionSection() {
         <CodeBlock lang="ts" label={t.content.sendTransaction.codeLabelTs} color="secondary">{TS_EXAMPLE}</CodeBlock>
         <CodeBlock lang="json" label={t.content.sendTransaction.codeLabel200} color="secondary">{SEND_RESPONSE}</CodeBlock>
       </div>
-    </section>
+    </>
   );
 }
 
 function MevReceiptSection() {
   const { t } = useDocs();
   return (
-    <section className="fade-up">
+    <>
       <div className="flex items-center gap-3 mb-4">
         <MethodBadge method="GET" />
         <h1 className="font-display font-bold text-3xl text-on-surf">
@@ -161,7 +179,10 @@ function MevReceiptSection() {
         GET /v1/tx/<span className="text-secondary">{'{hash}'}</span>/receipt
       </div>
 
-      <h3 id="path-parameters" className="font-display font-semibold text-on-surf text-base mb-3 scroll-mt-32">
+      <h3
+        id={apiSubId('mev-receipt', 'path-parameters')}
+        className="font-display font-semibold text-on-surf text-base mb-3 scroll-mt-32"
+      >
         {t.content.pathParameters}
       </h3>
       <div className="bg-surface mb-6">
@@ -170,7 +191,10 @@ function MevReceiptSection() {
         </ParamRow>
       </div>
 
-      <h3 id="response-fields" className="font-display font-semibold text-on-surf text-base mb-3 scroll-mt-32">
+      <h3
+        id={apiSubId('mev-receipt', 'response-fields')}
+        className="font-display font-semibold text-on-surf text-base mb-3 scroll-mt-32"
+      >
         {t.content.responseFields}
       </h3>
       <div className="bg-surface divide-y divide-outline/10 mb-6">
@@ -193,14 +217,14 @@ function MevReceiptSection() {
       <div className="mt-6">
         <CodeBlock lang="json" label={t.content.receipt.codeLabel} color="primary">{RECEIPT_RESPONSE}</CodeBlock>
       </div>
-    </section>
+    </>
   );
 }
 
 function ProtectionStatusSection() {
   const { t } = useDocs();
   return (
-    <section className="fade-up">
+    <>
       <div className="flex items-center gap-3 mb-4">
         <MethodBadge method="GET" />
         <h1 className="font-display font-bold text-3xl text-on-surf">
@@ -212,7 +236,10 @@ function ProtectionStatusSection() {
         GET /v1/protection/status
       </div>
 
-      <h3 id="response-fields" className="font-display font-semibold text-on-surf text-base mb-3 scroll-mt-32">
+      <h3
+        id={apiSubId('protection-status', 'response-fields')}
+        className="font-display font-semibold text-on-surf text-base mb-3 scroll-mt-32"
+      >
         {t.content.responseFields}
       </h3>
       <div className="bg-surface divide-y divide-outline/10">
@@ -231,14 +258,14 @@ function ProtectionStatusSection() {
           {t.content.protectionStatus.routesDesc}
         </ParamRow>
       </div>
-    </section>
+    </>
   );
 }
 
 function RateLimitsSection() {
   const { t } = useDocs();
   return (
-    <section className="fade-up">
+    <>
       <div className="flex items-center gap-2 mb-4">
         <span className="material-symbols-outlined text-primary">speed</span>
         <h1 className="font-display font-bold text-3xl text-on-surf">
@@ -272,14 +299,14 @@ function RateLimitsSection() {
           </tbody>
         </table>
       </div>
-    </section>
+    </>
   );
 }
 
 function SettingsSection() {
   const { t } = useDocs();
   return (
-    <section className="fade-up">
+    <>
       <div className="flex items-center gap-2 mb-4">
         <span className="material-symbols-outlined text-primary">settings</span>
         <h1 className="font-display font-bold text-3xl text-on-surf">
@@ -293,7 +320,7 @@ function SettingsSection() {
         </Link>
         {t.content.settings.bodyEnd}
       </p>
-    </section>
+    </>
   );
 }
 
@@ -308,7 +335,55 @@ const SECTION_RENDERERS: Record<string, () => React.JSX.Element> = {
 };
 
 export default function DocsContent() {
-  const { activeApiPage } = useDocs();
-  const Renderer = SECTION_RENDERERS[activeApiPage] ?? SECTION_RENDERERS.introduction;
-  return <Renderer />;
+  const { activeApiPage, setActiveApiPage } = useDocs();
+  const lastSpySetRef = useRef<string | null>(null);
+  const initialScrollDoneRef = useRef(false);
+  const spyPausedRef = useRef(false);
+
+  const sectionIds = useMemo(() => SECTION_ORDER, []);
+
+  // Scroll to the active anchor on initial mount and on external URL changes
+  // (browser back/forward, sidebar click outside this view). When the URL
+  // changed because of our own scroll spy, skip — the user is already there.
+  // Pause the spy while the programmatic scroll is in flight so transient
+  // intersection events don't overwrite the target URL.
+  useEffect(() => {
+    if (lastSpySetRef.current === activeApiPage) return;
+    const el = document.getElementById(activeApiPage);
+    if (!el) return;
+    const behavior: ScrollBehavior = initialScrollDoneRef.current ? 'smooth' : 'auto';
+    spyPausedRef.current = true;
+    el.scrollIntoView({ behavior, block: 'start' });
+    initialScrollDoneRef.current = true;
+    const tid = window.setTimeout(() => {
+      spyPausedRef.current = false;
+    }, 700);
+    return () => window.clearTimeout(tid);
+  }, [activeApiPage]);
+
+  useDocsScrollSpy(sectionIds, (id) => {
+    if (spyPausedRef.current) return;
+    if (id === activeApiPage) return;
+    lastSpySetRef.current = id;
+    setActiveApiPage(id);
+  });
+
+  return (
+    <div>
+      {sectionIds.map((id) => {
+        const Renderer = SECTION_RENDERERS[id];
+        if (!Renderer) return null;
+        return (
+          <section
+            key={id}
+            id={id}
+            className="fade-up scroll-mt-24 pt-4 pb-16"
+            data-docs-section={id}
+          >
+            <Renderer />
+          </section>
+        );
+      })}
+    </div>
+  );
 }

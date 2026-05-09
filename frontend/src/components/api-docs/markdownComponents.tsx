@@ -1,15 +1,6 @@
-'use client';
-
-import ReactMarkdown from 'react-markdown';
-import remarkGfm from 'remark-gfm';
-import rehypeRaw from 'rehype-raw';
-import rehypeSlug from 'rehype-slug';
 import type { Components } from 'react-markdown';
-import { DOCS } from '@/app/api-docs/content';
-import { parseDocPageId, isMarkdownGroup } from '@/app/api-docs/constants';
-import { useDocs } from '@/app/api-docs/DocsContext';
 
-const COMPONENTS: Components = {
+export const MARKDOWN_COMPONENTS: Components = {
   h1: ({ children, ...props }) => (
     <h1 {...props} className="font-display font-bold text-4xl text-on-surf mt-2 mb-4 scroll-mt-32">
       {children}
@@ -135,7 +126,7 @@ const COMPONENTS: Components = {
   hr: ({ ...props }) => <hr {...props} className="my-10 border-t border-outline/15" />,
   img: ({ alt, src, ...props }) => {
     if (!src || typeof src !== 'string') return null;
-    if (src.includes('shields.io')) return null; // belt-and-suspenders: badges shouldn't render
+    if (src.includes('shields.io')) return null;
     return (
       // eslint-disable-next-line @next/next/no-img-element
       <img {...props} alt={alt ?? ''} src={src} className="inline-block max-w-full rounded" />
@@ -147,44 +138,3 @@ const COMPONENTS: Components = {
     </strong>
   ),
 };
-
-export default function DocSectionView({ pageId }: { pageId: string }) {
-  const { lang, t } = useDocs();
-  const parsed = parseDocPageId(pageId);
-
-  if (!parsed || !isMarkdownGroup(parsed.group)) {
-    return <div className="text-error text-sm py-12">Invalid page id: {pageId}</div>;
-  }
-
-  const doc = DOCS[parsed.group][lang];
-  const allSections = [doc.intro, ...doc.sections];
-  const section = allSections.find((s) => s.id === parsed.section);
-
-  if (!section) {
-    return (
-      <div className="text-muted text-sm py-12">
-        {lang === 'ko' ? '섹션을 찾을 수 없습니다.' : 'Section not found.'}
-      </div>
-    );
-  }
-
-  const groupLabel = t.sidebar.docGroups[parsed.group];
-
-  return (
-    <article>
-      <p className="text-xs uppercase tracking-widest text-muted font-mono mb-3">
-        {groupLabel}
-      </p>
-      <h1 className="font-display font-bold text-4xl text-on-surf mt-1 mb-8 pb-4 border-b border-outline/15">
-        {section.title}
-      </h1>
-      <ReactMarkdown
-        remarkPlugins={[remarkGfm]}
-        rehypePlugins={[rehypeRaw, rehypeSlug]}
-        components={COMPONENTS}
-      >
-        {section.body}
-      </ReactMarkdown>
-    </article>
-  );
-}
