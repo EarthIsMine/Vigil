@@ -14,6 +14,17 @@ interface ClusterNode {
   version: string | null;
 }
 
+interface EpochInfo {
+  epoch: number;
+  slotIndex: number;     // 0-based offset within current epoch
+  slotsInEpoch: number;
+  absoluteSlot: number;
+}
+
+// getLeaderSchedule returns { [identity]: number[] } where the numbers are
+// 0-based slot offsets within the queried epoch.
+type LeaderSchedule = Record<string, number[]>;
+
 @Injectable()
 export class ValidatorMetaService implements OnModuleInit, OnModuleDestroy {
   private readonly logger = new Logger(ValidatorMetaService.name);
@@ -103,8 +114,81 @@ export class ValidatorMetaService implements OnModuleInit, OnModuleDestroy {
       }
 
       this.logger.log(`Updated ${updated} validator metadata from RPC`);
+
+      await this.refreshLeaderSlots(rpcUrl, identitySet);
     } catch (err) {
       this.logger.warn(`Validator metadata refresh failed: ${(err as Error).message}`);
+    }
+  }
+
+  /**
+   * Update each validator's `leaderSlotsObserved` based on the Solana leader
+   * schedule. We snapshot the current epoch's progress (slots assigned that
+   * have already been completed) and persist it under
+   * `leaderSlotsByEpoch[epoch]`. The cumulative running total across all
+   * recorded epochs is kept in `leaderSlotsObserved`.
+   *
+   * - For the in-progress epoch, the count grows on each refresh as more
+   *   leader slots complete.
+   * - When the chain rolls over to the next epoch, the previous epoch's
+   *   final count stays frozen and the new epoch starts at 0.
+   * - We only count completed slots (slot offset <= current slotIndex) so
+   *   the denominator never claims slots that haven't happened yet.
+   */
+  private async refreshLeaderSlots(rpcUrl: string, identitySet: Set<string>) {
+    try {
+      const epochInfo = await this.rpcCall<EpochInfo>(rpcUrl, 'getEpochInfo');
+      if (!epochInfo) return;
+
+      const { epoch, slotIndex, absoluteSlot } = epochInfo;
+      const epochFirstSlot = absoluteSlot - slotIndex;
+
+      // getLeaderSchedule(slotInEpoch) → schedule for the epoch that contains that slot
+      const schedule = await this.rpcCall<LeaderSchedule>(rpcUrl, 'getLeaderSchedule', [
+        epochFirstSlot,
+      ]);
+      if (!schedule) return;
+
+      const validators = await this.prisma.validatorStats.findMany({
+        where: { identity: { in: [...identitySet] } },
+        select: { identity: true, leaderSlotsByEpoch: true },
+      });
+
+      let updated = 0;
+      for (const v of validators) {
+        const offsets = schedule[v.identity];
+        if (!offsets || offsets.length === 0) continue;
+
+        // Count how many of this validator's assigned slots have already
+        // happened (offset <= slotIndex).
+        let completedThisEpoch = 0;
+        for (const off of offsets) {
+          if (off <= slotIndex) completedThisEpoch++;
+        }
+
+        const byEpochRaw = (v.leaderSlotsByEpoch ?? {}) as Record<string, number>;
+        const byEpoch: Record<string, number> = { ...byEpochRaw };
+
+        if (byEpoch[String(epoch)] === completedThisEpoch) continue; // no change
+
+        byEpoch[String(epoch)] = completedThisEpoch;
+        const total = Object.values(byEpoch).reduce((a, b) => a + b, 0);
+
+        await this.prisma.validatorStats.update({
+          where: { identity: v.identity },
+          data: {
+            leaderSlotsByEpoch: byEpoch,
+            leaderSlotsObserved: BigInt(total),
+          },
+        });
+        updated++;
+      }
+
+      this.logger.log(
+        `Refreshed leader slots (epoch ${epoch}, slotIndex ${slotIndex}) for ${updated} validators`,
+      );
+    } catch (err) {
+      this.logger.warn(`Leader-slot refresh failed: ${(err as Error).message}`);
     }
   }
 

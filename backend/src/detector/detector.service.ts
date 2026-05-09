@@ -174,23 +174,21 @@ export class DetectorService implements OnModuleInit, OnModuleDestroy {
           }
         }
 
-        // Upsert validator stats
+        // Upsert validator stats. Note: slot-level counters (totalSlotsSeen,
+        // slotsWithSandwich, slotsWithWideSandwich) are no longer maintained
+        // here. The validator service now derives those from MevAttack rows
+        // (distinct slots) divided by leaderSlotsObserved (populated by
+        // ValidatorMetaService from getLeaderSchedule).
         if (attack.slot_leader) {
           const loss = attack.victim_loss_lamports;
           await tx.validatorStats.upsert({
             where: { identity: attack.slot_leader },
             create: {
               identity: attack.slot_leader,
-              totalSlotsSeen: 1,
-              slotsWithSandwich: attack.attack_type !== 'backrun' ? 1 : 0,
-              slotsWithWideSandwich: attack.is_wide_sandwich ? 1 : 0,
               totalExtractedLamports: loss ?? 0,
               totalAttacksInSlots: 1,
             },
             update: {
-              totalSlotsSeen: { increment: 1 },
-              slotsWithSandwich: { increment: attack.attack_type !== 'backrun' ? 1 : 0 },
-              slotsWithWideSandwich: { increment: attack.is_wide_sandwich ? 1 : 0 },
               ...(loss != null && { totalExtractedLamports: { increment: loss } }),
               totalAttacksInSlots: { increment: 1 },
             },

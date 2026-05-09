@@ -131,6 +131,12 @@ model ValidatorStats {
   totalExtractedLamports Float    @default(0) @map("total_extracted_lamports")
   totalAttacksInSlots    Int      @default(0) @map("total_attacks_in_slots")
 
+  // Leader-slot tracking from RPC (correct denominator for involvement rates)
+  // leaderSlotsByEpoch: { [epochNumber]: completedLeaderSlotsInThatEpoch }
+  // leaderSlotsObserved is the running sum of all values in leaderSlotsByEpoch.
+  leaderSlotsObserved    BigInt   @default(0) @map("leader_slots_observed")
+  leaderSlotsByEpoch     Json     @default("{}") @map("leader_slots_by_epoch")
+
   riskScore              Float?   @map("risk_score")
   riskLevel              String   @default("unrated") @map("risk_level")
 

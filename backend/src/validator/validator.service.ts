@@ -159,17 +159,25 @@ export class ValidatorService {
 
   private async enrichAll(validators: ValidatorStats[]): Promise<EnrichedValidator[]> {
     const identities = validators.map((v) => v.identity);
-    const [abuseMap, trendMap] = await Promise.all([
+    const [abuseMap, trendMap, distinctSlotMap] = await Promise.all([
       this.computeConsecutiveAbuseMap(identities),
       this.computeTrendMap(identities),
+      this.computeDistinctAttackSlotMap(identities),
     ]);
 
     return validators.map((v) => {
-      const totalSlots = v.totalSlotsSeen;
-      const sandwichRate = totalSlots > 0 ? v.slotsWithSandwich / totalSlots : 0;
-      const wideRate = totalSlots > 0 ? v.slotsWithWideSandwich / totalSlots : 0;
+      const leaderSlots = Number(v.leaderSlotsObserved);
+      const distinct = distinctSlotMap.get(v.identity) ?? { sandwich: 0, wide: 0 };
+      // Rates are clamped to 1 — unlikely but possible if a leader's attacks
+      // straddle a leader-slot snapshot boundary.
+      const sandwichRate = leaderSlots > 0
+        ? Math.min(1, distinct.sandwich / leaderSlots)
+        : 0;
+      const wideRate = leaderSlots > 0
+        ? Math.min(1, distinct.wide / leaderSlots)
+        : 0;
       const extractedSol = Number(v.totalExtractedLamports) / 1e9;
-      const avgExtraction = totalSlots > 0 ? extractedSol / totalSlots : 0;
+      const avgExtraction = leaderSlots > 0 ? extractedSol / leaderSlots : 0;
 
       const raw: MetricsRaw = {
         sandwichInvolvementRate: sandwichRate,
@@ -178,7 +186,7 @@ export class ValidatorService {
         totalExtractedSol: extractedSol,
         avgExtractionPerSlot: avgExtraction,
         recentTrend: trendMap.get(v.identity) ?? 'stable',
-        observedSlots: totalSlots,
+        observedSlots: leaderSlots,
       };
 
       return { v, raw };
@@ -214,6 +222,52 @@ export class ValidatorService {
         if (sorted[i] - sorted[i - 1] === 1n) consecutive++;
       }
       map.set(identity, consecutive);
+    }
+    return map;
+  }
+
+  /**
+   * For each validator, count the distinct slots that contained at least one
+   * sandwich-class attack and at least one wide-sandwich attack. Distinct-slot
+   * counting (vs raw attack counting) keeps the rates true ratios — a single
+   * slot with N stacked sandwiches contributes 1, not N.
+   */
+  private async computeDistinctAttackSlotMap(
+    identities: string[],
+  ): Promise<Map<string, { sandwich: number; wide: number }>> {
+    const map = new Map<string, { sandwich: number; wide: number }>();
+    if (identities.length === 0) return map;
+
+    const attacks = await this.prisma.mevAttack.findMany({
+      where: { leaderIdentity: { in: identities } },
+      select: { leaderIdentity: true, slot: true, type: true },
+    });
+
+    const sandwichSlots = new Map<string, Set<bigint>>();
+    const wideSlots = new Map<string, Set<bigint>>();
+
+    const isSandwich = (t: string) => t !== 'backrun';
+    const isWide = (t: string) => t === 'wide_sandwich';
+
+    for (const a of attacks) {
+      if (!a.leaderIdentity) continue;
+      if (isSandwich(a.type)) {
+        let set = sandwichSlots.get(a.leaderIdentity);
+        if (!set) sandwichSlots.set(a.leaderIdentity, (set = new Set()));
+        set.add(a.slot);
+      }
+      if (isWide(a.type)) {
+        let set = wideSlots.get(a.leaderIdentity);
+        if (!set) wideSlots.set(a.leaderIdentity, (set = new Set()));
+        set.add(a.slot);
+      }
+    }
+
+    for (const id of identities) {
+      map.set(id, {
+        sandwich: sandwichSlots.get(id)?.size ?? 0,
+        wide: wideSlots.get(id)?.size ?? 0,
+      });
     }
     return map;
   }
