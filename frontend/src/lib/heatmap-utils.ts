@@ -18,12 +18,12 @@ export function getAttackCount(dayIndex: number, hour: number): number {
 }
 
 export function getHeatColor(count: number): string {
-  if (count === 0) return 'bg-white/[0.03]';
-  if (count < 20) return 'bg-red-500/10';
-  if (count < 40) return 'bg-red-500/20';
-  if (count < 60) return 'bg-red-500/35';
-  if (count < 80) return 'bg-red-500/50';
-  return 'bg-red-500/70';
+  if (count === 0) return 'bg-on-surf/5';
+  if (count < 20) return 'bg-red-500/25';
+  if (count < 40) return 'bg-red-500/40';
+  if (count < 60) return 'bg-red-500/55';
+  if (count < 80) return 'bg-red-500/70';
+  return 'bg-red-500/85';
 }
 
 /** @deprecated Use getHeatColor instead */

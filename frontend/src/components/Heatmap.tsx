@@ -89,15 +89,15 @@ export default function Heatmap({ data: externalData, days = DEFAULT_DAYS }: Hea
       )}
 
       {/* Legend */}
-      <div className="flex items-center justify-end gap-1.5 mt-3 text-[10px] text-[#8892ab]">
+      <div className="flex items-center justify-end gap-1.5 mt-3 text-[10px] text-muted">
         <span>Less</span>
         <div className="flex gap-[2px]">
-          <div className="w-3 h-3 bg-white/[0.03] rounded-[2px]" />
-          <div className="w-3 h-3 bg-red-500/10 rounded-[2px]" />
-          <div className="w-3 h-3 bg-red-500/20 rounded-[2px]" />
-          <div className="w-3 h-3 bg-red-500/35 rounded-[2px]" />
-          <div className="w-3 h-3 bg-red-500/50 rounded-[2px]" />
+          <div className="w-3 h-3 bg-on-surf/5 rounded-[2px]" />
+          <div className="w-3 h-3 bg-red-500/25 rounded-[2px]" />
+          <div className="w-3 h-3 bg-red-500/40 rounded-[2px]" />
+          <div className="w-3 h-3 bg-red-500/55 rounded-[2px]" />
           <div className="w-3 h-3 bg-red-500/70 rounded-[2px]" />
+          <div className="w-3 h-3 bg-red-500/85 rounded-[2px]" />
         </div>
         <span>More</span>
       </div>
