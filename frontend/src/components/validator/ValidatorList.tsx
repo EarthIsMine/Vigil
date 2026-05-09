@@ -79,7 +79,7 @@ export default function ValidatorList({ validators }: ValidatorListProps) {
                             ? `${v.identity.slice(0, 8)}…${v.identity.slice(-6)}`
                             : v.identity}
                         </code>
-                        <CopyAddressButton address={v.identity} iconClassName="text-xs" />
+                        <CopyAddressButton address={v.identity} />
                       </div>
                     </div>
 
