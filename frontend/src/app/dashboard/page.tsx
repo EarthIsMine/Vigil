@@ -29,23 +29,24 @@ export default function DashboardPage() {
             <StatsSection />
           </Suspense>
 
-          <div className="grid grid-cols-1 lg:grid-cols-[2fr_1fr] gap-12 mb-14">
+          <div className="mb-14">
             <Suspense fallback={<ChartSkeleton />}>
               <ChartSection />
             </Suspense>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 mb-14">
             <Suspense fallback={<LeaderboardSkeleton />}>
               <ValidatorLeaderboardSection />
             </Suspense>
-          </div>
-
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
             <Suspense fallback={<LeaderboardSkeleton />}>
               <PoolLeaderboardSection />
             </Suspense>
-            <Suspense fallback={<LiveFeedSkeleton />}>
-              <LiveFeedFetcher />
-            </Suspense>
           </div>
+
+          <Suspense fallback={<LiveFeedSkeleton />}>
+            <LiveFeedFetcher />
+          </Suspense>
         </div>
       </main>
     </div>
