@@ -46,6 +46,15 @@ export class AttacksService {
         dlmmReplay: a.dlmmReplay,
         victimLossLamports: a.victimLossLamports,
       }),
+      // Engine confidence interval — detector emits replay-derived
+      // lower/upper bounds; null when replay didn't enrich.
+      victimLossSolLower:
+        a.victimLossLamportsLower != null ? a.victimLossLamportsLower / 1e9 : null,
+      victimLossSolUpper:
+        a.victimLossLamportsUpper != null ? a.victimLossLamportsUpper / 1e9 : null,
+      // Structured evidence categories from detector. Pass-through jsonb;
+      // FE narrows when needed.
+      evidence: a.evidence ?? null,
     }));
   }
 }

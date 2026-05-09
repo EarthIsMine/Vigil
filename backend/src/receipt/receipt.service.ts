@@ -149,6 +149,15 @@ export class ReceiptService {
       bundleProvenance,
       lossSource,
       replayTrace,
+      victimLossSolLower:
+        attack?.victimLossLamportsLower != null
+          ? attack.victimLossLamportsLower / 1e9
+          : null,
+      victimLossSolUpper:
+        attack?.victimLossLamportsUpper != null
+          ? attack.victimLossLamportsUpper / 1e9
+          : null,
+      evidence: attack?.evidence ?? null,
       attackDetail: {
         kind: 'sandwich',
         attackerAddress: attack?.attacker ?? '',
