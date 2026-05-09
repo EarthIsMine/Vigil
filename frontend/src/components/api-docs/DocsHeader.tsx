@@ -52,13 +52,6 @@ export default function DocsHeader() {
 
       {/* Right: Actions */}
       <div className="flex items-center gap-4 flex-shrink-0">
-        <a
-          href="#"
-          className="hidden sm:inline-flex items-center gap-1.5 text-sm text-muted hover:text-on-surf transition"
-        >
-          <span className="material-symbols-outlined text-base leading-none">help</span>
-          {t.header.getHelp}
-        </a>
         <Link
           href="/"
           className="inline-flex items-center gap-1 px-3 py-1.5 text-sm font-medium text-white bg-accent-blue hover:bg-blue-600 rounded-md transition"

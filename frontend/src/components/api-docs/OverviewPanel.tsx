@@ -130,7 +130,7 @@ export default function OverviewPanel() {
       <button
         type="button"
         onClick={() => setActiveDocPage('gettingStarted:quickstart')}
-        className="inline-flex items-center gap-1 px-4 py-2 text-sm font-medium text-on-primary bg-primary hover:bg-primary-container rounded-md transition mb-12"
+        className="inline-flex items-center gap-1 px-4 py-2 text-sm font-medium text-white bg-accent-blue hover:bg-blue-600 rounded-md transition mb-12"
       >
         {isKo ? '빠른 시작' : 'Get Started'}
         <span className="material-symbols-outlined text-base leading-none">arrow_forward</span>

@@ -3,7 +3,6 @@ export type Lang = 'en' | 'ko';
 export const STRINGS = {
   en: {
     header: {
-      getHelp: 'Get Help',
       mainSite: 'Main Site',
       searchPlaceholder: 'Search...',
       themeLight: 'Switch to light mode',
@@ -113,7 +112,6 @@ export const STRINGS = {
   },
   ko: {
     header: {
-      getHelp: '도움말',
       mainSite: '메인 사이트',
       searchPlaceholder: '검색...',
       themeLight: '라이트 모드로 전환',
