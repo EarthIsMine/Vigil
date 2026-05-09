@@ -36,9 +36,16 @@ export default function EngineEvidence({ attacks }: Props) {
   // Engine flags rule-based detections where the counterfactual replay
   // shows the attacker actually lost SOL on the round-trip. We surface
   // this as the false-positive screen — Vigil's honesty differentiator.
-  const counterfactualFlips = attacks.filter(
-    (a) => a.victim.expectedAmountOut > 0 && a.victim.amountOut > a.victim.expectedAmountOut,
-  ).length;
+  const counterfactualFlips = attacks.filter((a) => {
+    const expected = a.victim?.expectedAmountOut;
+    const actual = a.victim?.amountOut;
+    return (
+      typeof expected === 'number' &&
+      typeof actual === 'number' &&
+      expected > 0 &&
+      actual > expected
+    );
+  }).length;
 
   const sourceCounts: Record<string, number> = {};
   for (const a of attacks) {
@@ -103,7 +110,7 @@ export default function EngineEvidence({ attacks }: Props) {
           {sourceEntries.map(([src, count]) => (
             <li key={src} className="flex items-center gap-2">
               <span
-                className={`w-2 h-2 rounded-sm flex-shrink-0 ${REPLAY_COLOR[src] ?? 'bg-muted/40'}`}
+                className={`w-2 h-2 rounded-sm shrink-0 ${REPLAY_COLOR[src] ?? 'bg-muted/40'}`}
               />
               <span className="text-on-surf/85">{REPLAY_LABEL[src] ?? src}</span>
               <span className="text-muted font-mono ml-auto tabular-nums">

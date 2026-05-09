@@ -6,7 +6,10 @@ export function useActiveSection(sectionIds: readonly string[]): string {
   const [activeSection, setActiveSection] = useState(sectionIds[0] ?? '');
 
   useEffect(() => {
-    if (sectionIds.length === 0) return;
+    if (sectionIds.length === 0) {
+      setActiveSection('');
+      return;
+    }
 
     const compute = () => {
       const doc = document.documentElement;
