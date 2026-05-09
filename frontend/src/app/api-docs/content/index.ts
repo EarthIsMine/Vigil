@@ -45,7 +45,11 @@ function sanitizeSection(body: string): string {
     .trim();
 }
 
-function splitByH2(markdown: string, introTitleFallback: string): ParsedDoc {
+function splitByH2(
+  markdown: string,
+  introTitleFallback: string,
+  canonicalIds?: string[],
+): ParsedDoc {
   const slugger = new GithubSlugger();
   const lines = markdown.split('\n');
   const sections: { title: string; bodyLines: string[] }[] = [];
@@ -79,12 +83,24 @@ function splitByH2(markdown: string, introTitleFallback: string): ParsedDoc {
       title: introTitleFallback,
       body: sanitizeSection(introLines.join('\n')),
     },
-    sections: sections.map((s) => ({
-      id: slugger.slug(s.title),
+    sections: sections.map((s, i) => ({
+      id: canonicalIds?.[i] ?? slugger.slug(s.title),
       title: s.title,
       body: sanitizeSection(s.bodyLines.join('\n')),
     })),
   };
+}
+
+function buildBilingual(
+  enRaw: string,
+  koRaw: string,
+  enIntroTitle: string,
+  koIntroTitle: string,
+): BilingualDoc {
+  const en = splitByH2(enRaw, enIntroTitle);
+  const canonicalIds = en.sections.map((s) => s.id);
+  const ko = splitByH2(koRaw, koIntroTitle, canonicalIds);
+  return { en, ko };
 }
 
 export interface BilingualDoc {
@@ -93,18 +109,9 @@ export interface BilingualDoc {
 }
 
 export const DOCS = {
-  detectorReadme: {
-    en: splitByH2(detectorReadmeEn, 'Overview'),
-    ko: splitByH2(detectorReadmeKo, '개요'),
-  },
-  detectorDesign: {
-    en: splitByH2(detectorDesignEn, 'Overview'),
-    ko: splitByH2(detectorDesignKo, '개요'),
-  },
-  rpcReadme: {
-    en: splitByH2(rpcReadmeEn, 'Overview'),
-    ko: splitByH2(rpcReadmeKo, '개요'),
-  },
+  detectorReadme: buildBilingual(detectorReadmeEn, detectorReadmeKo, 'Overview', '개요'),
+  detectorDesign: buildBilingual(detectorDesignEn, detectorDesignKo, 'Overview', '개요'),
+  rpcReadme: buildBilingual(rpcReadmeEn, rpcReadmeKo, 'Overview', '개요'),
 } satisfies Record<string, BilingualDoc>;
 
 export type DocKey = keyof typeof DOCS;
